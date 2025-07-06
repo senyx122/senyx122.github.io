@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hidden Directory - CTF Writeup | SenyX122</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inconsolata', monospace;
+        background: #0f0f0f;
+        color: #ccc;
+        padding: 40px;
+        max-width: 800px;
+        margin: auto;
+    }
+    h1, h2 {
+        color: #00ff88;
+        border-bottom: 1px dashed #333;
+        padding-bottom: 5px;
+    }
+    code, pre {
+        background: #111;
+        color: #00d4ff;
+        padding: 8px;
+        border-radius: 6px;
+        display: block;
+        overflow-x: auto;
+        margin: 15px 0;
+    }
+    a {
+        color: #00d4ff;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #ff4081;
+    }
+    footer {
+        text-align: center;
+        margin-top: 60px;
+        font-size: 0.9em;
+        color: #555;
+    }
+</style>
+</head>
+<body>
+
+<h1> CyberTalents CTF - Hidden Directory</h1>
+
+<h2> Challenge Description</h2>
+<p><em>Can you find the hidden directory on the target web app?</em><br>
+<strong>Flag is just the directory name.</strong></p>
+
+<h2> Target</h2>
+<pre>3.101.91.247</pre>
+
+<h2> Recon & Enumeration</h2>
+<h3> Nmap scan</h3>
+<pre>
+nmap -sV -sS -sC -T4 3.101.91.247
+</pre>
+
+<p><strong>Results:</strong></p>
+<pre>
+22/tcp   open     ssh     OpenSSH 7.6p1
+25/tcp   filtered smtp
+80/tcp   open     http    Apache 2.4.29
+2525/tcp filtered ms-v-worlds
+</pre>
+
+<h3> Web scan</h3>
+<p>Opened the IP in browser → Default Apache page.<br>
+Used <code>http-enum</code> script in Nmap which found:</p>
+<pre>
+/secret/: Potentially interesting folder
+</pre>
+
+<h2> Flag</h2>
+<p>As stated, flag is the directory name.</p>
+<pre>secret</pre>
+
+<h2>🛠 Tools Used</h2>
+<ul>
+    <li><strong>nmap</strong> <code>-sV -sS -sC -T4</code></li>
+</ul>
+
+<h2> Summary</h2>
+<table style="width:100%; border-collapse:collapse;">
+    <tr style="border-bottom:1px dashed #333;">
+        <td>Target</td>
+        <td>3.101.91.247</td>
+    </tr>
+    <tr style="border-bottom:1px dashed #333;">
+        <td>Interesting Dir</td>
+        <td>/secret/</td>
+    </tr>
+    <tr>
+        <td>Flag</td>
+        <td>secret</td>
+    </tr>
+</table>
+
+<footer>
+    &copy; 2025 SenyX122 |
+</footer>
+
+</body>
+</html>
