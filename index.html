@@ -25,6 +25,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        flex-shrink: 0;
     }
     .sidebar img {
         width: 150px;
@@ -59,7 +60,18 @@
     .sidebar a.active, .sidebar a:hover {
         color: #ff4081;
     }
-
+    .theme-toggle {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .theme-toggle button {
+        background: #00ff88;
+        color: #000;
+        border: none;
+        padding: 8px 14px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
     .main {
         flex: 1;
         padding: 40px;
@@ -123,20 +135,8 @@
         background: #00d4ff;
         color: #fff;
     }
-    .theme-toggle {
-        margin-top: 20px;
-        text-align: center;
-    }
-    .theme-toggle button {
-        background: #00ff88;
-        color: #000;
-        border: none;
-        padding: 8px 14px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
 
-    /* Light mode improved */
+    /* Light mode */
     .light-mode {
         background: #fdfdfd;
         color: #222;
@@ -151,8 +151,7 @@
     .light-mode .sidebar a {
         color: #0077ff;
     }
-    .light-mode .sidebar a.active, 
-    .light-mode .sidebar a:hover {
+    .light-mode .sidebar a.active, .light-mode .sidebar a:hover {
         color: #ff4081;
     }
     .light-mode h2 {
@@ -184,8 +183,46 @@
     .light-mode #scrollTopBtn:hover {
         background: #0077cc;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .wrapper {
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            box-shadow: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .sidebar img {
+            width: 100px;
+            height: 100px;
+            margin: 0 10px 10px;
+        }
+        .sidebar h1, .sidebar p {
+            width: 100%;
+            text-align: center;
+        }
+        .sidebar a {
+            margin: 6px 10px;
+            font-size: 0.9em;
+        }
+        .theme-toggle {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .main {
+            padding: 20px;
+        }
+    }
 </style>
-  
+
 </head>
 <body>
 
