@@ -3,55 +3,76 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>seny | InfoSec Portfolio</title>
-<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+<title>SenyX122 | PenTester</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
 <style>
     body {
+        margin: 0;
+        font-family: 'Inconsolata', monospace;
         background: #0f0f0f;
         color: #ccc;
-        font-family: 'Inconsolata', monospace;
-        margin: 0;
-        padding: 0;
+        transition: background 0.5s, color 0.5s;
     }
-    header {
-        text-align: center;
-        padding: 40px 20px 20px;
+    .wrapper {
+        display: flex;
+        min-height: 100vh;
     }
-    header img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 3px solid #00ff88;
-        margin-bottom: 15px;
-    }
-    header h1 {
-        color: #00ff88;
-        margin-bottom: 5px;
-    }
-    header p {
-        font-size: 1.1em;
-    }
-    nav {
-        text-align: center;
+    .sidebar {
+        width: 260px;
         background: #111;
-        padding: 10px 0;
+        padding: 30px 20px;
+        box-shadow: 2px 0 15px rgba(0,255,136,0.3);
+        position: sticky;
+        top: 0;
+        height: 100vh;
     }
-    nav a {
+    .sidebar img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: block;
+        margin: 0 auto 15px;
+        border: 4px solid #00ff88;
+        box-shadow: 0 0 20px #00ff88;
+        transition: transform 0.3s;
+    }
+    .sidebar img:hover {
+        transform: scale(1.1);
+    }
+    .sidebar h1 {
+        text-align: center;
+        color: #00ff88;
+        margin-bottom: 10px;
+    }
+    .sidebar p {
+        text-align: center;
+        font-size: 0.95em;
+    }
+    .sidebar a {
+        display: block;
         color: #00d4ff;
-        margin: 0 15px;
         text-decoration: none;
-        font-size: 1.1em;
+        margin: 12px 0;
+        text-align: center;
+        transition: color 0.3s;
     }
-    nav a:hover {
+    .sidebar a.active, .sidebar a:hover {
         color: #ff4081;
     }
-    .container {
-        max-width: 900px;
-        margin: auto;
-        padding: 20px;
+
+    .main {
+        flex: 1;
+        padding: 40px;
     }
     section {
-        margin-bottom: 50px;
+        margin-bottom: 80px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s;
+    }
+    section.visible {
+        opacity: 1;
+        transform: translateY(0);
     }
     h2 {
         color: #00ff88;
@@ -63,91 +84,253 @@
         list-style: none;
         padding: 0;
     }
-    ul li::before {
-        content: "▸";
-        color: #00d4ff;
-        margin-right: 8px;
+    ul li {
+        padding: 6px 0;
+        border-bottom: 1px dashed #222;
+    }
+    ul li:last-child {
+        border-bottom: none;
     }
     a {
         color: #00d4ff;
         text-decoration: none;
     }
     a:hover {
-        text-decoration: underline;
         color: #ff4081;
     }
     footer {
         text-align: center;
-        padding: 20px;
+        padding: 15px;
         background: #111;
         color: #555;
     }
+    #scrollTopBtn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #00ff88;
+        color: #000;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: none;
+        font-size: 15px;
+        box-shadow: 0 0 10px #00ff88;
+        transition: background 0.3s;
+    }
+    #scrollTopBtn:hover {
+        background: #00d4ff;
+        color: #fff;
+    }
+    .theme-toggle {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .theme-toggle button {
+        background: #00ff88;
+        color: #000;
+        border: none;
+        padding: 8px 14px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    /* Light mode improved */
+    .light-mode {
+        background: #fdfdfd;
+        color: #222;
+    }
+    .light-mode .sidebar {
+        background: #f0f0f0;
+        box-shadow: 2px 0 15px rgba(0,200,136,0.2);
+    }
+    .light-mode .sidebar h1 {
+        color: #00aa66;
+    }
+    .light-mode .sidebar a {
+        color: #0077ff;
+    }
+    .light-mode .sidebar a.active, 
+    .light-mode .sidebar a:hover {
+        color: #ff4081;
+    }
+    .light-mode h2 {
+        color: #00aa66;
+        border-bottom: 1px dashed #888;
+    }
+    .light-mode ul li {
+        border-bottom: 1px dashed #ccc;
+    }
+    .light-mode a {
+        color: #0077cc;
+    }
+    .light-mode a:hover {
+        color: #ff4081;
+    }
+    .light-mode footer {
+        background: #f0f0f0;
+        color: #555;
+    }
+    .light-mode .sidebar img {
+        border-color: #00aa66;
+        box-shadow: 0 0 15px #00aa66;
+    }
+    .light-mode #scrollTopBtn {
+        background: #00aa66;
+        color: #fff;
+        box-shadow: 0 0 8px #00aa66;
+    }
+    .light-mode #scrollTopBtn:hover {
+        background: #0077cc;
+    }
 </style>
+  
 </head>
 <body>
 
-<header>
-    <img src="https://i.pinimg.com/originals/e3/08/7d/e3087d984951a5cfd5f5fc952e4b77f7.jpg" alt="seny">
-    <h1>👋 Hey, I'm seny</h1>
-    <p>🇪🇬 Egypt | InfoSec Researcher | CTF Player | Ethical Hacker Wannabe</p>
-</header>
+<div class="wrapper">
+    <div class="sidebar">
+        <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="seny">
+        <h1><span id="typing"></span></h1>
+        <p>🇪🇬 Egypt<br>Bug Hunter | CTF | PenTester</p>
+        <a href="#tools">Tools & Skills</a>
+        <a href="#certs">Certifications</a>
+        <a href="#writeups">Writeups</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <div class="theme-toggle">
+            <button onclick="toggleTheme()">Toggle Theme</button>
+        </div>
+    </div>
 
-<nav>
-    <a href="#tools">Tools</a>
-    <a href="#certs">Certifications</a>
-    <a href="#writeups">Writeups</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-</nav>
+    <div class="main">
+        <section id="tools">
+            <h2> Tools & Skills</h2>
+            <ul>
+                <li>Linux (Kali, Parrot)</li>
+                <li>Burp Suite, Nmap, Gobuster, SQLMap, Nikto</li>
+                <li>Python, Bash Scripting</li>
+                <li>Web Exploitation, Privilege Escalation</li>
+            </ul>
+        </section>
 
-<div class="container">
-    <section id="tools">
-        <h2>🛠 Tools & Skills</h2>
-        <ul>
-            <li>Linux (Kali, Parrot)</li>
-            <li>Burp Suite, Nmap, Gobuster, SQLMap, Nikto</li>
-            <li>Python, Bash Scripting</li>
-            <li>Web Exploitation, Privilege Escalation</li>
-        </ul>
-    </section>
+        <section id="certs">
+            <h2> Certifications</h2>
+            <ul>
+                <li>TryHackMe Advent of Cyber 2024</li>
+                <li>Hack The Box Starting Point</li>
+                <li>OWASP Top 10</li>
+            </ul>
+        </section>
 
-    <section id="certs">
-        <h2>🎯 Certifications</h2>
-        <ul>
-            <li>TryHackMe Advent of Cyber 2024</li>
-            <li>Hack The Box Starting Point</li>
-            <li>OWASP Top 10</li>
-        </ul>
-    </section>
+     <section id="writeups">
+    <h2>✍ Writeups</h2>
+    <ul>
+        <li><a href="#">Injector - CTF Writeup</a></li>
+        <li><a href="#">Shadower Machine</a></li>
+        <li><a href="#">Mess Me</a></li>
+        <li><a href="#">HackVuln Labs</a></li>
+        <li><a href="#">BlogX Vuln</a></li>
+    </ul>
+    <p style="text-align:center; margin-top: 10px;">
+        Showing last 5 writeups —
+        <a href="writeups.html" style="color: #00d4ff;">More &raquo;</a>
+    </p>
+</section>
 
-    <section id="writeups">
-        <h2>✍ Writeups</h2>
-        <ul>
-            <li><a href="https://github.com/seny/ctf-writeups/blob/main/injector.md">Injector - CTF Writeup</a></li>
-            <li><a href="#">Shadower Machine</a></li>
-            <li><a href="#">Mess Me</a></li>
-        </ul>
-    </section>
 
-    <section id="about">
-        <h2>🚀 About Me</h2>
-        <p>Little boy has little dreams, a noob, a geek and a hacker wannabe. I like exploiting boxes, reading payloads, and living the terminal life 🐚.</p>
-    </section>
+        <section id="about">
+            <h2> About Me</h2>
+            <p>Little boy with little dreams, a noob, a geek, a hacker wannabe. I enjoy popping boxes, reading payloads, and living the terminal life .</p>
+        </section>
 
-    <section id="contact">
-        <h2>🔗 Contacts & Social</h2>
-        <p>
-            <a href="https://github.com/seny">GitHub</a> |
-            <a href="https://t.me/seny_hacker">Telegram</a> |
-            <a href="mailto:seny@example.com">Email</a>
-        </p>
-    </section>
+        <section id="contact">
+            <h2>🔗 Contact & Social</h2>
+            <p>
+                <a href="https://github.com/seny">GitHub</a> |
+                <a href="https://t.me/seny_hacker">Telegram</a> |
+                <a href="mailto:seny@example.com">Email</a>
+            </p>
+        </section>
+    </div>
 </div>
 
 <footer>
-    &copy; 2025 seny | Crafted with 💻 and ☕
+    &copy; 2025 SenyX122 |
 </footer>
+
+<button id="scrollTopBtn">↑ Top</button>
+
+<script>
+    // Typing animation
+    const words = ["Hey, I'm Seny!", "CTF Player", "Ethical Hacker"];
+    let i = 0, timer;
+    function typingEffect() {
+        let word = words[i].split("");
+        const loopTyping = function() {
+            if (word.length > 0) {
+                document.getElementById("typing").innerHTML += word.shift();
+            } else {
+                deletingEffect();
+                return;
+            }
+            timer = setTimeout(loopTyping, 150);
+        };
+        loopTyping();
+    }
+    function deletingEffect() {
+        let word = words[i].split("");
+        const loopDeleting = function() {
+            if (word.length > 0) {
+                word.pop();
+                document.getElementById("typing").innerHTML = word.join("");
+            } else {
+                i = (i + 1) % words.length;
+                typingEffect();
+                return;
+            }
+            timer = setTimeout(loopDeleting, 100);
+        };
+        setTimeout(loopDeleting, 1500);
+    }
+    typingEffect();
+
+    // Highlight active link
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.sidebar a');
+    window.addEventListener('scroll', () => {
+        let current = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (scrollY >= sectionTop) current = section.getAttribute('id');
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === "#" + current) link.classList.add('active');
+        });
+    });
+
+    // Scroll to top
+    const scrollBtn = document.getElementById("scrollTopBtn");
+    window.onscroll = () => {
+        scrollBtn.style.display = document.documentElement.scrollTop > 200 ? "block" : "none";
+    };
+    scrollBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+
+    // Animate sections on scroll
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.2 });
+    sections.forEach(section => observer.observe(section));
+
+    // Dark/Light toggle
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+    }
+</script>
 
 </body>
 </html>
-
