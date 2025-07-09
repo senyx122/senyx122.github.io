@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subdomain Recon Roadmap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      color: #ccc;
+      font-family: 'Inconsolata', monospace;
+      padding: 20px;
+      line-height: 1.7;
+    }
+    h1, h2 {
+      color: #00ff88;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h2 {
+      border-bottom: 1px dashed #333;
+      padding-bottom: 5px;
+      margin-top: 50px;
+    }
+    pre {
+      background: #111;
+      color: #00d4ff;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      box-shadow: 0 0 8px #00ff88;
+    }
+    .section {
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    a {
+      color: #00d4ff;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #ff4081;
+    }
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Subdomain Recon Roadmap</h1>
+
+  <div class="section">
+    <h2>1. Identify the target</h2>
+    <p>Start by choosing the main domain you want to test, e.g. <code>example.com</code>.
+    You usually get this from bug bounty platforms such as HackerOne or Bugcrowd.
+    Make sure you review the scope and authorization before proceeding.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Discover subdomains</h2>
+    <p>Use a mix of tools to maximize your coverage. Different tools pull from different sources.</p>
+    <pre>
+subfinder -d example.com -o subfinder.txt
+assetfinder --subs-only example.com > assetfinder.txt
+amass enum -passive -d example.com -o amass.txt
+dnsx -w /usr/share/wordlists/amass/subdomains-top1mil-110000.txt -d example.com -silent -o dnsx.txt
+curl -s "https://crt.sh/?q=%25.example.com&output=json" | jq -r '.[].name_value' | sort -u > crtsh.txt
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>3. Merge and remove duplicates</h2>
+    <p>Combine results from all tools into one file and sort to keep only unique subdomains.</p>
+    <pre>
+cat subfinder.txt assetfinder.txt amass.txt crtsh.txt dnsx.txt > all_subs.txt
+sort -u all_subs.txt > unique_subs.txt
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>4. Check for live subdomains</h2>
+    <p>Test which subdomains respond over HTTP/HTTPS. This helps focus on active assets only.</p>
+    <pre>
+httpx -l unique_subs.txt -o live_subs.txt
+cat unique_subs.txt | httprobe > live_subs.txt
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>5. Check for subdomain takeover</h2>
+    <p>Look for dangling DNS records that may allow an attacker to claim the subdomain.</p>
+    <pre>
+subjack -w unique_subs.txt -t 50 -timeout 30 -o takeover.txt -ssl
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>6. Detect technologies and vulnerabilities</h2>
+    <p>Fingerprint technologies used by the site and run port/service scans.</p>
+    <pre>
+whatweb -i live_subs.txt -o whatweb.txt
+nmap -iL live_subs.txt -sV -T4 -oN nmap_scan.txt
+npx wappalyzer https://sub.example.com
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>7. Additional recon tools</h2>
+    <p>Get historical URLs, parameters and more surface area for fuzzing.</p>
+    <pre>
+gau example.com > urls.txt
+cat subs.txt | waybackurls > wb_urls.txt
+dnsx -l subs.txt -a -resp
+naabu -iL live_subs.txt -o ports.txt
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>8. Quick example workflow</h2>
+    <p>Run a simple chain to quickly enumerate, probe, and scan.</p>
+    <pre>
+subfinder -d target.com -o s1.txt
+assetfinder --subs-only target.com > s2.txt
+dnsx -w /usr/share/wordlists/amass/subdomains-top1mil-110000.txt -d target.com -silent -o s3.txt
+
+cat s*.txt > all.txt
+sort -u all.txt > subs.txt
+
+httpx -l subs.txt -o live.txt
+subjack -w subs.txt -t 50 -o takeover.txt -ssl
+whatweb -i live.txt -o whatweb.txt
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>9. JS files and parameters discovery</h2>
+    <p>Extract JavaScript files and URL parameters for further testing like XSS or token leaks.</p>
+    <pre>
+awk '/\.js(\?|$)/ {print}' urls.txt > js_links.txt
+cat js_links.txt | mantra
+mkdir js && cd js && wget -i ../js_links.txt
+cat urls.txt | grep -oP '\?\K[^ ]+' | sort -u
+    </pre>
+  </div>
+
+  <footer>Keep learning. Every subdomain is a potential entry point.</footer>
+
+  <script>
+    const sections = document.querySelectorAll('.section');
+    function checkVisibility() {
+      const triggerBottom = window.innerHeight * 0.85;
+      sections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        if(sectionTop < triggerBottom) {
+          section.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', checkVisibility);
+    window.addEventListener('load', checkVisibility);
+  </script>
+</body>
+</html>
