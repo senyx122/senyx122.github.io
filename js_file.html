@@ -1,216 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>JSMap Inspector</title>
-  <style>
-    body {
-      font-family: monospace;
-      margin: 0;
-      background: #101010;
-      color: #a8ff60;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      background: #151515;
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      border-bottom: 1px solid #333;
-    }
-    input, button {
-      background: #202020;
-      color: #a8ff60;
-      border: 1px solid #555;
-      padding: 6px;
-    }
-    #searchInput {
-      font-family: monospace;
-      background: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      padding: 6px;
-      width: 200px;
-    }
-    main {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-    #treeView {
-      width: 35%;
-      overflow-y: auto;
-      border-right: 1px solid #333;
-      padding: 10px;
-    }
-    #preview {
-      flex: 1;
-      background: #1e1e1e;
-      color: #ccc;
-      padding: 15px;
-      overflow-y: auto;
-    }
-    ul {
-      list-style: none;
-      padding-left: 20px;
-    }
-    .folder {
-      cursor: pointer;
-      color: #66ff99;
-    }
-    .file {
-      cursor: pointer;
-      color: #99ffcc;
-      text-decoration: underline;
-    }
-    .hidden {
-      display: none;
-    }
-    pre code {
-      font-size: 14px;
-      line-height: 1.5em;
-    }
-    footer {
-      background: #151515;
-      color: #666;
-      text-align: center;
-      padding: 5px;
-      border-top: 1px solid #333;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>JavaScript Analyzer - PayloadLab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+ <style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  body {
+    background-color: #000000;
+    color: #c9d1d9;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background-color: #0d0d0d;
+    padding: 30px;
+    text-align: center;
+    border-bottom: 1px solid #222;
+  }
+
+  h1 {
+    margin: 0;
+    color: #00ff99;
+    font-size: 28px;
+    text-shadow: 0 0 5px #00ff99;
+  }
+
+  .container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  /* Neon-style custom file input */
+  .custom-file-input {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    background-color: #00ff99;
+    color: #000;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-bottom: 10px;
+    box-shadow: 0 0 10px #00ff99;
+  }
+
+  .custom-file-input:hover {
+    background-color: #00cc7a;
+  }
+
+  .custom-file-input input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+  }
+
+  button {
+    background-color: #00ff99;
+    color: #000;
+    border: none;
+    padding: 10px 15px;
+    margin: 10px 5px 0 0;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 0 10px #00ff99;
+  }
+
+  button:hover {
+    background-color: #00cc7a;
+  }
+
+  #drop-zone {
+    border: 2px dashed #00ff99;
+    padding: 30px;
+    text-align: center;
+    margin-top: 20px;
+    color: #00ff99;
+    transition: 0.3s;
+    border-radius: 10px;
+  }
+
+  #drop-zone:hover {
+    background-color: #111;
+  }
+
+  #result {
+    background-color: #0d0d0d;
+    border-left: 4px solid #00ff99;
+    margin-top: 20px;
+    padding: 15px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    border-radius: 6px;
+  }
+
+  .highlight {
+    background-color: #ff0044;
+    color: white;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted #ff0044;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: #111;
+    color: #fff;
+    text-align: left;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -110px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .stats {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+  }
+
+  .warning {
+    background-color: #ff004430;
+    color: #ff4d4d;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ff4d4d;
+    border-radius: 5px;
+  }
+</style>
 </head>
 <body>
   <header>
-    <input type="file" id="fileInput" accept=".map">
-    <input type="text" id="searchInput" placeholder="Search...">
+    <h1> JavaScript Code Analyzer  PayloadLab</h1>
   </header>
+  <div class="container">
+    <label class="custom-file-input">
+      Upload JS File
+      <input type="file" id="fileInput" accept=".js">
+    </label>
 
-  <main>
-    <div id="treeView"></div>
-    <div id="preview"><i>Source content will be displayed here</i></div>
-  </main>
+    <button id="downloadBtn" class="btn-download" style="display:none;">Download Beautified Code</button>
+    <button id="exportHtmlBtn" class="btn-download" style="display:none;">Export as HTML</button>
+    <div id="drop-zone">Or drag and drop a JavaScript file here</div>
+    <div class="stats" id="stats"></div>
+    <div id="result"></div>
+    <div id="warning"></div>
+  </div>
 
-  <footer>
-    Powered by mitsec — <a href="https://x.com/ynsmroztas" target="_blank" style="color: #888;">x.com/ynsmroztas</a>
-  </footer>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
   <script>
-    const treeView = document.getElementById('treeView');
-    const preview = document.getElementById('preview');
-    const searchInput = document.getElementById('searchInput');
+    const keywords = [
+      'apikey', 'token', 'secret', 'password', 'eval', 'innerHTML', 'document.cookie', 
+      'localStorage', 'sessionStorage', 'fetch', 'XMLHttpRequest', 'WebSocket', 
+      'Function("', 'atob', 'btoa', 'setTimeout(', 'new Function', 'return this'
+    ];
+
+    const descriptions = {
+      'eval': 'Executes dynamic code - high risk.',
+      'innerHTML': 'Manipulates HTML content - potential XSS risk.',
+      'document.cookie': 'Accessing cookies.',
+      'localStorage': 'Accessing local storage.',
+      'sessionStorage': 'Accessing session storage.',
+      'fetch': 'Fetching data from external sources.',
+      'XMLHttpRequest': 'Manual HTTP requests - can be malicious.',
+      'WebSocket': 'Direct connection - may be used for stealth.',
+      'Function("': 'Dynamic code execution inside Function - suspicious.',
+      'new Function': 'Creates executable code - dangerous.',
+      'return this': 'Old method to access the global object.',
+      'atob': 'Decodes base64 to string.',
+      'btoa': 'Encodes string to base64.',
+      'setTimeout(': 'Can delay malicious actions.',
+      'apikey': 'Sensitive API key.',
+      'token': 'Authentication token.',
+      'secret': 'Secret or password.',
+      'password': 'Password.'
+    };
+
     const fileInput = document.getElementById('fileInput');
-    let fileContents = {};
+    const resultDiv = document.getElementById('result');
+    const statsDiv = document.getElementById('stats');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const exportHtmlBtn = document.getElementById('exportHtmlBtn');
+    const warningDiv = document.getElementById('warning');
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    document.getElementById('drop-zone').addEventListener('dragover', e => e.preventDefault());
+    document.getElementById('drop-zone').addEventListener('drop', e => {
+      e.preventDefault();
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file || !file.name.endsWith('.js')) return alert("Please upload a .js file");
       const reader = new FileReader();
-      reader.onload = function(event) {
-        const content = event.target.result;
-        try {
-          const jsmap = JSON.parse(content);
-          const sources = jsmap.sources || [];
-          const sourcesContent = jsmap.sourcesContent || [];
+      reader.onload = (e) => {
+        const rawCode = e.target.result;
+        const beautified = beautifyCode(rawCode);
+        const highlighted = highlightSensitive(beautified);
+        const stats = analyzeStats(beautified);
 
-          fileContents = {};
-          sources.forEach((src, idx) => {
-            fileContents[src] = sourcesContent[idx] || "(No content)";
-          });
+        resultDiv.innerHTML = highlighted;
+        statsDiv.innerHTML = ` Lines: ${stats.total} |  Sensitive: ${stats.sensitive} |  Words: ${stats.words} |  Variables: ${stats.variables}`;
+        warningDiv.innerHTML = stats.sensitive >= 5 ? `<div class="warning"> High number of sensitive lines detected, review the code carefully!</div>` : '';
 
-          renderTree(buildTree(sources));
-        } catch (err) {
-          alert("Invalid .js.map file.");
-        }
+        prepareDownload(beautified);
+        prepareHTMLDownload(highlighted);
       };
       reader.readAsText(file);
-    });
+    }
 
-    function buildTree(paths) {
-      const root = {};
-      for (const path of paths) {
-        const parts = path.split('/');
-        let current = root;
-        for (const part of parts) {
-          if (!current[part]) current[part] = {};
-          current = current[part];
+    function beautifyCode(code) {
+      return js_beautify(code, { indent_size: 2 });
+    }
+
+    function highlightSensitive(code) {
+      return code.split('\n').map(line => {
+        for (let k of keywords) {
+          if (line.toLowerCase().includes(k.toLowerCase())) {
+            const desc = descriptions[k] || "Sensitive code";
+            return `<span class="tooltip highlight">${escapeHtml(line)}<span class="tooltiptext">${desc}</span></span>`;
+          }
         }
-      }
-      return root;
+        return escapeHtml(line);
+      }).join('\n');
     }
 
-    function renderTree(tree, parent = treeView) {
-      parent.innerHTML = '';
-      const ul = document.createElement('ul');
-      parent.appendChild(ul);
-      renderNode(tree, ul, '');
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[m]));
     }
 
-    function renderNode(node, container, fullPath) {
-      for (const key in node) {
-        const li = document.createElement('li');
-        const path = fullPath ? `${fullPath}/${key}` : key;
-
-        if (Object.keys(node[key]).length === 0) {
-          const span = document.createElement('span');
-          span.textContent = key;
-          span.className = 'file';
-          span.onclick = () => previewFile(path);
-          li.appendChild(span);
-        } else {
-          const folder = document.createElement('span');
-          folder.textContent = key;
-          folder.className = 'folder';
-          const subUL = document.createElement('ul');
-          folder.onclick = () => subUL.classList.toggle('hidden');
-          li.appendChild(folder);
-          renderNode(node[key], subUL, path);
-          li.appendChild(subUL);
-        }
-        container.appendChild(li);
-      }
+    function analyzeStats(code) {
+      const lines = code.split('\n');
+      const sensitiveLines = lines.filter(line => keywords.some(k => line.toLowerCase().includes(k.toLowerCase())));
+      const words = code.match(/\b\w+\b/g)?.length || 0;
+      const variables = (code.match(/(var|let|const)\s+\w+/g) || []).length;
+      return { total: lines.length, sensitive: sensitiveLines.length, words, variables };
     }
 
-    function previewFile(path) {
-      const content = fileContents[path];
-      if (content !== undefined) {
-        const ext = path.split('.').pop().toLowerCase();
-        let lang = 'plaintext';
-        if (ext === 'js') lang = 'javascript';
-        else if (ext === 'html') lang = 'html';
-        else if (ext === 'ts') lang = 'typescript';
-        else if (ext === 'json') lang = 'json';
-        else if (ext === 'css') lang = 'css';
-
-        preview.innerHTML = `<pre><code class="language-${lang}">${escapeHtml(content)}</code></pre>`;
-        hljs.highlightAll();
-      } else {
-        preview.innerHTML = `<b>Content not found:</b> ${path}`;
-      }
+    function prepareDownload(code) {
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      downloadBtn.href = url;
+      downloadBtn.download = "beautified-code.js";
+      downloadBtn.style.display = 'inline-block';
     }
 
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, function (m) {
-        return ({
-          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-        })[m];
-      });
+    function prepareHTMLDownload(htmlContent) {
+      const blob = new Blob(["<pre>" + htmlContent + "</pre>"], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      exportHtmlBtn.href = url;
+      exportHtmlBtn.download = "analyzed-code.html";
+      exportHtmlBtn.style.display = 'inline-block';
     }
-
-    searchInput.addEventListener('input', () => {
-      const term = searchInput.value.toLowerCase();
-      const items = treeView.querySelectorAll('li');
-      items.forEach(li => {
-        const text = li.textContent.toLowerCase();
-        li.style.display = text.includes(term) ? '' : 'none';
-      });
-    });
   </script>
 </body>
 </html>
