@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SenyX122 | Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --fg: #ccc;
+      --accent: #00ff88;
+      --accent-hover: #00d4ff;
+      --highlight: #ff4081;
+      --border: #222;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Inconsolata',monospace;
+      background:var(--bg);
+      color:var(--fg);
+      transition: background .5s, color .5s;
+    }
+    .container {
+      max-width:900px;
+      margin:40px auto;
+      padding:20px;
+    }
+    .header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+    }
+    .header h1 {
+      color:var(--accent);
+      font-size:2rem;
+    }
+    .header button {
+      background:var(--accent);
+      color:#000;
+      border:none;
+      padding:6px 12px;
+      border-radius:5px;
+      cursor:pointer;
+      transition:background .3s;
+    }
+    .header button:hover {
+      background:var(--accent-hover);
+    }
+    .search-bar {
+      text-align:right;
+      margin-bottom:20px;
+    }
+    .search-bar input {
+      width:250px;
+      max-width:100%;
+      padding:6px 10px;
+      border-radius:4px;
+      border:1px solid #444;
+      background:#222;
+      color:var(--fg);
+    }
+    h2 {
+      color:var(--accent);
+      margin:30px 0 10px;
+      border-bottom:1px dashed var(--border);
+      padding-bottom:5px;
+      font-size:1.4rem;
+    }
+    ul.tool-list {
+      list-style:none;
+      margin-bottom:20px;
+    }
+    ul.tool-list li {
+      padding:8px 0;
+      border-bottom:1px dashed var(--border);
+    }
+    ul.tool-list li:last-child {
+      border-bottom:none;
+    }
+    ul.tool-list li a {
+      font-weight:bold;
+      color:var(--accent-hover);
+      text-decoration:none;
+    }
+    ul.tool-list li a:hover {
+      color:var(--highlight);
+    }
+    ul.tool-list li span {
+      display:block;
+      font-size:.85em;
+      color:#999;
+      margin-left:4px;
+    }
+    /* Light mode */
+    .light-mode {
+      background:#fdfdfd; color:#222;
+    }
+    .light-mode .container {}
+    .light-mode .header h1 { color:#00aa66; }
+    .light-mode .header button { background:#00aa66; color:#fff; }
+    .light-mode .header button:hover { background:#0077cc; }
+    .light-mode .search-bar input { background:#eee; color:#222; border:1px solid #ccc; }
+    .light-mode h2 { color:#00aa66; border-bottom:1px dashed #ccc; }
+    .light-mode ul.tool-list li { border-bottom:1px dashed #ccc; }
+/* ===== Transition for list items ===== */
+ul.tool-list li {
+  overflow: hidden;
+  transition: opacity 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  height: auto; /* سيحسبها JS */
+}
+
+/* صنف يخفي العنصر تدريجيًّا */
+.hidden {
+  opacity: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* ===== Ripple effect for buttons ===== */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple::after {
+  content: "";
+  position: absolute;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+.ripple:active::after {
+  transform: scale(4);
+  opacity: 1;
+  transition: 0s;
+}
+
+/* ===== Fade-in sections on scroll (optional) ===== */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tools &amp; Skills</h1>
+      <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="toolSearch" placeholder="Filter tools…">
+    </div>
+
+    <!-- Reconnaissance -->
+    <h2>Reconnaissance</h2>
+    <ul class="tool-list">
+      <li><a href="https://nmap.org/" target="_blank">Nmap</a><span>Network mapper & port scanner</span></li>
+      <li><a href="https://whatweb.net/" target="_blank">WhatWeb</a><span>Web fingerprinting</span></li>
+      <li><a href="https://shodan.io/" target="_blank">Shodan</a><span>IoT search engine</span></li>
+      <li><a href="https://crt.sh/" target="_blank">crt.sh</a><span>Certificate transparency</span></li>
+      <li><a href="https://github.com/EnableSecurity/wafw00f" target="_blank">WAFW00F</a><span>WAF detection</span></li>
+      <li><a href="https://github.com/blacklanternsecurity/DNSRecon" target="_blank">DNSRecon</a><span>DNS enumeration</span></li>
+      <li><a href="https://github.com/jhutchins/enum4linux" target="_blank">enum4linux</a><span>SMB enumeration</span></li>
+      <li><a href="https://github.com/laramies/theHarvester" target="_blank">theHarvester</a><span>Email/host harvesting</span></li>
+      <li><a href="https://github.com/ChrisTruncer/EyeWitness" target="_blank">EyeWitness</a><span>Screenshot/credential capture</span></li>
+      <li><a href="https://github.com/SecureAuthCorp/impacket" target="_blank">Impacket</a><span>Network protocol toolkit</span></li>
+    </ul>
+
+    <!-- Scanning & Enumeration -->
+    <h2>Scanning &amp; Enumeration </h2>
+    <ul class="tool-list">
+      <li><a href="https://github.com/OJ/gobuster" target="_blank">Gobuster</a><span>Dir/file brute-forcer</span></li>
+      <li><a href="https://github.com/sullo/nikto" target="_blank">Nikto</a><span>Web server scanner</span></li>
+      <li><a href="https://wpscan.com/" target="_blank">WPScan</a><span>WordPress scanner</span></li>
+      <li><a href="https://github.com/v0re/dirsearch" target="_blank">Dirsearch</a><span>Python directory scanner</span></li>
+      <li><a href="https://github.com/ercpe/uesti" target="_blank">AutoRecon</a><span>Automated recon</span></li>
+      <li><a href="https://github.com/projectdiscovery/naabu" target="_blank">naabu</a><span>Fast port scanner</span></li>
+      <li><a href="https://github.com/projectdiscovery/nuclei" target="_blank">Nuclei</a><span>Vulnerability scanner</span></li>
+      <li><a href="https://github.com/projectdiscovery/httpx" target="_blank">httpx</a><span>HTTP probing tool</span></li>
+      <li><a href="https://github.com/projectdiscovery/subfinder" target="_blank">subfinder</a><span>Subdomain discovery</span></li>
+      <li><a href="https://github.com/projectdiscovery/chaos" target="_blank">Chaos</a><span>Passive recon framework</span></li>
+    </ul>
+
+    <!-- Exploitation Frameworks -->
+    <h2>Exploitation Frameworks</h2>
+    <ul class="tool-list">
+      <li><a href="https://www.metasploit.com/" target="_blank">Metasploit</a><span>Exploit development</span></li>
+      <li><a href="https://sqlmap.org/" target="_blank">SQLMap</a><span>Automated SQLi</span></li>
+      <li><a href="https://www.beefproject.com/" target="_blank">BeEF</a><span>Browser exploitation</span></li>
+      <li><a href="https://github.com/Manisso/fsociety" target="_blank">Fsociety</a><span>Automated pentest suite</span></li>
+      <li><a href="https://github.com/rapid7/commix" target="_blank">Commix</a><span>Command injection tool</span></li>
+      <li><a href="https://github.com/graphql/express-graphql" target="_blank">GraphQL-CLI</a><span>GraphQL testing</span></li>
+      <li><a href="https://github.com/taviso/american-fuzzy-lop" target="_blank">AFL</a><span>Fuzzer</span></li>
+      <li><a href="https://github.com/zaproxy/zaproxy" target="_blank">OWASP ZAP</a><span>Web proxy scanner</span></li>
+      <li><a href="https://github.com/pentestmonkey/sqlsus" target="_blank">sqlsus</a><span>SQL injection tool</span></li>
+      <li><a href="https://github.com/lanjelot/pymetasploit" target="_blank">pymetasploit</a><span>MSF API client</span></li>
+    </ul>
+
+    <!-- Password Attacks -->
+    <h2>Password Attacks</h2>
+    <ul class="tool-list">
+      <li><a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank">THC‑Hydra</a><span>Login cracker</span></li>
+      <li><a href="https://hashcat.net/" target="_blank">Hashcat</a><span>GPU attacker</span></li>
+      <li><a href="https://www.openwall.com/john/" target="_blank">John the Ripper</a><span>Password cracker</span></li>
+      <li><a href="https://github.com/magnumripper/JohnTheRipper" target="_blank">Jumbo John</a><span>Extended JTR</span></li>
+      <li><a href="https://github.com/ab99/crunch" target="_blank">Crunch</a><span>Wordlist generator</span></li>
+      <li><a href="https://github.com/brannondorsey/naive-hashcat" target="_blank">RockYou</a><span>Wordlist collection</span></li>
+      <li><a href="https://github.com/laramies/theHarvester" target="_blank">theHarvester</a><span>Cred mining</span></li>
+      <li><a href="https://github.com/RustScan/RustScan" target="_blank">RustScan</a><span>Fast port scanning</span></li>
+      <li><a href="https://github.com/Dionach/CMSmap" target="_blank">CMSmap</a><span>CMS scanner</span></li>
+      <li><a href="https://github.com/byt3bl33d3r/BloodHound" target="_blank">BloodHound</a><span>AD mapper</span></li>
+    </ul>
+
+    <!-- Wireless & Networking -->
+    <h2>Wireless &amp; Networking</h2>
+    <ul class="tool-list">
+      <li><a href="https://www.aircrack-ng.org/" target="_blank">Aircrack‑ng</a><span>Wi‑Fi suite</span></li>
+      <li><a href="https://www.kismetwireless.net/" target="_blank">Kismet</a><span>Wireless detector/sniffer</span></li>
+      <li><a href="https://www.wireshark.org/" target="_blank">Wireshark</a><span>Packet analyzer</span></li>
+      <li><a href="https://github.com/inquisb/tcpkill" target="_blank">tcpkill</a><span>TCP session killer</span></li>
+      <li><a href="https://github.com/moxie0/sslstrip" target="_blank">sslstrip</a><span>Strip SSL</span></li>
+      <li><a href="https://ettercap.github.io/" target="_blank">Ettercap</a><span>MITM framework</span></li>
+      <li><a href="https://github.com/AlliedModders/SourceMod" target="_blank">Responder</a><span>LLMNR/NBT-NS poison</span></li>
+      <li><a href="https://github.com/byt3bl33d3r/Silence" target="_blank">Silence</a><span>ARP spoofing</span></li>
+      <li><a href="https://github.com/rubenher15/xerosploit" target="_blank">XeroSploit</a><span>MITMf toolset</span></li>
+      <li><a href="https://github.com/RezwanBash/ARP-ping" target="_blank">ARP-ping</a><span>Network host discovery</span></li>
+    </ul>
+
+    <!-- Web Application -->
+    <h2>Web Application</h2>
+    <ul class="tool-list">
+      <li><a href="https://portswigger.net/burp" target="_blank">Burp Suite</a><span>Proxy & testing</span></li>
+      <li><a href="https://senyx122.github.io/js_file.html" target="_blank">JavaScript Code Analyzer PayloadLab</a><span>JavaScript Code Analyzer PayloadLab</span></li>
+      <li><a href="https://github.com/s0md3v/XSStrike" target="_blank">XSStrike</a><span>XSS detector</span></li>
+      <li><a href="https://github.com/hahwul/dalfox" target="_blank">DalFox</a><span>XSS exploitation</span></li>
+      <li><a href="https://github.com/epi052/ffuf" target="_blank">ffuf</a><span>Web fuzzer</span></li>
+      <li><a href="https://github.com/aboul3la/Sublist3r" target="_blank">Sublist3r</a><span>Subdomain discovery</span></li>
+      <li><a href="https://github.com/EdOverflow/canarytokens" target="_blank">Canarytokens</a><span>Honeytokens</span></li>
+      <li><a href="https://github.com/danielmiessler/SecLists" target="_blank">SecLists</a><span>Payload collection</span></li>
+      <li><a href="https://github.com/tomnomnom/waybackurls" target="_blank">waybackurls</a><span>Archived URLs</span></li>
+      <li><a href="https://github.com/urbanadventurer/doorbash" target="_blank">doorbash</a><span>Dir brute based wordlists</span></li>
+      <li><a href="https://github.com/projectdiscovery/jwt-cli" target="_blank">jwt-cli</a><span>JWT tool</span></li>
+    </ul>
+
+    <!-- Post-Exploitation -->
+    <h2>Post-Exploitation</h2>
+    <ul class="tool-list">
+      <li><a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank">PowerSploit</a><span>PS post-exploit</span></li>
+      <li><a href="https://github.com/redcanaryco/atomic-red-team" target="_blank">Atomic Red Team</a><span>Test detection</span></li>
+      <li><a href="https://github.com/samratashok/nishang" target="_blank">Nishang</a><span>PS scripts</span></li>
+      <li><a href="https://github.com/ghost1eth/evil-winrm" target="_blank">evil-winrm</a><span>WinRM shell</span></li>
+      <li><a href="https://github.com/mthbernardes/convosploit" target="_blank">Convosploit</a><span>C2 emulator</span></li>
+      <li><a href="https://github.com/byt3bl33d3r/Mimikatz" target="_blank">Mimikatz</a><span>Credential theft</span></li>
+      <li><a href="https://github.com/gentilkiwi/mimikatz" target="_blank">Mimikatz NG</a><span>Advanced mimikatz</span></li>
+      <li><a href="https://github.com/PlaySilent/Empire" target="_blank">Empire</a><span>PS C2</span></li>
+      <li><a href="https://github.com/fatihsalih/pupy" target="_blank">Pupy</a><span>Cross-platform RAT</span></li>
+      <li><a href="https://github.com/PowerShellEmpire/PowerTools" target="_blank">PowerTools</a><span>Empowering PS dev</span></li>
+    </ul>
+
+    <!-- Reverse Engineering -->
+    <h2>Reverse Engineering</h2>
+    <ul class="tool-list">
+      <li><a href="https://www.ghidra-sre.org/" target="_blank">Ghidra</a><span>NSA framework</span></li>
+      <li><a href="https://www.hex-rays.com/ida-pro/" target="_blank">IDA Pro</a><span>Disassembler</span></li>
+      <li><a href="https://radare.org/" target="_blank">radare2</a><span>Reverse framework</span></li>
+      <li><a href="https://retdec.com/" target="_blank">RetDec</a><span>Decompiler</span></li>
+      <li><a href="https://github.com/0xProject/0xRenegade" target="_blank">0xRenegade</a><span>Malware analysis</span></li>
+      <li><a href="https://www.binaryanalysisplatform.org/" target="_blank">BAP</a><span>Binary analysis</span></li>
+      <li><a href="https://github.com/fireeye/flare-vm" target="_blank">FLARE VM</a><span>RE toolkit</span></li>
+      <li><a href="https://github.com/skelsec/pypykatz" target="_blank">pypykatz</a><span>Mimikatz parser</span></li>
+      <li><a href="https://github.com/avast/mariner" target="_blank">Mariner</a><span>Malware sandbox</span></li>
+      <li><a href="https://github.com/vrtadmin/clarity" target="_blank">Clarity</a><span>Dynamic analysis</span></li>
+    </ul>
+
+    <!-- Social Engineering -->
+ <h2>Social Engineering</h2>
+<ul class="tool-list">
+  <li>
+    <a href="https://github.com/trustedsec/social-engineer-toolkit" target="_blank">Social-Engineer Toolkit (SET)</a>
+    <span>Automated phishing & social attacks</span>
+  </li>
+  <li>
+    <a href="https://github.com/gophish/gophish" target="_blank">GoPhish</a>
+    <span>Open‑source phishing framework</span>
+  </li>
+  <li>
+    <a href="https://github.com/kingphisher/king-phisher" target="_blank">King Phisher</a>
+    <span>Phishing campaign toolkit</span>
+  </li>
+  <li>
+    <a href="https://github.com/adroit-katze/Evilginx2" target="_blank">Evilginx2</a>
+    <span>Phish & capture session cookies</span>
+  </li>
+  <li>
+    <a href="https://github.com/thelinuxchoice/blackeye" target="_blank">BlackEye</a>
+    <span>Phishing page generator</span>
+  </li>
+  <li>
+    <a href="https://github.com/Und3rf10w/kali-linux-forensics" target="_blank">King‑Phisher Server</a>
+    <span>Self‑hosted phishing server</span>
+  </li>
+  <li>
+    <a href="https://github.com/sensepost/evedev" target="_blank">EveDev</a>
+    <span>Interactive social engineering toolkit</span>
+  </li>
+  <li>
+    <a href="https://github.com/Dionach/hasherator" target="_blank">Hasherator</a>
+    <span>Password list generator (useful for targeted attacks)</span>
+  </li>
+  <li>
+    <a href="https://github.com/alexanderatallah/PhishX" target="_blank">PhishX</a>
+    <span>Modular phishing platform</span>
+  </li>
+  <li>
+    <a href="https://github.com/WhitewidowSec/whitewidow" target="_blank">Whitewidow</a>
+    <span>Hybrid phishing reconnaissance</span>
+  </li>
+</ul>
+Base64
+<h2>Cryptography</h2>
+<ul class="tool-list">
+  <li>
+    <a href="https://www.openssl.org/" target="_blank">OpenSSL</a>
+    <span>Toolkit for SSL/TLS & general crypto</span>
+  </li>
+   <li>
+    <a href="https://senyx122.github.io/Base64.html" target="_blank">Base64</a>
+    <span>Base64 Encoder / Decoder</span>
+  </li>
+  <li>
+    <a href="https://gnupg.org/" target="_blank">GPG (GnuPG)</a>
+    <span>File/email encryption & signing</span>
+  </li>
+  <li>
+    <a href="https://hashcat.net/hashcat/" target="_blank">Hashcat</a>
+    <span>GPU‑accelerated password/hash cracking</span>
+  </li>
+  <li>
+    <a href="https://github.com/mozilla/sops" target="_blank">sops</a>
+    <span>Encrypted file editor (YAML/JSON/…) </span>
+  </li>
+  <li>
+    <a href="https://www.veracrypt.fr/en/Home.html" target="_blank">VeraCrypt</a>
+    <span>Disk encryption & hidden volumes</span>
+  </li>
+  <li>
+    <a href="https://keepass.info/" target="_blank">KeePass</a>
+    <span>Password manager with database encryption</span>
+  </li>
+  <li>
+    <a href="https://github.com/RUB-NDS/TLS-Attacker" target="_blank">TLS‑Attacker</a>
+    <span>Framework for analyzing TLS implementations</span>
+  </li>
+  <li>
+    <a href="https://github.com/crytic/echidna" target="_blank">Echidna</a>
+    <span>Smart‑contract fuzzer for Ethereum</span>
+  </li>
+  <li>
+    <a href="https://github.com/ricochet-im/crypto–lint" target="_blank">Crypto‑Lint</a>
+    <span>Static analysis for crypto misuse</span>
+  </li>
+  <li>
+    <a href="https://github.com/crypto-com/chain-docs" target="_blank">Crypto.com Chain</a>
+    <span>Blockchain & cryptographic primitives</span>
+  </li>
+</ul>
+
+
+  </div>
+
+<script>
+  // Helper: يسجّل ارتفاع العنصر ليسمح بالانتقال
+  function prepareListItems() {
+    document.querySelectorAll('ul.tool-list li').forEach(li => {
+      const style = window.getComputedStyle(li);
+      const h = li.offsetHeight 
+              + parseFloat(style.marginTop) 
+              + parseFloat(style.marginBottom);
+      li.dataset.origHeight = h;
+    });
+  }
+
+  // Theme toggle with body class
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+  }
+
+  // Live filter with animated hide/show
+  function setupLiveFilter() {
+    const input = document.getElementById('toolSearch');
+    input.addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.tool-list li').forEach(li => {
+        const text = li.textContent.toLowerCase();
+        if (text.includes(term)) {
+          // Show
+          li.classList.remove('hidden');
+          // Restore height after next paint
+          requestAnimationFrame(() => {
+            li.style.height = li.dataset.origHeight + 'px';
+          });
+        } else {
+          // Hide
+          li.style.height = '0px';
+          li.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // Ripple effect: نضيف العنصر ::after تلقائيًا
+  function setupRipples() {
+    document.querySelectorAll('button.ripple').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const after = getComputedStyle(this, '::after');
+        // تحريك مركز الـ ripple
+        this.style.setProperty('--ripple-x', x + 'px');
+        this.style.setProperty('--ripple-y', y + 'px');
+      });
+    });
+  }
+
+  // Fade-in on scroll
+  function setupFadeInOnScroll() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(ent => {
+        if (ent.isIntersecting) {
+          ent.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('.fade-in').forEach(sec => observer.observe(sec));
+  }
+
+  // Initialization
+  document.addEventListener('DOMContentLoaded', () => {
+    prepareListItems();
+    setupLiveFilter();
+    setupRipples();
+    setupFadeInOnScroll();
+  });
+</script>
+
+</body>
+</html>
+
