@@ -122,6 +122,8 @@ npx wappalyzer https://sub.example.com
     <h2>7. Additional recon tools</h2>
     <p>Get historical URLs, parameters and more surface area for fuzzing.</p>
     <pre>
+  katana -u https://example.com -o urls.txt
+  sort -u urls.txt > unique_urls.txt
 gau example.com > urls.txt
 cat subs.txt | waybackurls > wb_urls.txt
 dnsx -l subs.txt -a -resp
@@ -154,6 +156,19 @@ awk '/\.js(\?|$)/ {print}' urls.txt > js_links.txt
 cat js_links.txt | mantra
 mkdir js && cd js && wget -i ../js_links.txt
 cat urls.txt | grep -oP '\?\K[^ ]+' | sort -u
+    </pre>
+  </div>
+
+    <div class="section">
+    <h2>CORS</h2>
+    <p>FIND CORS.</p>
+    <pre>
+while read url; do
+    curl -s -I -H "Origin: https://evil.com" "$url" | \
+    grep -iE "access-control-allow-origin|access-control-allow-credentials" && \
+    echo "[Vulnerable?] $url"
+done < unique_urls.txt
+
     </pre>
   </div>
 
