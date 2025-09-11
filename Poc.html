@@ -1,39 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <title>WebSocket CORS PoC</title>
 </head>
 <body>
   <h2>WebSocket CORS PoC</h2>
-  <button onclick="exploit()">Open WS & Send Request</button>
-  <pre id="output"></pre>
+
+  <button id="openWs">Open WS</button>
+  <button id="sendPing" disabled>Send Ping</button>
+  <button id="sendBlock" disabled>Send getBlockByHeight</button>
+
+  <pre id="log"></pre>
 
   <script>
+    let ws;
+
     function log(msg) {
-      document.getElementById("output").textContent += msg + "\n";
+      document.getElementById("log").textContent += msg + "\n";
     }
 
-    function exploit() {
-      const ws = new WebSocket("wss://access.mainnet.nodes.flow.com/v1/ws");
+    document.getElementById("openWs").onclick = function() {
+      // Endpoint الحقيقي
+      ws = new WebSocket("wss://access.mainnet.nodes.onflow.org/ws");  
 
       ws.onopen = function() {
         log("OPEN: connection established");
-
-        // 📌 مثال: طلب getLatestBlock (RPC request)
-        const msg = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "getLatestBlock",
-          params: [{ "is_sealed": true }]
-        };
-
-        ws.send(JSON.stringify(msg));
-        log("SENT: " + JSON.stringify(msg));
+        document.getElementById("sendPing").disabled = false;
+        document.getElementById("sendBlock").disabled = false;
       };
 
-      ws.onmessage = function(event) {
-        log("RECEIVED: " + event.data);
+      ws.onmessage = function(evt) {
+        log("RECEIVED: " + evt.data);
       };
 
       ws.onerror = function(err) {
@@ -43,7 +41,29 @@
       ws.onclose = function() {
         log("CLOSED: connection closed");
       };
-    }
+    };
+
+    document.getElementById("sendPing").onclick = function() {
+      const msg = {
+        jsonrpc: "2.0",
+        id: 2,
+        method: "ping",
+        params: []
+      };
+      ws.send(JSON.stringify(msg));
+      log("SENT: " + JSON.stringify(msg));
+    };
+
+    document.getElementById("sendBlock").onclick = function() {
+      const msg = {
+        jsonrpc: "2.0",
+        id: 3,
+        method: "getBlockByHeight",
+        params: [{ height: 1 }]
+      };
+      ws.send(JSON.stringify(msg));
+      log("SENT: " + JSON.stringify(msg));
+    };
   </script>
 </body>
 </html>
