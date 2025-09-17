@@ -2,30 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Safe Clickjacking PoC (Non-destructive)</title>
+<title>Interactive Safe Clickjacking PoC</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 20px; background:#fff; color:#111; }
-  h1 { font-size:18px; margin:0 0 10px; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 18px; background:#fff; color:#111; }
+  h1 { font-size:18px; margin:0 0 8px; }
   p { margin:6px 0; color:#333; }
   .wrap { display:flex; gap:20px; align-items:flex-start; }
-  .panel { width:420px; max-width:42%; }
-  .demo { flex:1; position:relative; border:1px solid #ddd; background:#f8f8f8; padding:8px; }
-  iframe { width:100%; height:720px; border:0; display:block; background:transparent; }
-  /* IMPORTANT: make iframe non-interactive to prevent any clicks or form submits */
-  iframe.safe-frame { pointer-events: none; user-select: none; }
-  /* transparent overlay used to illustrate attacker overlay (subtle outline + fully transparent bg) */
+  .panel { width:380px; max-width:40%; }
+  .demo { flex:1; position:relative; border:1px solid #ddd; background:#fafafa; padding:8px; }
+  iframe { width:100%; height:720px; border:0; display:block; background:transparent; transition: filter .18s ease; }
+  /* default: non-interactive */
+  iframe.safe-frame { pointer-events: none; user-select: none; filter: none; }
+  /* interactive class enables pointer events */
+  iframe.interactive { pointer-events: auto; user-select: auto; }
   .highlight {
     position:absolute;
-    pointer-events:none; /* don't let clicks through this highlight */
-    border: 2px dashed rgba(255,80,0,0.18); /* very subtle dashed border */
-    background: rgba(255,80,0,0.00); /* fully transparent background */
+    pointer-events:none;
+    border: 2px dashed rgba(255,80,0,0.18);
+    background: rgba(255,80,0,0.00);
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
     border-radius:6px;
     transition: box-shadow .18s ease, border-color .18s ease;
   }
   .highlight:after {
-    /* subtle label to help screenshots (can be removed) */
     content: 'Sensitive area';
     position: absolute;
     top: -22px;
@@ -42,41 +42,63 @@
   label { display:block; font-weight:600; margin-top:8px; font-size:13px; color:#222; }
   input[type="text"], input[type="number"] { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px; }
   .note { margin-top:10px; font-size:13px; color:#555; }
-  .btn { margin-top:10px; display:inline-block; padding:8px 12px; border-radius:6px; background:#0b6; color:#fff; text-decoration:none; cursor:pointer; }
+  .btn { margin-top:10px; display:inline-block; padding:8px 12px; border-radius:6px; background:#0b6; color:#fff; text-decoration:none; cursor:pointer; border:0; }
+  .btn.warn { background:#d9534f; }
+  .actions { display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
   footer { margin-top:14px; font-size:13px; color:#666; }
+  .warning { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; color:#856404; margin-top:10px; }
 </style>
 </head>
 <body>
-  <h1>Safe Clickjacking PoC — visualization only (non-destructive)</h1>
-  <p>This PoC intentionally <strong>prevents</strong> any interaction with the framed site. It only visualizes how an attacker could overlay or misplace UI over a sensitive button (e.g. "Cancel Account"). Use this to document the risk — <em>do not</em> use it to perform destructive actions.</p>
+  <h1>Interactive Safe Clickjacking PoC</h1>
+  <p>Use this tool to visualize the clickjacking surface and — <strong>optionally</strong> — interact with the framed page manually. <strong>Do not</strong> perform destructive actions. Use a test account only.</p>
 
   <div class="wrap">
     <div class="panel controls">
-      <div style="font-weight:700">PoC Controls (safe)</div>
+      <div style="font-weight:700">Controls</div>
+
       <label>Target URL</label>
       <input id="url" type="text" value="https://www.rtreefinance.com/personal?kycStatus=0" />
+
       <label>Highlight X (px from left)</label>
       <input id="x" type="number" value="160" />
+
       <label>Highlight Y (px from top)</label>
       <input id="y" type="number" value="220" />
+
       <label>Highlight Width (px)</label>
       <input id="w" type="number" value="420" />
+
       <label>Highlight Height (px)</label>
       <input id="h" type="number" value="220" />
-      <div class="note">
-        <strong>How to use:</strong> adjust X/Y/W/H so the transparent box highlights the sensitive button/area in the framed page. The framed page is intentionally non-interactive (pointer-events disabled) so no click or submit can occur.
+
+      <div class="actions">
+        <button class="btn" id="apply">Apply & Reload Frame</button>
+        <button class="btn warn" id="toggleInteract">Enable Interaction</button>
       </div>
-      <a class="btn" id="apply">Apply & Reload Frame</a>
-      <div class="note" style="margin-top:8px;">After positioning, take screenshots (Full page + DevTools Network) to include in your bounty report. Do NOT include any session tokens or cookies.</div>
-      <footer>Safe PoC — visualization only. No clicks are passed to the target.</footer>
+
+      <div style="margin-top:8px;">
+        <input id="confirm" type="checkbox" /> <label style="display:inline; font-weight:600; margin-left:8px;">I confirm I will use a test account and will NOT perform destructive actions</label>
+      </div>
+
+      <div class="note warning" id="safetyNote">
+        <strong>Warning:</strong> Enabling interaction allows your clicks to reach the target site. Use a test account only. Never include or expose session tokens in screenshots or reports.
+      </div>
+
+      <div class="note">
+        <strong>How to use:</strong> 1) adjust X/Y/W/H to position the transparent highlight over the sensitive UI. 2) Click <em>Apply & Reload Frame</em>. 3) If you want to interact, check the confirmation box and click <em>Enable Interaction</em>. 4) Take screenshots from DevTools (Network → select iframe request → Response Headers) and the visible page as evidence.
+      </div>
+
+      <footer>Safe PoC — interactive only by explicit confirmation.</footer>
     </div>
 
     <div class="demo">
-      <div style="font-size:13px; margin-bottom:8px; color:#333">Framed target (non-interactive)</div>
-      <!-- sandbox is left blank to maximize safety; iframe has pointer-events:none to prevent any click -->
+      <div style="font-size:13px; margin-bottom:8px; color:#333">Framed target</div>
+
+      <!-- iframe starts non-interactive -->
       <iframe id="frame" class="safe-frame" src="https://www.rtreefinance.com/personal?kycStatus=0" sandbox></iframe>
 
-      <!-- highlight element: positioned absolutely relative to .demo -->
+      <!-- transparent highlight -->
       <div id="hl" class="highlight" style="left:160px; top:220px; width:420px; height:220px;"></div>
     </div>
   </div>
@@ -85,23 +107,55 @@
   const frame = document.getElementById('frame');
   const hl = document.getElementById('hl');
   const apply = document.getElementById('apply');
+  const toggle = document.getElementById('toggleInteract');
+  const confirmBox = document.getElementById('confirm');
+
   apply.addEventListener('click', () => {
     const url = document.getElementById('url').value.trim();
     const x = parseInt(document.getElementById('x').value||0,10);
     const y = parseInt(document.getElementById('y').value||0,10);
     const w = parseInt(document.getElementById('w').value||300,10);
     const h = parseInt(document.getElementById('h').value||120,10);
-    // update highlight position & size
+
     hl.style.left = x + 'px';
     hl.style.top  = y + 'px';
     hl.style.width = w + 'px';
     hl.style.height = h + 'px';
-    // reload frame src only (frame is non-interactive)
+    // reload frame (stays non-interactive by default)
     frame.src = url;
-    // hint to user
     apply.textContent = 'Applied — update screenshot';
-    setTimeout(()=> apply.textContent = 'Apply & Reload Frame', 1600);
+    setTimeout(()=> apply.textContent = 'Apply & Reload Frame', 1400);
   });
+
+  toggle.addEventListener('click', () => {
+    if (!confirmBox.checked) {
+      alert('Please confirm you will use a test account and not perform destructive actions.');
+      return;
+    }
+    // Toggle interactive state
+    if (frame.classList.contains('interactive')) {
+      frame.classList.remove('interactive');
+      frame.classList.add('safe-frame');
+      toggle.textContent = 'Enable Interaction';
+      toggle.style.background = '#d9534f';
+      toggle.style.color = '#fff';
+    } else {
+      // remove sandbox attribute to allow full interaction if needed
+      frame.classList.remove('safe-frame');
+      frame.classList.add('interactive');
+      // remove sandbox to allow forms/scripts (use with caution)
+      frame.removeAttribute('sandbox');
+      toggle.textContent = 'Disable Interaction';
+      toggle.style.background = '#5cb85c';
+      toggle.style.color = '#fff';
+      // hint to user
+      alert('Interaction ENABLED. You can now click inside the framed page. Use a TEST account only.');
+    }
+  });
+
+  // init styles
+  toggle.style.background = '#d9534f';
+  toggle.style.color = '#fff';
 </script>
 </body>
 </html>
