@@ -1,14 +1,155 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Clickjacking PoC — rtreefinance</title>
-  <style>body{font-family:Arial;margin:24px;}iframe{width:1500px;height:2000px;border:1px solid #ccc;}</style>
+<meta charset="utf-8" />
+<title>Simulated Clickjacking PoC — SAFE (no clicks)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:18px;background:#fff;color:#111}
+  h1{font-size:18px;margin:0 0 8px}
+  p{margin:6px 0;color:#333}
+  .container{display:flex;gap:18px}
+  .side{width:380px;border:1px solid #eee;padding:12px;border-radius:8px;background:#fafafa}
+  .demo{flex:1;position:relative;border:1px solid #ddd;padding:8px;background:#fff}
+  iframe{width:100%;height:900px;border:0;background:transparent}
+  iframe.safe{pointer-events:none;user-select:none;filter: none;}
+  /* visual cursor */
+  .vcursor{
+    position:absolute; width:34px; height:34px; border-radius:50%;
+    background:rgba(0,0,0,0.8); color:#fff; display:flex;align-items:center;justify-content:center;
+    font-size:18px; z-index:2100; transform:translate(-50%,-50%); pointer-events:none;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  }
+  .note{font-size:13px;color:#444;margin-top:8px}
+  .log{margin-top:12px;font-size:14px;background:#fff;padding:8px;border-radius:6px;border:1px solid #eee;height:86px;overflow:auto}
+  .btn{display:inline-block;padding:8px 10px;border-radius:6px;background:#0b6;color:#fff;text-decoration:none;cursor:pointer;border:0}
+  .warn{background:#d9534f}
+  .overlayLabel{
+    position:absolute; padding:6px 10px; background:rgba(255,255,255,0.95);
+    border-radius:6px; top:14px; left:14px; z-index:2200; border:1px solid #eee; font-weight:600;
+  }
+</style>
 </head>
 <body>
-  <h3>Clickjacking PoC — rtreefinance</h3>
-  <p>Target: <code>https://www.rtreefinance.com/personal?kycStatus=0</code></p>
-  <iframe src="https://www.rtreefinance.com/personal?kycStatus=0" id="t"></iframe>
-  <p>If you see the site loaded inside the iframe, the page is frameable.</p>
+  <h1>Simulated Clickjacking PoC — SAFE (no clicks)</h1>
+  <p>This PoC <strong>does not</strong> perform any clicks on the framed site. It visualizes a click sequence (Cancel → Confirm) by animating a fake cursor and messages. Use screenshots / video to include in your report. <strong>Do not</strong> use with real accounts when enabling actual interactions.</p>
+
+  <div class="container">
+    <div class="side">
+      <div style="font-weight:700">Controls</div>
+      <label style="display:block;margin-top:8px;font-weight:600">Target URL</label>
+      <input id="url" style="width:100%;padding:8px;margin-top:6px;border:1px solid #ccc;border-radius:6px" value="https://www.rtreefinance.com/personal?kycStatus=0">
+      <div style="margin-top:10px">
+        <button id="run" class="btn">Run simulated sequence</button>
+        <button id="reset" class="btn" style="margin-left:6px;background:#666">Reset</button>
+      </div>
+      <div class="note">Simulation steps (visual only): moves to Cancel Account → show "Simulated click (no action performed)" → moves to Confirm → show "Simulated confirm (no action performed)".</div>
+      <div class="log" id="log">Ready. Use "Run simulated sequence" to start.</div>
+    </div>
+
+    <div class="demo" id="demo">
+      <div class="overlayLabel">Framed target (non-interactive)</div>
+
+      <!-- SAFE iframe: pointer-events disabled to prevent real clicks -->
+      <iframe id="frame" class="safe" src="https://www.rtreefinance.com/personal?kycStatus=0" sandbox></iframe>
+
+      <!-- visual fake cursor -->
+      <div id="vc" class="vcursor" style="left:50px;top:50px;display:none">🖱</div>
+
+      <!-- transient message badge -->
+      <div id="msg" style="position:absolute;z-index:2200;left:50%;transform:translateX(-50%);top:20px;padding:8px 12px;background:rgba(0,0,0,0.75);color:#fff;border-radius:6px;display:none;font-weight:700"></div>
+    </div>
+  </div>
+
+<script>
+  const frame = document.getElementById('frame');
+  const v = document.getElementById('vc');
+  const msg = document.getElementById('msg');
+  const run = document.getElementById('run');
+  const reset = document.getElementById('reset');
+  const log = document.getElementById('log');
+  const urlInput = document.getElementById('url');
+
+  // positions are approximate and depend on layout/viewport — adjust if needed
+  // default positions estimated for 1500px wide iframe; you may host and adjust values
+  const defaultPositions = {
+    cancel: {x: 1220, y: 230}, // px relative to iframe top-left (adjust in your environment)
+    confirm: {x: 960, y: 540}
+  };
+
+  function logMsg(text){
+    log.textContent = (new Date()).toLocaleTimeString() + ' — ' + text + '\\n' + log.textContent;
+  }
+
+  function showMsg(text, ms=1800){
+    msg.textContent = text;
+    msg.style.display = 'block';
+    setTimeout(()=> msg.style.display='none', ms);
+  }
+
+  function placeCursorAt(px,py){
+    // px,py are coordinates relative to the iframe element inside demo
+    const rect = frame.getBoundingClientRect();
+    const demoRect = document.getElementById('demo').getBoundingClientRect();
+    // compute position inside demo: rect.left + px * (frame.width / iframe content width)
+    // We cannot know content scale; use direct mapping assumption that iframe fills area and content scale ~1
+    const cx = rect.left + px * (rect.width / Math.max(rect.width, 1200));
+    const cy = rect.top + py * (rect.width / Math.max(rect.width, 1200)); // approximate mapping
+    v.style.left = (cx - demoRect.left) + 'px';
+    v.style.top  = (cy - demoRect.top)  + 'px';
+    v.style.display = 'flex';
+  }
+
+  function hideCursor(){ v.style.display='none'; }
+
+  function animateMove(from, to, steps=24, stepTime=20){
+    return new Promise(resolve=>{
+      let i=0;
+      const dx = (to.x - from.x)/steps;
+      const dy = (to.y - from.y)/steps;
+      let cur = {x: from.x, y: from.y};
+      const t = setInterval(()=>{
+        cur.x += dx; cur.y += dy;
+        placeCursorAt(cur.x, cur.y);
+        i++;
+        if(i>=steps){ clearInterval(t); resolve(); }
+      }, stepTime);
+    });
+  }
+
+  async function runSequence(){
+    run.disabled = true;
+    logMsg('Starting simulation (visual only).');
+    // reload iframe to ensure current state
+    frame.src = urlInput.value;
+    await new Promise(r=>setTimeout(r,800)); // wait for visual load
+    showMsg('Simulation starting',1000);
+
+    // approximate initial cursor position
+    const start = {x: 80, y: 80};
+    const posCancel = defaultPositions.cancel;
+    const posConfirm = defaultPositions.confirm;
+
+    placeCursorAt(start.x, start.y);
+    await animateMove(start, posCancel, 30, 18);
+    logMsg('Reached Cancel Account area (simulated).');
+    showMsg('Simulated click: Cancel Account (no action performed)', 1800);
+    await new Promise(r=>setTimeout(r,900));
+
+    // move to confirm after short pause
+    await animateMove(posCancel, posConfirm, 34, 18);
+    logMsg('Reached Confirm button area (simulated).');
+    showMsg('Simulated click: Confirm (no action performed)', 1800);
+    await new Promise(r=>setTimeout(r,900));
+
+    hideCursor();
+    showMsg('Simulation complete — no actions were performed.', 2200);
+    logMsg('Simulation complete (no network requests were sent).');
+    run.disabled = false;
+  }
+
+  run.addEventListener('click', runSequence);
+  reset.addEventListener('click', ()=>{ hideCursor(); log.textContent='Ready. Use \"Run simulated sequence\" to start.'; frame.src = urlInput.value; });
+</script>
 </body>
 </html>
