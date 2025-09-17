@@ -1,14 +1,92 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Clickjacking PoC — rtreefinance</title>
-  <style>body{font-family:Arial;margin:24px;}iframe{width:1500px;height:200px;border:1px solid #ccc;}</style>
+<meta charset="utf-8" />
+<title>Safe Clickjacking PoC (Non-destructive)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 20px; background:#fff; color:#111; }
+  h1 { font-size:18px; margin:0 0 10px; }
+  p { margin:6px 0; color:#333; }
+  .wrap { display:flex; gap:20px; align-items:flex-start; }
+  .panel { width:420px; max-width:42%; }
+  .demo { flex:1; position:relative; border:1px solid #ddd; background:#f8f8f8; padding:8px; }
+  iframe { width:100%; height:720px; border:0; display:block; }
+  /* IMPORTANT: make iframe non-interactive to prevent any clicks or form submits */
+  iframe.safe-frame { pointer-events: none; user-select: none; }
+  /* translucent overlay used to illustrate attacker overlay */
+  .highlight {
+    position:absolute;
+    pointer-events:none; /* don't let clicks through this highlight */
+    border: 3px dashed rgba(255,80,0,0.9);
+    background: rgba(255,80,0,0.06);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    border-radius:6px;
+  }
+  .controls { background:#fff; border:1px solid #eee; padding:12px; border-radius:6px; }
+  label { display:block; font-weight:600; margin-top:8px; font-size:13px; color:#222; }
+  input[type="text"], input[type="number"] { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px; }
+  .note { margin-top:10px; font-size:13px; color:#555; }
+  .btn { margin-top:10px; display:inline-block; padding:8px 12px; border-radius:6px; background:#0b6; color:#fff; text-decoration:none; }
+  footer { margin-top:14px; font-size:13px; color:#666; }
+</style>
 </head>
 <body>
-  <h3>Clickjacking PoC — rtreefinance</h3>
-  <p>Target: <code>https://www.rtreefinance.com/personal?kycStatus=0</code></p>
-  <iframe src="https://www.rtreefinance.com/personal?kycStatus=0" id="t"></iframe>
-  <p>If you see the site loaded inside the iframe, the page is frameable.</p>
+  <h1>Safe Clickjacking PoC — visualization only (non-destructive)</h1>
+  <p>This PoC intentionally <strong>prevents</strong> any interaction with the framed site. It only visualizes how an attacker could overlay or misplace UI over a sensitive button (e.g. "Cancel Account"). Use this to document the risk — <em>do not</em> use it to perform destructive actions.</p>
+
+  <div class="wrap">
+    <div class="panel controls">
+      <div style="font-weight:700">PoC Controls (safe)</div>
+      <label>Target URL</label>
+      <input id="url" type="text" value="https://www.rtreefinance.com/personal?kycStatus=0" />
+      <label>Highlight X (px from left)</label>
+      <input id="x" type="number" value="160" />
+      <label>Highlight Y (px from top)</label>
+      <input id="y" type="number" value="220" />
+      <label>Highlight Width (px)</label>
+      <input id="w" type="number" value="420" />
+      <label>Highlight Height (px)</label>
+      <input id="h" type="number" value="220" />
+      <div class="note">
+        <strong>How to use:</strong> adjust X/Y/W/H so the red dashed box highlights the sensitive button/area in the framed page. The framed page is intentionally non-interactive (pointer-events disabled) so no click or submit can occur.
+      </div>
+      <a class="btn" id="apply">Apply & Reload Frame</a>
+      <div class="note" style="margin-top:8px;">After positioning, take screenshots (Full page + DevTools Network) to include in your bounty report. Do NOT include any session tokens or cookies.</div>
+      <footer>Safe PoC — visualization only. No clicks are passed to the target.</footer>
+    </div>
+
+    <div class="demo">
+      <div style="font-size:13px; margin-bottom:8px; color:#333">Framed target (non-interactive)</div>
+      <!-- sandbox is left blank to maximize safety; iframe has pointer-events:none to prevent any click -->
+      <iframe id="frame" class="safe-frame" src="https://www.rtreefinance.com/personal?kycStatus=0" sandbox></iframe>
+
+      <!-- highlight element: positioned absolutely relative to .demo -->
+      <div id="hl" class="highlight" style="left:160px; top:220px; width:420px; height:220px;"></div>
+    </div>
+  </div>
+
+<script>
+  const frame = document.getElementById('frame');
+  const hl = document.getElementById('hl');
+  const apply = document.getElementById('apply');
+  apply.addEventListener('click', () => {
+    const url = document.getElementById('url').value.trim();
+    const x = parseInt(document.getElementById('x').value||0,10);
+    const y = parseInt(document.getElementById('y').value||0,10);
+    const w = parseInt(document.getElementById('w').value||300,10);
+    const h = parseInt(document.getElementById('h').value||120,10);
+    // update highlight position & size
+    hl.style.left = x + 'px';
+    hl.style.top  = y + 'px';
+    hl.style.width = w + 'px';
+    hl.style.height = h + 'px';
+    // reload frame src only (frame is non-interactive)
+    frame.src = url;
+    // hint to user
+    apply.textContent = 'Applied — update screenshot';
+    setTimeout(()=> apply.textContent = 'Apply & Reload Frame', 1600);
+  });
+</script>
 </body>
 </html>
