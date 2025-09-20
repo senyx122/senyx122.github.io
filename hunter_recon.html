@@ -122,10 +122,11 @@ npx wappalyzer https://sub.example.com
     <h2>7. Additional recon tools</h2>
     <p>Get historical URLs, parameters and more surface area for fuzzing.</p>
     <pre>
-  katana -u https://example.com -o urls.txt
-  sort -u urls.txt > unique_urls.txt
-gau example.com > urls.txt
-cat subs.txt | waybackurls > wb_urls.txt
+cat live_subs.txt | katana > urls.txt
+cat live_subs.txt | waybackurls >> urls.txt 
+cat live_subs.txt | gau >> urls.txt
+sort -u urls.txt > unique_urls.txt
+httpx -l unique_urls.txt -o live_urls.txt
 dnsx -l subs.txt -a -resp
 naabu -iL live_subs.txt -o ports.txt
     </pre>
