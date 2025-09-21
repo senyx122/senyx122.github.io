@@ -1,26 +1,40 @@
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>CORS PoC (no credentials)</title></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Safe CORS PoC</title>
+</head>
 <body>
-  <h3>CORS PoC (no credentials)</h3>
-  <button id="run">Run fetch</button>
-  <pre id="out"></pre>
-  <script>
-    document.getElementById('run').onclick = async () => {
-      try {
-        const res = await fetch('https://go.capital.com/v2/login/admin-login/', {
-          method: 'GET',
-          credentials: 'omit' // <-- لا ترسل credentials
-        });
-        const text = await res.text();
-        document.getElementById('out').textContent =
-          'Status: ' + res.status + '\\n\\nHeaders:\\n' +
-          [...res.headers].map(h => h.join(': ')).join('\\n') +
-          '\\n\\nBody (first 200 chars):\\n' + text.slice(0,200);
-      } catch (e) {
-        document.getElementById('out').textContent = 'Error: ' + e;
-      }
-    };
-  </script>
+<h2>Safe CORS PoC for /v2/auth endpoints</h2>
+<pre id="results"></pre>
+
+<script>
+const endpoints = [
+    '/v2/login/admin-login/',
+    '/v2/authenticate/login',
+    '/v2/authenticate/logout',
+    '/v2/authenticate/check',
+    // أضف أي مسارات auth مشبوهة هنا
+];
+
+const baseURL = 'https://go.capital.com';
+
+const resultsEl = document.getElementById('results');
+
+endpoints.forEach(ep => {
+    fetch(baseURL + ep, { credentials: 'omit' })
+    .then(res => res.text())
+    .then(data => {
+        const output = `✅ ${ep} - Response size: ${data.length}\nFirst 200 chars:\n${data.substring(0,200)}\n\n`;
+        resultsEl.textContent += output;
+        console.log(output);
+    })
+    .catch(err => {
+        const output = `❌ ${ep} - Error or blocked by CORS\n${err}\n\n`;
+        resultsEl.textContent += output;
+        console.log(output);
+    });
+});
+</script>
 </body>
 </html>
