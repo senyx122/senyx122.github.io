@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Writeups — SenyX122</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-dark:#0f0f0f;
+    --accent:#00ff88;
+    --accent-2:#00d4ff;
+    --muted:#ccc;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:'Inconsolata',monospace;
+    background:var(--bg-dark);
+    color:var(--muted);
+    padding:28px;
+  }
+  header{display:flex;gap:14px;align-items:center;margin-bottom:18px}
+  header img{width:64px;height:64px;border-radius:8px;border:3px solid var(--accent);object-fit:cover}
+  h1{margin:0;color:var(--accent);font-size:1.6rem}
+  .subtitle{color:#9aa;font-size:0.95rem}
+  
+  .section-header{margin-top:36px;margin-bottom:12px;color:var(--accent);font-size:1.2rem;border-bottom:1px dashed #333;padding-bottom:6px}
+  
+  .controls{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+  .controls .left{display:flex;gap:10px;align-items:center}
+  .search{
+    background:#111;border:1px solid #222;padding:8px;border-radius:8px;color:var(--muted);
+    min-width:220px;
+  }
+  .search::placeholder{color:#888}
+  .count{color:#9aa;font-size:0.95rem}
+
+  .list{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .item{background:#111;padding:14px;border-radius:10px;border-left:4px solid var(--accent)}
+  .item h3{margin:0 0 6px;color:var(--accent-2);font-size:1.05rem}
+  .meta{font-size:0.88rem;color:#9aa;margin-bottom:8px}
+  .desc{color:#bbb;margin:0 0 10px}
+  .read{display:inline-block;padding:6px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent-2);text-decoration:none}
+  .read:hover{color:#ff4081}
+
+  footer{margin-top:26px;color:#888;text-align:center}
+  a.home{color:var(--accent-2);text-decoration:none}
+  a.home:hover{color:#ff4081}
+  @media (max-width:600px){header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Writeups — SenyX122</h1>
+    <div class="subtitle">CTF writeups & bug reports</div>
+  </div>
+  <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="Seny avatar">
+</header>
+
+<div class="controls" role="search">
+  <div class="left">
+    <input id="search" class="search" type="search" placeholder="Search writeups" aria-label="Search writeups">
+    <div class="count" id="count">0 results</div>
+  </div>
+  <div>
+    <a href="index.html" class="home">← Back to Home</a>
+  </div>
+</div>
+
+<!-- CTF Writeups Section -->
+<h2 class="section-header">CTF Writeups</h2>
+<main class="list" id="ctf-list">
+  <article class="item" data-title="Injector" data-category="CTF" data-type="ctf">
+    <h3>Injector — CTF Writeup</h3>
+    <div class="meta">Category: Web • Year: 2025</div>
+    <p class="desc">Step-by-step guide on exploiting an unsecured entry point to gain higher access.</p>
+    <p><a href="Injector.html" class="read">Read Full Writeup →</a></p>
+  </article>
+
+  <article class="item" data-title="Hidden" data-category="CTF" data-type="ctf">
+    <h3>Hidden — CyberTalents CTF</h3>
+    <div class="meta">Category: Forensics / JS • Year: 2025</div>
+    <p class="desc">Analysis of obfuscated JavaScript to extract logic and flags.</p>
+    <p><a href="hidden.html" class="read">Read Full Writeup →</a></p>
+  </article>
+</main>
+
+<!-- Bug Reports Section -->
+<h2 class="section-header">Bug Reports</h2>
+<main class="list" id="bugs-list">
+  <article class="item" data-title="Shopify Token Leak" data-category="Bug" data-type="bug">
+    <h3>Shopify Storefront Token Leak</h3>
+    <div class="meta">Category: Web Security • Year: 2025</div>
+    <p class="desc">Report and PoC showing exposure of sensitive API token on storefront.</p>
+    <p><a href="shopify-token.html" class="read">Read Full Report →</a></p>
+  </article>
+
+  <article class="item" data-title="Email Enumeration" data-category="Bug" data-type="bug">
+    <h3>Email Activation User Enumeration</h3>
+    <div class="meta">Category: Web Security • Year: 2025</div>
+    <p class="desc">Analyzed activation workflow and discovered user enumeration vulnerability.</p>
+    <p><a href="email-enum.html" class="read">Read Full Report →</a></p>
+  </article>
+</main>
+
+<footer>
+  <p>All writeups organized in CTF and Bug Reports sections for easy access.</p>
+  <p><a href="index.html" class="home">← Back to Home</a></p>
+</footer>
+
+<script>
+  const search = document.getElementById('search');
+  const ctfItems = Array.from(document.querySelectorAll('#ctf-list .item'));
+  const bugItems = Array.from(document.querySelectorAll('#bugs-list .item'));
+  const countEl = document.getElementById('count');
+
+  function updateList() {
+    const q = search.value.trim().toLowerCase();
+    let shown = 0;
+
+    [...ctfItems, ...bugItems].forEach(it => {
+      const title = it.dataset.title.toLowerCase();
+      const cat = (it.dataset.category||'').toLowerCase();
+      const combined = title + ' ' + cat;
+      if(!q || combined.indexOf(q) !== -1) {
+        it.style.display = '';
+        shown++;
+      } else {
+        it.style.display = 'none';
+      }
+    });
+
+    countEl.textContent = shown === 0 ? 'No results' : shown + (shown===1 ? ' result' : ' results');
+  }
+
+  search.addEventListener('input', updateList);
+  updateList();
+</script>
+
+</body>
+</html>
