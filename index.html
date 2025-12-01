@@ -3,124 +3,164 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="SenyX122 — Bug hunter, CTF player and web penetration tester. Portfolio, writeups and contact." />
 <title>SenyX122 | PenTester</title>
+<link rel="icon" href="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" />
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
 <style>
+    :root{
+        --bg-dark:#0f0f0f;
+        --bg-light:#fdfdfd;
+        --accent:#00ff88;
+        --accent-2:#00d4ff;
+        --muted:#ccc;
+        --muted-dark:#222;
+        --sidebar-w:260px;
+        --radius:12px;
+    }
+    *{box-sizing: border-box}
+    html{scroll-behavior: smooth}
     body {
         margin: 0;
         font-family: 'Inconsolata', monospace;
-        background: #0f0f0f;
-        color: #ccc;
-        transition: background 0.5s, color 0.5s;
+        background: var(--bg-dark);
+        color: var(--muted);
+        transition: background 0.3s, color 0.3s;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
     }
+
+    /* Respect user preferences */
+    @media (prefers-color-scheme: light){
+        body:not(.dark-mode){
+            background: var(--bg-light);
+            color: var(--muted-dark);
+        }
+    }
+
     .wrapper {
         display: flex;
         min-height: 100vh;
     }
     .sidebar {
-        width: 260px;
+        width: var(--sidebar-w);
         background: #111;
         padding: 30px 20px;
-        box-shadow: 2px 0 15px rgba(0,255,136,0.3);
+        box-shadow: 2px 0 15px rgba(0,255,136,0.18);
         position: sticky;
         top: 0;
         height: 100vh;
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
     }
     .sidebar img {
         width: 150px;
         height: 150px;
         border-radius: 50%;
         display: block;
-        margin: 0 auto 15px;
-        border: 4px solid #00ff88;
-        box-shadow: 0 0 20px #00ff88;
-        transition: transform 0.3s;
+        margin: 0 auto 8px;
+        border: 4px solid var(--accent);
+        box-shadow: 0 0 20px var(--accent);
+        transition: transform 0.25s ease;
+        object-fit: cover;
     }
+    .sidebar img:focus{outline:3px solid rgba(0,255,136,0.25)}
     .sidebar img:hover {
-        transform: scale(1.1);
+        transform: scale(1.06);
     }
     .sidebar h1 {
         text-align: center;
-        color: #00ff88;
-        margin-bottom: 10px;
+        color: var(--accent);
+        margin: 0 0 6px;
+        font-size: 1.15rem;
     }
     .sidebar p {
         text-align: center;
         font-size: 0.95em;
+        margin: 0 0 8px;
+        color: #9aa;
     }
-    .sidebar a {
+    .nav {
+        display:flex;
+        flex-direction:column;
+        width:100%;
+        gap:6px;
+        margin-top:8px;
+    }
+    .nav a {
         display: block;
-        color: #00d4ff;
+        color: var(--accent-2);
         text-decoration: none;
-        margin: 12px 0;
-        text-align: center;
-        transition: color 0.3s;
+        padding:8px 6px;
+        border-radius:8px;
+        text-align:center;
+        transition: color 0.15s, background 0.15s;
+        font-size:0.95rem;
     }
-    .sidebar a.active, .sidebar a:hover {
+    .nav a:focus{outline:2px dashed rgba(0,212,255,0.25)}
+    .nav a.active, .nav a:hover {
         color: #ff4081;
+        background: rgba(255,64,129,0.04);
     }
     .theme-toggle {
-        margin-top: 20px;
-        text-align: center;
+        margin-top: auto;
+        width:100%;
+        text-align:center;
     }
     .theme-toggle button {
-        background: #00ff88;
+        background: var(--accent);
         color: #000;
         border: none;
         padding: 8px 14px;
         cursor: pointer;
-        border-radius: 5px;
+        border-radius: 6px;
+        width:100%;
     }
     .main {
         flex: 1;
         padding: 40px;
+        max-width: 980px;
+        margin: 0 auto;
     }
     section {
         margin-bottom: 80px;
         opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.6s;
+        transform: translateY(12px);
+        transition: all 0.55s ease;
     }
     section.visible {
         opacity: 1;
         transform: translateY(0);
     }
     h2 {
-        color: #00ff88;
+        color: var(--accent);
         border-bottom: 1px dashed #333;
         padding-bottom: 5px;
         margin-bottom: 15px;
+        font-size:1.1rem;
     }
     ul {
         list-style: none;
         padding: 0;
+        margin: 0;
     }
     ul li {
         padding: 6px 0;
         border-bottom: 1px dashed #222;
     }
-    ul li:last-child {
-        border-bottom: none;
-    }
-    a {
-        color: #00d4ff;
-        text-decoration: none;
-    }
-    a:hover {
-        color: #ff4081;
-    }
-    footer {
-        text-align: center;
-        padding: 15px;
-        background: #111;
-        color: #555;
-    }
+    ul li:last-child {border-bottom:none}
+    a {color: var(--accent-2); text-decoration:none}
+    a:hover{color:#ff4081}
+    footer{ text-align:center; padding:15px; background:#111; color:#666 }
+
     #scrollTopBtn {
         position: fixed;
         bottom: 30px;
         right: 30px;
-        background: #00ff88;
+        background: var(--accent);
         color: #000;
         border: none;
         padding: 10px 18px;
@@ -128,125 +168,65 @@
         cursor: pointer;
         display: none;
         font-size: 15px;
-        box-shadow: 0 0 10px #00ff88;
-        transition: background 0.3s;
+        box-shadow: 0 0 10px var(--accent);
+        transition: background 0.15s;
     }
-    #scrollTopBtn:hover {
-        background: #00d4ff;
-        color: #fff;
-    }
+    #scrollTopBtn:hover{background:var(--accent-2); color:#fff}
 
-    /* Light mode */
-    .light-mode {
-        background: #fdfdfd;
-        color: #222;
+    /* Light mode overrides when class added */
+    .light-mode{
+        background: var(--bg-light);
+        color: var(--muted-dark);
     }
-    .light-mode .sidebar {
-        background: #f0f0f0;
-        box-shadow: 2px 0 15px rgba(0,200,136,0.2);
-    }
-    .light-mode .sidebar h1 {
-        color: #00aa66;
-    }
-    .light-mode .sidebar a {
-        color: #0077ff;
-    }
-    .light-mode .sidebar a.active, .light-mode .sidebar a:hover {
-        color: #ff4081;
-    }
-    .light-mode h2 {
-        color: #00aa66;
-        border-bottom: 1px dashed #888;
-    }
-    .light-mode ul li {
-        border-bottom: 1px dashed #ccc;
-    }
-    .light-mode a {
-        color: #0077cc;
-    }
-    .light-mode a:hover {
-        color: #ff4081;
-    }
-    .light-mode footer {
-        background: #f0f0f0;
-        color: #555;
-    }
-    .light-mode .sidebar img {
-        border-color: #00aa66;
-        box-shadow: 0 0 15px #00aa66;
-    }
-    .light-mode #scrollTopBtn {
-        background: #00aa66;
-        color: #fff;
-        box-shadow: 0 0 8px #00aa66;
-    }
-    .light-mode #scrollTopBtn:hover {
-        background: #0077cc;
-    }
+    .light-mode .sidebar{background:#f0f0f0; box-shadow: 2px 0 15px rgba(0,200,136,0.08)}
+    .light-mode h2{color:#00aa66}
+
+    /* focus styles for accessibility */
+    :focus{outline:none}
+    a:focus, button:focus, input:focus, textarea:focus{outline:3px solid rgba(0,212,255,0.12); border-radius:6px}
 
     /* Responsive */
-    @media (max-width: 768px) {
-        .wrapper {
-            flex-direction: column;
-        }
-        .sidebar {
-            width: 100%;
-            height: auto;
-            position: relative;
-            box-shadow: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-        }
-        .sidebar img {
-            width: 100px;
-            height: 100px;
-            margin: 0 10px 10px;
-        }
-        .sidebar h1, .sidebar p {
-            width: 100%;
-            text-align: center;
-        }
-        .sidebar a {
-            margin: 6px 10px;
-            font-size: 0.9em;
-        }
-        .theme-toggle {
-            width: 100%;
-            margin-top: 10px;
-        }
-        .main {
-            padding: 20px;
-        }
+    @media (max-width: 768px){
+        .wrapper{flex-direction:column}
+        .sidebar{width:100%; height:auto; position:relative; box-shadow:none; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; padding:15px}
+        .sidebar img{width:100px;height:100px;margin:0 10px 10px}
+        .sidebar h1,.sidebar p{width:100%; text-align:center}
+        .nav{flex-direction:row; flex-wrap:wrap; gap:8px; justify-content:center}
+        .nav a{margin:6px 6px; font-size:0.88rem}
+        .theme-toggle{width:100%; margin-top:10px}
+        .main{padding:20px}
+        footer{position:static}
     }
-</style>
 
+    /* HackenProof small icon in-contact */
+    .contact-icons img.service-icon{width:20px; height:20px; vertical-align:middle; margin-right:6px}
+</style>
 </head>
 <body>
 
 <div class="wrapper">
-    <div class="sidebar">
-        <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="seny">
-        <h1><span id="typing"></span></h1>
+    <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="Seny avatar" loading="lazy" width="150" height="150">
+        <h1><span id="typing" aria-live="polite"></span></h1>
         <p>🇪🇬 Egypt<br>Bug Hunter | CTF | PenTester</p>
-        <a href="#tools">Tools & Skills</a>
-        <a href="#certs">Certifications</a>
-        <a href="#writeups">Writeups</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="tools">Tools</a>
-        <a href="recon_pentester.html">Recon Pentester</a>
-        <a href="hunter_recon.html">Recon Hunting </a>
+        <nav class="nav" aria-label="Sections">
+            <a href="#tools">Tools & Skills</a>
+            <a href="#certs">Certifications</a>
+            <a href="#writeups">Writeups</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <a href="#recon">Recon</a>
+            <a href="bugs.html">Bugs</a>
+            <a href="#resume" id="resumeLink">Download CV</a>
+        </nav>
         <div class="theme-toggle">
-            <button onclick="toggleTheme()">Toggle Theme</button>
+            <button id="themeToggle" aria-pressed="false">Toggle Theme</button>
         </div>
-    </div>
+    </aside>
 
-    <div class="main">
+    <main class="main" role="main">
         <section id="tools">
-            <h2> Tools & Skills</h2>
+            <h2>Tools & Skills</h2>
             <ul>
                 <li>Linux (Kali, Parrot)</li>
                 <li>Burp Suite, Nmap, Gobuster, SQLMap, Nikto</li>
@@ -256,7 +236,7 @@
         </section>
 
         <section id="certs">
-            <h2> Certifications</h2>
+            <h2>Certifications</h2>
             <ul>
                 <li>TryHackMe Advent of Cyber 2024</li>
                 <li>Hack The Box Starting Point</li>
@@ -264,112 +244,170 @@
             </ul>
         </section>
 
-     <section id="writeups">
-    <h2> Writeups</h2>
-    <ul>
-        <li><a href="Injector.html">Injector - CTF Writeup</a></li>
-        <li><a href="hidden.html">CyberTalents CTF - Hidden</a></li>
-        <li><a href="maximum.html"> CyberTalents CTF - Maximum Courage </a></li>
-        <li><a href="Tomcat.html"> CyberTalents CTF - Tomcat </a></li>     
-    </ul>
-    <p style="text-align:center; margin-top: 10px;">
-        Showing last 5 writeups —
-        <a href="writeups.html" style="color: #00d4ff;">More &raquo;</a>
-    </p>
-</section>
-
+        <section id="writeups">
+            <h2>Writeups</h2>
+            <ul>
+                <li><a href="Injector.html">Injector - CTF Writeup</a></li>
+                <li><a href="hidden.html">CyberTalents CTF - Hidden</a></li>
+                <li><a href="maximum.html">CyberTalents CTF - Maximum Courage</a></li>
+                <li><a href="Tomcat.html">CyberTalents CTF - Tomcat</a></li>
+            </ul>
+            <p style="text-align:center; margin-top: 10px;">Showing last 5 writeups — <a href="writeups.html" style="color: var(--accent-2);">More »</a></p>
+        </section>
 
         <section id="about">
-            <h2> About Me</h2>
-            <p>Little boy with little dreams, a noob, a geek, a hacker wannabe. I enjoy popping boxes, reading payloads, and living the terminal life .</p>
+            <h2>About Me</h2>
+            <p>Little boy with little dreams, a noob, a geek, a hacker wannabe. I enjoy popping boxes, reading payloads, and living the terminal life.</p>
         </section>
 
         <section id="contact">
-            <h2> Contact & Social</h2>
-            <p>
-                <a href="https://github.com/senyx122">GitHub</a> |
-                <a href="https://t.me/seny_hacker">Telegram</a> |
-                <a href="mailto:senyx122@gmail.com">Email</a>
+            <h2>Contact & Social</h2>
+            <p class="contact-icons" style="line-height:1.6;">
+                <a href="https://github.com/senyx122" target="_blank" rel="noopener">GitHub</a> |
+                <a href="https://t.me/seny_hacker" target="_blank" rel="noopener">Telegram</a> |
+                <a href="mailto:senyx122@gmail.com">Email</a> |
+                <a href="https://hackenproof.com/senyx122" target="_blank" rel="noopener">
+                    <img class="service-icon" src="https://i.ibb.co/KbN4m4W/hackenproof.png" alt="HackenProof icon">
+                    HackenProof
+                </a>
             </p>
+
+            <form id="contactForm" aria-label="Contact form" onsubmit="return handleContact(event)">
+                <p style="margin-top:12px;">Or send a quick message:</p>
+                <input id="name" name="name" placeholder="Your name" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px;">
+                <input id="subject" name="subject" placeholder="Subject" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px;">
+                <textarea id="message" name="message" placeholder="Message" rows="4" required style="width:100%; padding:8px; margin:6px 0; border-radius:6px;"></textarea>
+                <div style="display:flex; gap:8px;">
+                    <button type="submit" style="flex:1; padding:8px; border-radius:6px;">Send</button>
+                    <button type="reset" style="flex:1; padding:8px; border-radius:6px;">Clear</button>
+                </div>
+                <p id="contactNote" style="font-size:0.9rem; color:#999; margin-top:8px;">This form will open your email client to send the message.</p>
+            </form>
         </section>
-    </div>
+
+        <section id="recon">
+            <h2>Recon & Tools</h2>
+            <ul>
+                <li><a href="recon_pentester.html">Recon Pentester</a></li>
+                <li><a href="hunter_recon.html">Recon Hunting</a></li>
+            </ul>
+        </section>
+
+        <section id="resume">
+            <h2>Resume</h2>
+            <p>Download a PDF version of my resume/CV.</p>
+            <p><a href="/assets/SenyX122_CV.pdf" id="downloadCv" download>Download CV (PDF)</a></p>
+        </section>
+    </main>
 </div>
 
 <footer>
-    &copy; 2025 SenyX122 |
+    &copy; <span id="year">2025</span> SenyX122 |
 </footer>
 
-<button id="scrollTopBtn">↑ Top</button>
+<button id="scrollTopBtn" aria-label="Scroll to top">↑ Top</button>
 
 <script>
-    // Typing animation
-    const words = ["Hey, I'm Seny!", "CTF Player", "Ethical Hacker"];
-    let i = 0, timer;
-    function typingEffect() {
-        let word = words[i].split("");
-        const loopTyping = function() {
-            if (word.length > 0) {
-                document.getElementById("typing").innerHTML += word.shift();
+    /* Typing animation - improved, avoids overlapping timers and is accessible */
+    (function(){
+        const words = ["Hey, I'm Seny!", "CTF Player", "Ethical Hacker"];
+        const el = document.getElementById('typing');
+        let w = 0, idx = 0, forward = true;
+        function tick(){
+            const word = words[w];
+            if(forward){
+                el.textContent = word.slice(0, ++idx);
+                if(idx === word.length){
+                    forward = false;
+                    setTimeout(tick, 1200);
+                    return;
+                }
             } else {
-                deletingEffect();
-                return;
+                el.textContent = word.slice(0, --idx);
+                if(idx === 0){
+                    forward = true;
+                    w = (w + 1) % words.length;
+                }
             }
-            timer = setTimeout(loopTyping, 150);
-        };
-        loopTyping();
-    }
-    function deletingEffect() {
-        let word = words[i].split("");
-        const loopDeleting = function() {
-            if (word.length > 0) {
-                word.pop();
-                document.getElementById("typing").innerHTML = word.join("");
-            } else {
-                i = (i + 1) % words.length;
-                typingEffect();
-                return;
-            }
-            timer = setTimeout(loopDeleting, 100);
-        };
-        setTimeout(loopDeleting, 1500);
-    }
-    typingEffect();
+            setTimeout(tick, forward ? 120 : 60);
+        }
+        tick();
+    })();
 
-    // Highlight active link
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.sidebar a');
+    // Highlight active link on scroll
+    const sections = document.querySelectorAll('main section');
+    const navLinks = document.querySelectorAll('.nav a');
     window.addEventListener('scroll', () => {
-        let current = "";
+        let current = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop - 100;
-            if (scrollY >= sectionTop) current = section.getAttribute('id');
+            const top = section.offsetTop - 120;
+            if(window.scrollY >= top) current = section.getAttribute('id');
         });
         navLinks.forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href') === "#" + current) link.classList.add('active');
+            if(link.getAttribute('href') === '#' + current) link.classList.add('active');
         });
     });
 
-    // Scroll to top
-    const scrollBtn = document.getElementById("scrollTopBtn");
-    window.onscroll = () => {
-        scrollBtn.style.display = document.documentElement.scrollTop > 200 ? "block" : "none";
-    };
-    scrollBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+    // Scroll to top button
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        scrollBtn.style.display = document.documentElement.scrollTop > 200 ? 'block' : 'none';
+    });
+    scrollBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
 
-    // Animate sections on scroll
+    // Intersection observer for reveal animations
     const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) entry.target.classList.add('visible');
-        });
-    }, { threshold: 0.2 });
-    sections.forEach(section => observer.observe(section));
+        entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.18 });
+    sections.forEach(s => observer.observe(s));
 
-    // Dark/Light toggle
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
+    // Theme toggle with persisted preference
+    const themeBtn = document.getElementById('themeToggle');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    function applyTheme(name){
+        if(name === 'light') document.documentElement.classList.remove('dark-mode'), document.body.classList.add('light-mode');
+        else if(name === 'dark') document.body.classList.remove('light-mode');
+        // update aria
+        themeBtn.setAttribute('aria-pressed', name === 'light');
     }
-</script>
+    // load saved
+    const saved = localStorage.getItem('sx_theme');
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+    themeBtn.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-mode');
+        localStorage.setItem('sx_theme', isLight ? 'light' : 'dark');
+        themeBtn.setAttribute('aria-pressed', isLight);
+    });
 
+    // Contact form: open mail client via mailto (simple fallback)
+    function handleContact(e){
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+        const mailto = `mailto:senyx122@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: '+name+'\n\n'+message)}`;
+        window.location.href = mailto;
+        return false;
+    }
+
+    // Footer year dynamic
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Small keyboard accessibility improvement: allow 'Top' button via keyboard
+    document.getElementById('scrollTopBtn').addEventListener('keyup', (e)=>{ if(e.key === 'Enter') window.scrollTo({top:0, behavior:'smooth'}); });
+
+    // Download link fallback (if file missing, hide link)
+    (function(){
+        const dl = document.getElementById('downloadCv');
+        // keep simple; if your server doesn't have file, the link will 404 — implement server-side check if needed
+        document.getElementById('resumeLink').addEventListener('click', (ev)=>{
+            // navigate to resume section instead of external page
+            ev.preventDefault();
+            document.getElementById('resume').scrollIntoView({behavior:'smooth'});
+        });
+    })();
+
+</script>
 </body>
 </html>
