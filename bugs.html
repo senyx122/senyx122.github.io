@@ -12,19 +12,21 @@
     header img{width:56px;height:56px;border-radius:8px;border:3px solid #00ff88}
     h1{margin:0;color:#00ff88}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:18px}
-    .card{background:#111;padding:14px;border-radius:10px;border-left:4px solid #00ff88}
+    .card{background:#111;padding:14px;border-radius:10px;border-left:4px solid #00ff88;display:flex;flex-direction:column;justify-content:space-between}
     .card h3{margin:0 0 6px;color:#00d4ff}
     .meta{font-size:0.9rem;color:#9aa;margin-bottom:6px}
-    .status{display:inline-block;padding:4px 8px;border-radius:8px;font-weight:600;font-size:0.85rem}
+    .status{display:inline-block;padding:4px 8px;border-radius:8px;font-weight:600;font-size:0.85rem;margin-bottom:6px}
     .open{background:#1b1b1b;color:#00ff88;border:1px solid rgba(0,255,136,0.06)}
     .closed{background:#1b1b1b;color:#ff8080;border:1px solid rgba(255,64,129,0.06)}
     .pending{background:#1b1b1b;color:#ffd580;border:1px solid rgba(255,212,128,0.06)}
+    .resolved{background:#1b1b1b;color:#00ff88;border:1px solid rgba(0,255,136,0.06)}
     footer{margin-top:22px;color:#888}
     a{color:#00d4ff;text-decoration:none}
     a:hover{color:#ff4081}
 </style>
 </head>
 <body>
+
 <header>
     <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="Seny avatar">
     <div>
@@ -34,16 +36,30 @@
 </header>
 
 <div class="grid">
+    <!-- Bug 1 -->
     <article class="card">
         <h3>User Enumeration — DeFacto Egypt</h3>
         <div class="meta">Type: User Enumeration • Target: www.defacto.com.eg</div>
-        <div style="margin-bottom:8px"><span class="Resolved">Resolved</span></div>
-        <p style="margin:0.25rem 0 0;color:#aaa">Email activation endpoint leaks registeration state. See writeup for PoC & recommendation.</p>
-        <p style="margin-top:10px"><a href="https://medium.com/@mohamedabdulhamid/user-enumeration-discovered-in-defacto-egypts-email-activation-endpoint-21a8e446ab99">View writeup →</a></p>
+        <div class="status resolved">Resolved</div>
+        <p style="margin:0.25rem 0 0;color:#aaa">Email activation endpoint leaks registration state. See writeup for PoC & recommendation.</p>
+        <p style="margin-top:10px"><a href="https://medium.com/@mohamedabdulhamid/user-enumeration-discovered-in-defacto-egypts-email-activation-endpoint-21a8e446ab99" target="_blank">View writeup →</a></p>
     </article>
+
+    <!-- Bug 2 -->
+    <article class="card">
+        <h3>Hardcoded Crypto Deposit Addresses — NonKYC.io</h3>
+        <div class="meta">Type: Information Exposure • Target: https://nonkyc.io</div>
+        <div class="status pending">Pending Review</div>
+        <p style="margin:0.25rem 0 0;color:#aaa">
+        Sensitive data such as cryptocurrency deposit addresses, TXIDs, account balances, withdrawal messages, and KYC-bypass indicators are exposed in frontend JavaScript bundles. This creates risks of phishing, user tracking, and financial loss.
+        </p>
+        <p style="margin-top:10px"><a href="https://medium.com/@senyx122/exposed-crypto-addresses-in-frontend-code-a-bug-bounty-story-5c3b9e4c2f12" target="_blank">View writeup →</a></p>
+    </article>
+</div>
 
 <footer>
     <p><a href="index.html">← Back to Home</a></p>
 </footer>
+
 </body>
 </html>
