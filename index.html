@@ -214,10 +214,9 @@
             <a href="#certs">Certifications</a>
             <a href="#writeups">Writeups</a>
             <a href="#about">About</a>
-            <a href="#contact">Contact</a>
             <a href="#recon">Recon</a>
             <a href="bugs.html">Bugs</a>
-            <a href="#resume" id="resumeLink">Download CV</a>
+            <!-- removed Download CV link as requested -->
         </nav>
         <div class="theme-toggle">
             <button id="themeToggle" aria-pressed="false">Toggle Theme</button>
@@ -260,6 +259,15 @@
             <p>Little boy with little dreams, a noob, a geek, a hacker wannabe. I enjoy popping boxes, reading payloads, and living the terminal life.</p>
         </section>
 
+        <section id="recon">
+            <h2>Recon & Tools</h2>
+            <ul>
+                <li><a href="recon_pentester.html">Recon Pentester</a></li>
+                <li><a href="hunter_recon.html">Recon Hunting</a></li>
+            </ul>
+        </section>
+
+        <!-- Contact moved to the very end as requested -->
         <section id="contact">
             <h2>Contact & Social</h2>
             <p class="contact-icons" style="line-height:1.6;">
@@ -283,20 +291,6 @@
                 </div>
                 <p id="contactNote" style="font-size:0.9rem; color:#999; margin-top:8px;">This form will open your email client to send the message.</p>
             </form>
-        </section>
-
-        <section id="recon">
-            <h2>Recon & Tools</h2>
-            <ul>
-                <li><a href="recon_pentester.html">Recon Pentester</a></li>
-                <li><a href="hunter_recon.html">Recon Hunting</a></li>
-            </ul>
-        </section>
-
-        <section id="resume">
-            <h2>Resume</h2>
-            <p>Download a PDF version of my resume/CV.</p>
-            <p><a href="/assets/SenyX122_CV.pdf" id="downloadCv" download>Download CV (PDF)</a></p>
         </section>
     </main>
 </div>
@@ -397,17 +391,7 @@
     // Small keyboard accessibility improvement: allow 'Top' button via keyboard
     document.getElementById('scrollTopBtn').addEventListener('keyup', (e)=>{ if(e.key === 'Enter') window.scrollTo({top:0, behavior:'smooth'}); });
 
-    // Download link fallback (if file missing, hide link)
-    (function(){
-        const dl = document.getElementById('downloadCv');
-        // keep simple; if your server doesn't have file, the link will 404 — implement server-side check if needed
-        document.getElementById('resumeLink').addEventListener('click', (ev)=>{
-            // navigate to resume section instead of external page
-            ev.preventDefault();
-            document.getElementById('resume').scrollIntoView({behavior:'smooth'});
-        });
-    })();
-
+    // Note: removed resume/download link & its JS per your request
 </script>
 </body>
 </html>
