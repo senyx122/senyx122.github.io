@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bugs — SenyX122</title>
+<link rel="icon" href="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png">
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+<style>
+    body{margin:0;font-family:'Inconsolata',monospace;background:#0f0f0f;color:#ccc;padding:28px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    header img{width:56px;height:56px;border-radius:8px;border:3px solid #00ff88}
+    h1{margin:0;color:#00ff88}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:18px}
+    .card{background:#111;padding:14px;border-radius:10px;border-left:4px solid #00ff88}
+    .card h3{margin:0 0 6px;color:#00d4ff}
+    .meta{font-size:0.9rem;color:#9aa;margin-bottom:6px}
+    .status{display:inline-block;padding:4px 8px;border-radius:8px;font-weight:600;font-size:0.85rem}
+    .open{background:#1b1b1b;color:#00ff88;border:1px solid rgba(0,255,136,0.06)}
+    .closed{background:#1b1b1b;color:#ff8080;border:1px solid rgba(255,64,129,0.06)}
+    .pending{background:#1b1b1b;color:#ffd580;border:1px solid rgba(255,212,128,0.06)}
+    footer{margin-top:22px;color:#888}
+    a{color:#00d4ff;text-decoration:none}
+    a:hover{color:#ff4081}
+</style>
+</head>
+<body>
+<header>
+    <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="Seny avatar">
+    <div>
+        <h1>Discovered Bugs</h1>
+        <div style="color:#9aa;font-size:0.95rem">Reports, statuses and quick links — SenyX122</div>
+    </div>
+</header>
+
+<div class="grid">
+    <article class="card">
+        <h3>User Enumeration — DeFacto Egypt</h3>
+        <div class="meta">Type: User Enumeration • Target: www.defacto.com.eg</div>
+        <div style="margin-bottom:8px"><span class="status pending">Reported</span></div>
+        <p style="margin:0.25rem 0 0;color:#aaa">Email activation endpoint leaks registeration state. See writeup for PoC & recommendation.</p>
+        <p style="margin-top:10px"><a href="writeups/defacto_user_enum.html">View writeup →</a></p>
+    </article>
+
+    <article class="card">
+        <h3>Shopify Storefront API — Unlimited Cart Creation</h3>
+        <div class="meta">Type: Rate-limiting / Abuse • Target: store.eero.com</div>
+        <div style="margin-bottom:8px"><span class="status closed">Closed (Ineligible)</span></div>
+        <p style="margin:0.25rem 0 0;color:#aaa">Issue discussed with program; classified as Core Ineligible. Details in report.</p>
+        <p style="margin-top:10px"><a href="writeups/shopify_cart.html">View report →</a></p>
+    </article>
+
+    <article class="card">
+        <h3>IDOR — Email Activation Parameter</h3>
+        <div class="meta">Type: IDOR • Status: Pending Program Review</div>
+        <div style="margin-bottom:8px"><span class="status pending">Pending Program Review</span></div>
+        <p style="margin:0.25rem 0 0;color:#aaa">IDOR in activation link parameter allowing cross-account actions.</p>
+        <p style="margin-top:10px"><a href="writeups/idor_activation.html">View details →</a></p>
+    </article>
+
+    <article class="card">
+        <h3>Obfuscated JS — Hidden CTF Challenge</h3>
+        <div class="meta">Type: Info disclosure • Status: Resolved</div>
+        <div style="margin-bottom:8px"><span class="status open">Resolved</span></div>
+        <p style="margin:0.25rem 0 0;color:#aaa">Found logic leak in challenge; fixed by authors.</p>
+        <p style="margin-top:10px"><a href="hidden.html">Read writeup →</a></p>
+    </article>
+</div>
+
+<footer>
+    <p>Want this list dynamic? I can add a JSON + fetch to load entries — tell me if you want that.</p>
+    <p><a href="index.html">← Back to Home</a></p>
+</footer>
+</body>
+</html>
