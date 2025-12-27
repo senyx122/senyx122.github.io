@@ -1,127 +1,2035 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Subdomain Recon Roadmap</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background: #0f0f0f;
-      color: #ccc;
-      font-family: 'Inconsolata', monospace;
-      padding: 20px;
-      line-height: 1.7;
-    }
-    h1, h2 {
-      color: #00ff88;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    h2 {
-      border-bottom: 1px dashed #333;
-      padding-bottom: 5px;
-      margin-top: 50px;
-    }
-    pre {
-      background: #111;
-      color: #00d4ff;
-      padding: 12px;
-      border-radius: 6px;
-      overflow-x: auto;
-      box-shadow: 0 0 8px #00ff88;
-    }
-    .section {
-      margin-bottom: 40px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.6s;
-    }
-    .section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    a {
-      color: #00d4ff;
-      text-decoration: none;
-    }
-    a:hover {
-      color: #ff4081;
-    }
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 0.9em;
-      color: #555;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bug Bounty Workshop — Full Workbook & Recon Commands</title>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg:#0f0f0f; --panel:#0b1113; --muted:#cbd5e1;
+    --accent:#00ff88; --accent2:#00d4ff; --danger:#ff4d9d;
+    --success:#00ff88; --warning:#ffb74d; --info:#64b5f6;
+    --glass: rgba(255,255,255,0.03); --shadow: 0 6px 24px rgba(0,0,0,0.6); --radius:12px;
+    --mono: 'Inconsolata', monospace;
+    --transition: all 0.3s ease;
+  }
+  :root.light { 
+    --bg:#f6f7fb; --panel:#ffffff; --muted:#172031; 
+    --accent:#0b8457; --accent2:#0b7fae; --danger:#d81b60;
+    --success:#0b8457; --warning:#f57c00; --info:#0b7fae;
+    color-scheme:light; 
+  }
+  
+  :root.reading-mode {
+    --bg:#1a1a2e; --panel:#16213e; --muted:#e6e6e6;
+    --accent:#4cc9f0; --accent2:#4361ee; --danger:#f72585;
+    --success:#4cc9f0; --warning:#f8961e; --info:#7209b7;
+  }
+  
+  *{box-sizing:border-box; margin:0; padding:0;}
+  
+  body{
+    margin:0;
+    font-family:var(--mono);
+    background:var(--bg);
+    color:var(--muted);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    line-height:1.6;
+  }
+  
+  /* Header & Navigation */
+  header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 18px;
+    background:linear-gradient(180deg, rgba(11,17,19,0.95), rgba(11,17,19,0.85));
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  }
+  
+  header h1{
+    margin:0;
+    color:var(--accent);
+    font-size:18px;
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  .logo-icon {
+    color:var(--accent2);
+  }
+  
+  .controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  
+  .btn{
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,0.05);
+    color:var(--muted);
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    font-family:var(--mono);
+    transition:var(--transition);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  
+  .btn:hover{
+    background:rgba(255,255,255,0.08);
+    border-color:rgba(0,255,136,0.1);
+    transform:translateY(-1px);
+  }
+  
+  .btn.small{padding:6px 10px;font-size:12px;}
+  .btn.strong{border-color:rgba(0,255,136,0.2);color:var(--accent);}
+  .btn.primary{background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#000; font-weight:700;}
+  
+  /* Main Layout */
+  .wrap{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:20px;
+    padding:18px;
+    max-width:1600px;
+    margin:0 auto;
+  }
+  
+  /* Sidebar Navigation */
+  nav.sidebar{
+    position:sticky;
+    top:72px;
+    height:calc(100vh - 92px);
+    overflow:auto;
+    padding:18px;
+    background:var(--panel);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex;
+    flex-direction:column;
+  }
+  
+  nav.sidebar h3{
+    margin:0 0 15px 0;
+    color:var(--accent);
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  .nav-section {
+    margin-bottom:20px;
+  }
+  
+  nav.sidebar a{
+    display:flex;
+    text-decoration:none;
+    color:var(--muted);
+    padding:8px 10px;
+    border-radius:6px;
+    margin:2px 0;
+    font-size:13px;
+    transition:var(--transition);
+    align-items:center;
+    gap:8px;
+  }
+  
+  nav.sidebar a:hover{
+    background:rgba(0,255,136,0.05);
+    color:var(--accent);
+    padding-left:12px;
+  }
+  
+  nav.sidebar a.active{
+    background:rgba(0,255,136,0.1);
+    color:var(--accent);
+    border-left:3px solid var(--accent);
+  }
+  
+  .nav-icon {
+    width:16px;
+    text-align:center;
+    color:var(--accent2);
+  }
+  
+  .page-indicator {
+    margin-left:auto;
+    font-size:11px;
+    color:var(--accent2);
+    background:rgba(0,255,136,0.1);
+    padding:2px 6px;
+    border-radius:4px;
+  }
+  
+  /* Main Content */
+  main{
+    padding-bottom:40px;
+  }
+  
+  .meta{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  
+  input[type=search]{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.05);
+    background:rgba(255,255,255,0.03);
+    color:var(--muted);
+    font-family:var(--mono);
+    transition:var(--transition);
+  }
+  
+  input[type=search]:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(0,255,136,0.1);
+  }
+  
+  /* Sections */
+  .section{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:20px;
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow:var(--shadow);
+    transition:var(--transition);
+    position:relative;
+  }
+  
+  .section.hidden{display:none;}
+  .section:hover{box-shadow:0 8px 30px rgba(0,0,0,0.5);}
+  
+  .section-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  
+  .section h2{
+    color:var(--accent);
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:18px;
+  }
+  
+  .section-number {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;
+    height:28px;
+    background:linear-gradient(135deg, var(--accent), var(--accent2));
+    color:#000;
+    border-radius:50%;
+    font-weight:700;
+    font-size:14px;
+  }
+  
+  .muted{
+    color:var(--muted);
+    font-size:14px;
+    margin:8px 0 0 0;
+    line-height:1.6;
+  }
+  
+  /* Code Blocks */
+  pre{
+    background:linear-gradient(135deg, rgba(7,16,23,0.9), rgba(11,17,19,0.9));
+    color:var(--accent2);
+    padding:16px;
+    border-radius:8px;
+    overflow:auto;
+    margin-top:12px;
+    position:relative;
+    white-space:pre-wrap;
+    word-break:break-word;
+    border:1px solid rgba(0,212,255,0.05);
+    line-height:1.5;
+    font-size:14px;
+  }
+  
+  :root.light pre{
+    background:#f7fbff;
+    color:#0b3b4a;
+    border-color:rgba(11,127,174,0.08);
+  }
+  
+  .code-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  
+  .code-language {
+    font-size:12px;
+    color:var(--warning);
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  
+  .code-actions{
+    position:absolute;
+    top:10px;
+    right:10px;
+    display:flex;
+    gap:6px;
+    opacity:0.7;
+    transition:var(--transition);
+  }
+  
+  pre:hover .code-actions {
+    opacity:1;
+  }
+  
+  .code-actions button{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:6px;
+    transition:var(--transition);
+  }
+  
+  .code-actions button:hover {
+    transform:translateY(-2px);
+  }
+  
+  .tag{
+    font-size:12px;
+    color:var(--muted);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:4px 10px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.03);
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  
+  .tag.success {color:var(--success); border-color:rgba(0,255,136,0.2);}
+  .tag.warning {color:var(--warning); border-color:rgba(255,183,77,0.2);}
+  .tag.danger {color:var(--danger); border-color:rgba(255,77,157,0.2);}
+  .tag.info {color:var(--info); border-color:rgba(100,181,246,0.2);}
+  
+  /* Tabs for Commands */
+  .tabs {
+    display:flex;
+    gap:8px;
+    margin-bottom:15px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    padding-bottom:8px;
+    flex-wrap:wrap;
+  }
+  
+  .tab-btn {
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    padding:8px 16px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:13px;
+    transition:var(--transition);
+  }
+  
+  .tab-btn:hover {
+    background:rgba(255,255,255,0.05);
+    color:var(--accent);
+  }
+  
+  .tab-btn.active {
+    background:rgba(0,255,136,0.1);
+    color:var(--accent);
+    border-bottom:2px solid var(--accent);
+  }
+  
+  .tab-content {
+    display:none;
+  }
+  
+  .tab-content.active {
+    display:block;
+  }
+  
+  /* Progress Bar */
+  #progress{
+    position:fixed;
+    left:0;
+    top:0;
+    height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    width:0;
+    z-index:9999;
+    transition:width 0.3s ease;
+    box-shadow:0 0 10px var(--accent);
+  }
+  
+  /* Stats & Progress */
+  .stats-container {
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  
+  .stat-box {
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:15px;
+    flex:1;
+    min-width:150px;
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+  
+  .stat-value {
+    font-size:24px;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:5px;
+  }
+  
+  .stat-label {
+    font-size:12px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  
+  /* Page Navigation */
+  .page-nav {
+    display:flex;
+    justify-content:space-between;
+    margin-top:30px;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,0.03);
+  }
+  
+  .page-nav-btn {
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  /* Footer */
+  footer{
+    text-align:center;
+    color:var(--muted);
+    margin-top:28px;
+    font-size:13px;
+    padding:20px;
+    border-top:1px solid rgba(255,255,255,0.03);
+  }
+  
+  /* Responsive Design */
+  @media (max-width:1100px){
+    .wrap{grid-template-columns:1fr; padding:14px;}
+    nav.sidebar{position:static; height:auto; margin-bottom:20px;}
+    header h1{font-size:16px;}
+    .controls{gap:6px;}
+  }
+  
+  @media (max-width:768px){
+    .section{padding:15px;}
+    .btn span:not(.icon){display:none;}
+    .btn{min-width:40px; justify-content:center;}
+    .btn .icon{font-size:14px;}
+    .stats-container{gap:10px;}
+    .stat-box{min-width:calc(50% - 10px);}
+  }
+  
+  @media print{
+    header,nav.sidebar,.controls,.code-actions,#progress,.page-nav{display:none!important;}
+    body{background:#fff;color:#000;}
+    .section{page-break-inside:avoid; border:none;box-shadow:none;background:transparent;}
+    pre{white-space:pre-wrap;color:#000;background:transparent;border:none;}
+    .tab-content{display:block!important;}
+  }
+</style>
 </head>
 <body>
 
-  <h1>Subdomain Recon Roadmap</h1>
+<div id="progress" aria-hidden="true"></div>
 
-  <div class="section">
-    <h2>1. Identify the target</h2>
-    <p>Start by choosing the main domain you want to test, e.g. <code>example.com</code>.
-    You usually get this from bug bounty platforms such as HackerOne or Bugcrowd.
-    Make sure you review the scope and authorization before proceeding.</p>
+<header>
+  <h1><i class="fas fa-bug logo-icon"></i> Bug Bounty Workshop — Full Workbook</h1>
+  <div class="controls" role="toolbar" aria-label="tools">
+    <button class="btn small" id="toggleTheme" title="Toggle light/dark"><i class="fas fa-moon icon"></i> <span>Theme</span></button>
+    <button class="btn small" id="toggleReadingMode" title="Toggle reading mode"><i class="fas fa-book-open icon"></i> <span>Reading</span></button>
+    <button class="btn small" id="copyAll" title="Copy all code snippets"><i class="fas fa-copy icon"></i> <span>Copy All</span></button>
+    <button class="btn small" id="downloadHTML" title="Download page as .html"><i class="fas fa-download icon"></i> <span>Download</span></button>
+    <button class="btn small strong" id="printBtn" title="Print / Save as PDF"><i class="fas fa-print icon"></i> <span>Print</span></button>
+    <button class="btn small primary" id="quickStart" title="Quick start guide"><i class="fas fa-play icon"></i> <span>Quick Start</span></button>
   </div>
+</header>
 
-  <div class="section">
-    <h2>2. Discover subdomains</h2>
-    <p>Use a mix of tools to maximize your coverage. Different tools pull from different sources.</p>
-    <pre>
+<div class="wrap">
+  <nav class="sidebar" aria-label="Table of contents">
+    <div class="nav-section">
+      <h3><i class="fas fa-book"></i> Contents</h3>
+      <div id="navContents">
+        <!-- Navigation will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <div class="nav-section">
+      <h3><i class="fas fa-tools"></i> Recon Tools</h3>
+      <a href="#recon-commands" class="nav-link"><i class="fas fa-terminal nav-icon"></i> Recon Commands <span class="page-indicator">Cheatsheet</span></a>
+      <a href="#js-params" class="nav-link"><i class="fab fa-js-square nav-icon"></i> JS & Params Discovery <span class="page-indicator">Detailed</span></a>
+      <a href="#cors-checks" class="nav-link"><i class="fas fa-unlock-alt nav-icon"></i> CORS Quick Check <span class="page-indicator">Tool</span></a>
+    </div>
+    
+    <div class="nav-section">
+      <h3><i class="fas fa-bolt"></i> Quick Access</h3>
+      <a href="#page1" class="nav-link"><i class="fas fa-flag nav-icon"></i> Workshop Cover</a>
+      <a href="#page8" class="nav-link"><i class="fas fa-user-plus nav-icon"></i> Signup Vulnerabilities</a>
+      <a href="#page11" class="nav-link"><i class="fas fa-key nav-icon"></i> Password Reset</a>
+      <a href="#page17" class="nav-link"><i class="fas fa-bolt nav-icon"></i> Race Conditions</a>
+      <a href="#page31" class="nav-link"><i class="fas fa-shield-alt nav-icon"></i> CSRF Attacks</a>
+    </div>
+    
+    <div class="nav-section" style="margin-top:auto; padding-top:15px; border-top:1px solid rgba(255,255,255,0.03);">
+      <h3><i class="fas fa-info-circle"></i> Tips</h3>
+      <div style="font-size:12px; color:var(--muted); padding:8px; background:rgba(255,255,255,0.02); border-radius:6px; margin-top:5px;">
+        <p><i class="fas fa-check-circle" style="color:var(--success); margin-right:5px;"></i> Always confirm scope and written authorization.</p>
+        <p><i class="fas fa-file-alt" style="color:var(--info); margin-right:5px;"></i> Document PoCs and remediation suggestions.</p>
+        <p><i class="fas fa-clock" style="color:var(--warning); margin-right:5px;"></i> Rate limit your scans to avoid detection.</p>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="meta">
+      <div style="flex:1; min-width:300px;">
+        <input type="search" id="search" placeholder="Search the workbook (e.g., CORS, reset, httpx)" aria-label="search">
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <div class="tag success"><i class="fas fa-check"></i> Printable</div>
+        <div class="tag warning"><i class="fas fa-exclamation-triangle"></i> Ethical Use Only</div>
+      </div>
+    </div>
+    
+    <!-- Stats -->
+    <div class="stats-container">
+      <div class="stat-box">
+        <div class="stat-value" id="totalPages">34</div>
+        <div class="stat-label">Total Pages</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="completedPages">0</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="codeBlocks">45+</div>
+        <div class="stat-label">Code Blocks</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="vulnTypes">12+</div>
+        <div class="stat-label">Vulnerability Types</div>
+      </div>
+    </div>
+
+    <!-- PAGE 1 -->
+    <section class="section" id="page1" data-title="Workshop cover" data-page="1">
+      <div class="section-header">
+        <h2><span class="section-number">1</span> Workshop Cover</h2>
+        <div class="tag info"><i class="fas fa-flag"></i> Introduction</div>
+      </div>
+      <div style="text-align:center; padding:20px; border:2px solid var(--accent); border-radius:var(--radius); margin:20px 0;">
+        <h1 style="color:var(--accent); font-size:32px; margin-bottom:10px;">Bug Bounty Workshop</h1>
+        <h2 style="color:var(--accent2); font-size:24px; margin-bottom:20px;">Full Workbook & Recon Commands</h2>
+        <div style="font-size:18px; margin-top:30px;">
+          <p><strong>CEO:</strong> Jehad M. Ghaben</p>
+          <p><strong>Organizing Team:</strong> Eng. Omar Abu-Ghali</p>
+          <p><strong>Trainers:</strong> Eng. Hisham Eid, Ziad Ali, Eng. Saba'a Hussien</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <div></div>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page2')">
+          Next: Introduction <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section class="section" id="page2" data-title="Introduction" data-page="2">
+      <div class="section-header">
+        <h2><span class="section-number">2</span> Introduction</h2>
+        <div class="tag info"><i class="fas fa-info-circle"></i> Overview</div>
+      </div>
+      <p class="muted" style="font-size:16px; line-height:1.8;">
+        The comprehensive security checklist is your ultimate companion for bug hunting and ethical hacking. 
+        It covers various attack vectors, methodologies, and techniques that will help you discover and report 
+        vulnerabilities in web applications and systems.
+      </p>
+      <div style="background:rgba(0,255,136,0.05); padding:15px; border-radius:8px; margin-top:20px; border-left:3px solid var(--accent);">
+        <p style="margin:0;"><i class="fas fa-lightbulb" style="color:var(--accent); margin-right:8px;"></i>
+          <strong>Pro Tip:</strong> Start with reconnaissance. Understanding your target is 50% of the work in bug bounty hunting.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page1')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page3')">
+          Next: Recon Methodology <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 3 -->
+    <section class="section" id="page3" data-title="Recon Methodology 1-4" data-page="3">
+      <div class="section-header">
+        <h2><span class="section-number">3</span> Recon Methodology (1-4)</h2>
+        <div class="tag"><i class="fas fa-search"></i> Reconnaissance</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">1</div>
+          <p style="font-weight:bold; color:var(--accent2);">Manually explore the target</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">2</div>
+          <p style="font-weight:bold; color:var(--accent2);">Hunt down all subdomains</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">3</div>
+          <p style="font-weight:bold; color:var(--accent2);">Perform fuzzing on discovered subdomains</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">4</div>
+          <p style="font-weight:bold; color:var(--accent2);">Check robots.txt files</p>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:20px; padding:15px; background:rgba(0,255,136,0.05); border-radius:var(--radius);">
+        <strong>A killer reconnaissance phase is the foundation of successful bug hunting.</strong> 
+        Execute these steps to uncover hidden treasures.
+      </p>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page2')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page4')">
+          Next: Recon 5-8 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 4 -->
+    <section class="section" id="page4" data-title="Recon Methodology 5-8" data-page="4">
+      <div class="section-header">
+        <h2><span class="section-number">4</span> Recon Methodology (5-8)</h2>
+        <div class="tag"><i class="fas fa-search"></i> Reconnaissance</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">5</div>
+          <p style="font-weight:bold; color:var(--accent2);">Utilize Shodan search with various methods</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">6</div>
+          <p style="font-weight:bold; color:var(--accent2);">Leverage FOFA for additional intelligence gathering</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">7</div>
+          <p style="font-weight:bold; color:var(--accent2);">Implement comprehensive Google dorking techniques</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">8</div>
+          <p style="font-weight:bold; color:var(--accent2);">Analyze historical data using Wayback Machine</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page3')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page5')">
+          Next: Recon 9-11 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 5 -->
+    <section class="section" id="page5" data-title="Recon Methodology 9-11" data-page="5">
+      <div class="section-header">
+        <h2><span class="section-number">5</span> Recon Methodology (9-11)</h2>
+        <div class="tag"><i class="fas fa-search"></i> Reconnaissance</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">9</div>
+          <p style="font-weight:bold; color:var(--accent2);">Perform Git dorking in repositories</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">10</div>
+          <p style="font-weight:bold; color:var(--accent2);">Examine JavaScript files</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <div style="font-size:24px; color:var(--accent); margin-bottom:10px;">11</div>
+          <p style="font-weight:bold; color:var(--accent2);">Conduct OSINT</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page4')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page6')">
+          Next: Broken Link Hijacking <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 6 -->
+    <section class="section" id="page6" data-title="Broken Link Hijacking" data-page="6">
+      <div class="section-header">
+        <h2><span class="section-number">6</span> Broken Link Hijacking (BLH)</h2>
+        <div class="tag warning"><i class="fas fa-unlink"></i> Vulnerability</div>
+      </div>
+      <p class="muted" style="font-size:16px; line-height:1.8; margin:20px 0;">
+        <strong>Broken Link Hijacking (BLH) is a sweet spot for bug hunters.</strong><br><br>
+        When external links on a website point to domains that are no longer registered, 
+        you can potentially find a security issue.
+      </p>
+      <div style="background:rgba(255,183,77,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--warning); margin-top:15px;">
+        <p style="margin:0;"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i>
+          <strong>Note:</strong> BLH occurs when you can register a domain that a target website links to, 
+          allowing you to serve malicious content to their users.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page5')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page7')">
+          Next: Identifying BLH <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 7 -->
+    <section class="section" id="page7" data-title="Identifying BLH opportunities" data-page="7">
+      <div class="section-header">
+        <h2><span class="section-number">7</span> Identifying BLH Opportunities</h2>
+        <div class="tag warning"><i class="fas fa-unlink"></i> Vulnerability</div>
+      </div>
+      <div style="margin:20px 0;">
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Manually identify and click external links on the target site</p>
+            <p class="muted">Check all outbound links for broken or unregistered domains.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Run broken-link-checker in the background</p>
+            <p class="muted">Automate the process of finding broken links.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Utilize specialized tools for comprehensive checks</p>
+            <ul style="margin:10px 0 0 20px; color:var(--muted);">
+              <li>a. <a href="https://brokenlinkcheck.com/" style="color:var(--accent2);">https://brokenlinkcheck.com/</a></li>
+              <li>b. <a href="https://www.deadlinkchecker.com/" style="color:var(--accent2);">https://www.deadlinkchecker.com/</a></li>
+              <li>c. <a href="https://ahrefs.com/" style="color:var(--accent2);">https://ahrefs.com/</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page6')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page8')">
+          Next: Signup Vulnerabilities <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 8 -->
+    <section class="section" id="page8" data-title="Signup Page Vulnerabilities 1-5" data-page="8">
+      <div class="section-header">
+        <h2><span class="section-number">8</span> Signup Page Vulnerabilities (1-5)</h2>
+        <div class="tag danger"><i class="fas fa-user-plus"></i> Authentication</div>
+      </div>
+      <pre data-copy>
+1. Test for rate limiting on signup functionality
+2. Attempt to bypass email verification mechanisms
+3. Try using identical email addresses or usernames across different accounts
+4. Test for DoS vulnerabilities using extremely long passwords, especially on reset password functionality
+5. Check if server-side credentials are stored in plaintext (particularly when HTTP is used)
+      </pre>
+      <div style="background:rgba(255,77,157,0.05); padding:15px; border-radius:8px; margin-top:15px; border-left:3px solid var(--danger);">
+        <p style="margin:0;"><i class="fas fa-exclamation-circle" style="color:var(--danger); margin-right:8px;"></i>
+          <strong>Critical:</strong> Signup pages are prime targets for account enumeration, DoS attacks, and credential exposure.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page7')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page9')">
+          Next: Signup 6-15 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 9 -->
+    <section class="section" id="page9" data-title="Signup Page Vulnerabilities 6-15" data-page="9">
+      <div class="section-header">
+        <h2><span class="section-number">9</span> Signup Page Vulnerabilities (6-15)</h2>
+        <div class="tag danger"><i class="fas fa-user-plus"></i> Authentication</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">6. SSTI</p>
+          <p class="muted" style="font-size:13px;">Test for Server-Side Template Injection vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">7. Open Redirect</p>
+          <p class="muted" style="font-size:13px;">Check for open redirect vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">8. SSRF</p>
+          <p class="muted" style="font-size:13px;">Test for SSRF vulnerabilities that might expose internal IP addresses</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">9. Email Confirmation</p>
+          <p class="muted" style="font-size:13px;">Verify email confirmation requirements</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">10. DMARC</p>
+          <p class="muted" style="font-size:13px;">Check if DMARC records are properly configured</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">11. Input Validation</p>
+          <p class="muted" style="font-size:13px;">Test for input validation issues and attempt to bypass existing validations</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">12. CSRF</p>
+          <p class="muted" style="font-size:13px;">Check for Cross-Site Request Forgery (CSRF) vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">13. XSS</p>
+          <p class="muted" style="font-size:13px;">Test for Cross-Site Scripting (XSS) and Blind XSS vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">14. HTML Injection</p>
+          <p class="muted" style="font-size:13px;">Check for HTML injection possibilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">15. IDOR</p>
+          <p class="muted" style="font-size:13px;">Test for Insecure Direct Object References (IDOR)</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page8')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page10')">
+          Next: Signup 16-24 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 10 -->
+    <section class="section" id="page10" data-title="Signup Page Vulnerabilities 16-24" data-page="10">
+      <div class="section-header">
+        <h2><span class="section-number">10</span> Signup Page Vulnerabilities (16-24)</h2>
+        <div class="tag danger"><i class="fas fa-user-plus"></i> Authentication</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">16. Buffer Overflow</p>
+          <p class="muted" style="font-size:13px;">Check for buffer overflow vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">17. SQL Injection</p>
+          <p class="muted" style="font-size:13px;">Test for SQL Injection vulnerabilities</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">18. Password Policy</p>
+          <p class="muted" style="font-size:13px;">Evaluate password policy strength</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">19. HPP</p>
+          <p class="muted" style="font-size:13px;">Test for HTTP Parameter Pollution</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">20. Default Credentials</p>
+          <p class="muted" style="font-size:13px;">Check for default credentials</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">21. Email Enumeration</p>
+          <p class="muted" style="font-size:13px;">Test for email address enumeration</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">22. CAPTCHA Bypass</p>
+          <p class="muted" style="font-size:13px;">Attempt to bypass CAPTCHA mechanisms</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">23. Brute Force Protection</p>
+          <p class="muted" style="font-size:13px;">Test brute force protection</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">24. Account Overwrite</p>
+          <p class="muted" style="font-size:13px;">Attempt to overwrite accounts associated with email via Android applications</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page9')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page11')">
+          Next: Password Reset <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 11 -->
+    <section class="section" id="page11" data-title="Password Reset Vulnerabilities 1-10" data-page="11">
+      <div class="section-header">
+        <h2><span class="section-number">11</span> Password Reset Vulnerabilities (1-10)</h2>
+        <div class="tag warning"><i class="fas fa-key"></i> Authentication</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Password reset functionality is often a weak link.</strong> Try these hacks:
+      </p>
+      <pre data-copy>
+1. Test if sessions expire after 2FA and if other sessions can change passwords
+2. Check for session fixation issues
+3. Verify if reset password links are sent over secure protocols (HTTPS)
+4. Test cookie persistence by copying login cookies, logging out, and pasting them
+5. Check for broken authentication and session management
+6. Test for session hijacking due to improper sanitization
+7. Verify if server-side credentials are stored in plaintext
+8. Test if the same email or username can be used across different accounts
+9. Check if reset password tokens can be used via third parties
+10. Verify if reset links expire and if tokens can be reused
+      </pre>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page10')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page12')">
+          Next: Password Reset 11-20 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 12 -->
+    <section class="section" id="page12" data-title="Password Reset Vulnerabilities 11-20" data-page="12">
+      <div class="section-header">
+        <h2><span class="section-number">12</span> Password Reset Vulnerabilities (11-20)</h2>
+        <div class="tag warning"><i class="fas fa-key"></i> Authentication</div>
+      </div>
+      <pre data-copy>
+11. Check for reset token leaks in responses
+12. Test for password reset token leaks via referrer headers
+13. Check for host header injection on reset password functionality
+14. Test for DoS using extremely long passwords
+15. Attempt to set one-digit passwords to test for weak password implementation
+16. Check for rate limiting on password reset requests
+17. Verify CAPTCHA implementation to prevent automated requests
+18. Test for email enumeration vulnerabilities
+19. Check protection against brute force attacks on reset tokens
+20. Verify the randomness and length of reset tokens
+      </pre>
+      <div style="background:rgba(255,183,77,0.05); padding:15px; border-radius:8px; margin-top:15px; border-left:3px solid var(--warning);">
+        <p style="margin:0;"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i>
+          <strong>Important:</strong> Password reset flows are commonly targeted by attackers. Always test token entropy and expiration mechanisms.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page11')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page13')">
+          Next: Password Reset 21-25 <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 13 -->
+    <section class="section" id="page13" data-title="Password Reset Vulnerabilities 21-25" data-page="13">
+      <div class="section-header">
+        <h2><span class="section-number">13</span> Password Reset Vulnerabilities (21-25)</h2>
+        <div class="tag warning"><i class="fas fa-key"></i> Authentication</div>
+      </div>
+      <pre data-copy>
+21. Confirm reset token expiry mechanisms
+22. Ensure users are forced to re-login after password resets
+23. Check for account lockout after failed reset attempts
+24. Verify security notifications for password reset requests
+25. Test logging and monitoring for suspicious activities
+      </pre>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page12')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page14')">
+          Next: Business Logic <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 14 -->
+    <section class="section" id="page14" data-title="Business Logic Vulnerabilities" data-page="14">
+      <div class="section-header">
+        <h2><span class="section-number">14</span> Business Logic Vulnerabilities</h2>
+        <div class="tag info"><i class="fas fa-brain"></i> Advanced</div>
+      </div>
+      <p class="muted" style="font-size:16px; line-height:1.8; margin:20px 0;">
+        <strong>Business logic vulnerabilities are the elite-level bugs that automated scanners miss.</strong><br><br>
+        These require your hacker intuition and creative thinking. Check out this detailed guide:
+      </p>
+      <div style="text-align:center; padding:20px; background:var(--panel); border-radius:var(--radius); margin:20px 0;">
+        <a href="https://medium.com/@Az3m/business-logic-checklist-eafde7f86dc2" 
+           style="color:var(--accent2); font-size:18px; text-decoration:none; font-weight:bold;">
+          <i class="fas fa-external-link-alt" style="margin-right:10px;"></i>
+          Business Logic Checklist by Az3m
+        </a>
+      </div>
+      <div style="background:rgba(100,181,246,0.05); padding:15px; border-radius:8px; border-left:3px solid var(--info);">
+        <p style="margin:0;"><i class="fas fa-lightbulb" style="color:var(--info); margin-right:8px;"></i>
+          <strong>Tip:</strong> Think like a user trying to abuse the application's intended workflow. 
+          Look for inconsistencies in pricing, privileges, or access controls.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page13')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page15')">
+          Next: HTTP Methods <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 15 -->
+    <section class="section" id="page15" data-title="Dangerous HTTP Methods" data-page="15">
+      <div class="section-header">
+        <h2><span class="section-number">15</span> Dangerous HTTP Methods</h2>
+        <div class="tag"><i class="fas fa-globe"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>HTTP method hacking can lead to some sweet findings.</strong> Try these techniques:
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <p style="color:var(--accent); font-weight:bold; margin-bottom:15px;">1. Use the OPTIONS method to identify which methods are enabled on the server</p>
+        <p style="color:var(--accent2); font-weight:bold; margin-bottom:10px;">2. Test the following methods for potential vulnerabilities:</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:15px;">
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">PUT</p>
+            <p class="muted" style="font-size:13px;">Can potentially store enclosed entities on the server</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">GET</p>
+            <p class="muted" style="font-size:13px;">Retrieves requested information</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">HEAD</p>
+            <p class="muted" style="font-size:13px;">Retrieves only header information</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">POST</p>
+            <p class="muted" style="font-size:13px;">Sends requests with enclosed data entities</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">DELETE</p>
+            <p class="muted" style="font-size:13px;">Removes resources from the server</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">TRACE</p>
+            <p class="muted" style="font-size:13px;">Used for diagnosing communication</p>
+          </div>
+          <div style="padding:10px; background:rgba(0,255,136,0.05); border-radius:6px;">
+            <p style="font-weight:bold; color:var(--accent);">CONNECT</p>
+            <p class="muted" style="font-size:13px;">Creates tunnels with proxies</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page14')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page16')">
+          Next: HTTP Methods Continued <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 16 -->
+    <section class="section" id="page16" data-title="HTTP Methods Continued" data-page="16">
+      <div class="section-header">
+        <h2><span class="section-number">16</span> HTTP Methods Continued</h2>
+        <div class="tag"><i class="fas fa-globe"></i> Web</div>
+      </div>
+      <pre data-copy>
+Also test by placing URLs in the /directory/ location.
+If the application behaves as a proxy, it will return responses from the URL server.
+
+Try changing HTTP methods (PUT/OPTIONS/CONNECT) and when using the CONNECT method, 
+use format like hackersera.com:80.
+
+Test with: GET <url> HTTP/1.1
+      </pre>
+      <div style="background:rgba(0,255,136,0.05); padding:15px; border-radius:8px; margin-top:15px;">
+        <p style="margin:0;"><i class="fas fa-code" style="color:var(--accent); margin-right:8px;"></i>
+          <strong>Example:</strong> Use curl to test different HTTP methods: 
+          <code style="color:var(--accent2);">curl -X OPTIONS https://target.com/</code>
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page15')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page17')">
+          Next: Race Conditions <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 17 -->
+    <section class="section" id="page17" data-title="Race Conditions Overview" data-page="17">
+      <div class="section-header">
+        <h2><span class="section-number">17</span> Race Conditions Overview</h2>
+        <div class="tag"><i class="fas fa-bolt"></i> Advanced</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Race conditions are tricky bugs that can lead to big bounties.</strong> Look for these opportunities:
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <i class="fas fa-user-friends" style="font-size:24px; color:var(--accent); margin-bottom:10px;"></i>
+          <p style="font-weight:bold; color:var(--accent2);">User invitation functionality</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <i class="fas fa-users" style="font-size:24px; color:var(--accent); margin-bottom:10px;"></i>
+          <p style="font-weight:bold; color:var(--accent2);">Group joining mechanisms</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <i class="fas fa-money-bill-wave" style="font-size:24px; color:var(--accent); margin-bottom:10px;"></i>
+          <p style="font-weight:bold; color:var(--accent2);">Money transfer between accounts</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <i class="fas fa-tachometer-alt" style="font-size:24px; color:var(--accent); margin-bottom:10px;"></i>
+          <p style="font-weight:bold; color:var(--accent2);">Actions with limits (likes, subscriptions, follows, votes, etc.)</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page16')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page18')">
+          Next: Race Condition Testing <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 18 -->
+    <section class="section" id="page18" data-title="Race Condition Testing" data-page="18">
+      <div class="section-header">
+        <h2><span class="section-number">18</span> Race Condition Testing</h2>
+        <div class="tag"><i class="fas fa-bolt"></i> Advanced</div>
+      </div>
+      <div style="margin:20px 0;">
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Identify request chains</p>
+            <p class="muted">(e.g., /product → /cart → /cart/checkout)</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Send all required requests to Burp Repeater in sequence and create a tab</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Select "Send Parallel" (single packet attack) and execute</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Utilize Burp Suite Turbo Intruder for more advanced testing</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Try null byte attacks</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; padding:15px; background:var(--panel); border-radius:var(--radius);">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">6</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Test rate limiting by increasing count parameters (e.g., count=100)</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page17')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page19')">
+          Next: Session Management <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 19 -->
+    <section class="section" id="page19" data-title="Session Management Vulnerabilities" data-page="19">
+      <div class="section-header">
+        <h2><span class="section-number">19</span> Session Management Vulnerabilities</h2>
+        <div class="tag warning"><i class="fas fa-user-shield"></i> Authentication</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Session management vulnerabilities can lead to account takeovers - the holy grail of bug hunting:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <p style="color:var(--accent); font-weight:bold; margin-bottom:10px;">1. Test for guessable session IDs using tools like Hash-Identifier</p>
+        <p style="color:var(--accent); font-weight:bold; margin-bottom:10px;">2. Check if cookies store sensitive information like session IDs, user data, or plaintext passwords</p>
+        <p style="color:var(--accent); font-weight:bold; margin-bottom:10px;">3. Examine localStorage/sessionStorage for sensitive data</p>
+        <p style="color:var(--accent); font-weight:bold; margin-bottom:5px;">4. Test session invalidation:</p>
+        <ul style="margin:10px 0 0 20px; color:var(--muted);">
+          <li>Log into the website</li>
+          <li>Capture requests (e.g., profile edit) using Burp Proxy</li>
+          <li>Log out from the website</li>
+          <li>Replay captured requests and observe if they still work</li>
+        </ul>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page18')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page20')">
+          Next: Email Reset Scenario <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 20 -->
+    <section class="section" id="page20" data-title="Email Reset Scenario" data-page="20">
+      <div class="section-header">
+        <h2><span class="section-number">20</span> Email Change & Reset Scenario</h2>
+        <div class="tag warning"><i class="fas fa-envelope"></i> Authentication</div>
+      </div>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Log in to the website</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Change your email ID</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Attempt to use the old email to reset the password</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--danger);">If successful, you've found a bug!</p>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,77,0.05); padding:15px; border-radius:8px; margin-top:15px; border-left:3px solid var(--warning);">
+        <p style="margin:0;"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i>
+          <strong>Important:</strong> This vulnerability occurs when the system doesn't properly invalidate the old email after a change.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page19')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page21')">
+          Next: Insufficient Validation <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 21 -->
+    <section class="section" id="page21" data-title="Insufficient Validation" data-page="21">
+      <div class="section-header">
+        <h2><span class="section-number">21</span> Insufficient Account Process Validation</h2>
+        <div class="tag warning"><i class="fas fa-user-check"></i> Authentication</div>
+      </div>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Create an account on the website</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Navigate to the profile section and prepare to update details</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Capture the update request in Burp Suite</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Log out from the website</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Modify email and name parameters in the captured request</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">6</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Execute the request and check for a 200 OK response</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">7</div>
+          <div>
+            <p style="font-weight:bold; color:var(--danger);">Log back in to verify if changes were applied</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page20')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page22')">
+          Next: Cache Control <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 22 -->
+    <section class="section" id="page22" data-title="Cache Control" data-page="22">
+      <div class="section-header">
+        <h2><span class="section-number">22</span> Cache Control Vulnerabilities</h2>
+        <div class="tag"><i class="fas fa-database"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Cache control issues can be easy wins.</strong> Try this simple test:
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Log in to the application</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Navigate through various pages</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Log out</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Press Alt+left-arrow buttons</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--danger);">If you can still view previously navigated pages, you've found a cache control vulnerability</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page21')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page23')">
+          Next: Password Confirmation Bypass <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 23 -->
+    <section class="section" id="page23" data-title="Password Confirmation Bypass" data-page="23">
+      <div class="section-header">
+        <h2><span class="section-number">23</span> Password Confirmation Bypass</h2>
+        <div class="tag warning"><i class="fas fa-user-lock"></i> Authentication</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Look for missing password confirmation in sensitive operations:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Attempt to bypass confirmation requirements using headers like X-Forwarded-For:127.0.0.1</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Test on email address changes, password changes, account deletion, and 2FA management</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">Verify if password changes are properly confirmed via email notifications</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page22')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page24')">
+          Next: Session Fixation <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 24 -->
+    <section class="section" id="page24" data-title="Session Fixation" data-page="24">
+      <div class="section-header">
+        <h2><span class="section-number">24</span> Session Fixation</h2>
+        <div class="tag danger"><i class="fas fa-user-secret"></i> Authentication</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Session fixation is a classic hack:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Attempt to log in with correct email but wrong password</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Intercept the request in Burp Suite and copy the cookie</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Switch to a private browser window</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Attempt to log in with correct credentials</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Intercept the request and replace the cookie with the previously copied one</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">6</div>
+          <div>
+            <p style="font-weight:bold; color:var(--danger);">If login succeeds, you've found a session fixation vulnerability</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page23')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page25')">
+          Next: Unauthorized Cache Purging <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 25 -->
+    <section class="section" id="page25" data-title="Unauthorized Cache Purging" data-page="25">
+      <div class="section-header">
+        <h2><span class="section-number">25</span> Unauthorized Cache Purging</h2>
+        <div class="tag"><i class="fas fa-trash-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Check for unauthorized cache purging vulnerabilities:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Look for "cache: HIT" in responses</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test with commands like:</p>
+          </div>
+        </div>
+        <pre data-copy style="margin-left:40px;">
+curl -S -D - https://app.example.com/
+curl -X PURGE https://example.com/
+        </pre>
+        <div style="display:flex; align-items:center; gap:15px; margin-top:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test for web cache deception vulnerabilities</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page24')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page26')">
+          Next: Input Validation <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 26 -->
+    <section class="section" id="page26" data-title="Input Validation" data-page="26">
+      <div class="section-header">
+        <h2><span class="section-number">26</span> Input Validation Vulnerabilities</h2>
+        <div class="tag warning"><i class="fas fa-edit"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Lack of proper input validation can lead to various security issues:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test for improper input validation by intercepting requests and increasing input length</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Check for text length verification in input fields</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page25')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page27')">
+          Next: Input Bypass Techniques <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 27 -->
+    <section class="section" id="page27" data-title="Input Bypass Techniques" data-page="27">
+      <div class="section-header">
+        <h2><span class="section-number">27</span> Input Bypass Techniques</h2>
+        <div class="tag"><i class="fas fa-code"></i> Techniques</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Bypass techniques to try:</strong>
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">1. Encoding/Decoding</p>
+          <p class="muted" style="font-size:13px;">URL encoding, Base64 encoding</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">2. Whitespace Injection</p>
+          <p class="muted" style="font-size:13px;">Spaces, tabs, newlines</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">3. Null Byte Injection</p>
+          <p class="muted" style="font-size:13px;">%00</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">4. Character Encoding</p>
+          <p class="muted" style="font-size:13px;">Manipulation</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">5. HTML Entity Encoding</p>
+          <p class="muted" style="font-size:13px;"><, >, &</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">6. Unicode Encoding</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">7. Double Encoding</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius);">
+          <p style="font-weight:bold; color:var(--accent); margin-bottom:5px;">8. Escape Sequences</p>
+          <p class="muted" style="font-size:13px;">\x, \u</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page26')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page28')">
+          Next: Rate Limiting <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 28 -->
+    <section class="section" id="page28" data-title="Rate Limiting" data-page="28">
+      <div class="section-header">
+        <h2><span class="section-number">28</span> Rate Limiting Vulnerabilities</h2>
+        <div class="tag"><i class="fas fa-tachometer-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Rate limiting issues are easy to find and report.</strong> Test these endpoints:
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin:20px 0;">
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">1. Subdomains</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">2. Registration pages</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">3. Login pages</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">4. SMS triggering functionality</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">5. Email sending features</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">6. Comment systems</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">7. Contact forms</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">8. OTP verification</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">9. Token validation</p>
+        </div>
+        <div style="background:var(--panel); padding:15px; border-radius:var(--radius); text-align:center;">
+          <p style="font-weight:bold; color:var(--accent2);">10. File upload features</p>
+          <p class="muted" style="font-size:12px; margin-top:5px;">(try uploading 4MB files multiple times)</p>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page27')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page29')">
+          Next: Host Header Injection <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 29 -->
+    <section class="section" id="page29" data-title="Host Header Injection" data-page="29">
+      <div class="section-header">
+        <h2><span class="section-number">29</span> Host Header Injection</h2>
+        <div class="tag warning"><i class="fas fa-server"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Host header injection can lead to some nice bounties:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">First method: Change the real host to bing.com.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Second method: Change host from realweb.com to bing.com and set X-Forwarded-Host to realweb.com.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Third method: Set X-Forwarded-Host to bing.com and Host to realweb.com</p>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,77,0.05); padding:15px; border-radius:8px; margin-top:15px; border-left:3px solid var(--warning);">
+        <p style="margin:0;"><i class="fas fa-exclamation-triangle" style="color:var(--warning); margin-right:8px;"></i>
+          <strong>Note:</strong> Host header attacks can lead to password reset poisoning, cache poisoning, and SSRF.
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page28')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page30')">
+          Next: Open Redirect <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 30 -->
+    <section class="section" id="page30" data-title="Open Redirect" data-page="30">
+      <div class="section-header">
+        <h2><span class="section-number">30</span> Open Redirect Vulnerabilities</h2>
+        <div class="tag warning"><i class="fas fa-external-link-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>Open redirect vulnerabilities are common and easy to find:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Use dorks and extract all URLs from LinkFinder</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test parameters like ?redirect=https://evil.com</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Check login, logout, and registration functionality</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test any redirects to third-party sites like Facebook or Twitter</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Use various payloads with format target.com/$payloads$</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">6</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Check reset password and confirmation email link redirections</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">7</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test OAuth 2.0 implementations (Facebook, Google, Apple)</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page29')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page31')">
+          Next: CSRF Overview <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 31 -->
+    <section class="section" id="page31" data-title="CSRF Overview" data-page="31">
+      <div class="section-header">
+        <h2><span class="section-number">31</span> Cross-Site Request Forgery (CSRF)</h2>
+        <div class="tag danger"><i class="fas fa-shield-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>CSRF vulnerabilities can lead to account takeovers:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test logout functionality</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Check email changing mechanisms</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Test password changing functionality</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Examine any input field changes (name, address, comments, feedback)</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">5</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Try to bypass CSRF protections</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">6</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Create CSRF payloads for any modifiable or deletable content</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page30')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page32')">
+          Next: CSRF POC <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 32 -->
+    <section class="section" id="page32" data-title="CSRF POC" data-page="32">
+      <div class="section-header">
+        <h2><span class="section-number">32</span> Cross-Site Request Forgery (CSRF)</h2>
+        <div class="tag danger"><i class="fas fa-shield-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>CSRF to change password (account takeover):</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Log into your account and change your password.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Capture the change password request through Burp Suite.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Check if CSRF tokens or other protections are present.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">4</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Generate a CSRF POC and test it</p>
+          </div>
+        </div>
+      </div>
+      <pre data-copy style="margin-top:20px;">
+<script>document.forms[0].submit();</script>
+      </pre>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page31')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page33')">
+          Next: CSRF Bypass Techniques <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 33 -->
+    <section class="section" id="page33" data-title="CSRF Bypass" data-page="33">
+      <div class="section-header">
+        <h2><span class="section-number">33</span> Cross-Site Request Forgery (CSRF)</h2>
+        <div class="tag danger"><i class="fas fa-shield-alt"></i> Web</div>
+      </div>
+      <p class="muted" style="font-size:16px; margin-bottom:20px;">
+        <strong>CSRF bypass techniques:</strong>
+      </p>
+      <div style="background:var(--panel); padding:20px; border-radius:var(--radius); margin:20px 0;">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">1</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Delete the token parameter or send a blank token.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">2</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2);">Change the request method.</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:15px;">
+          <div style="font-size:24px; color:var(--accent); font-weight:bold;">3</div>
+          <div>
+            <p style="font-weight:bold; color:var(--accent2); margin-bottom:5px;">If protected only by origin header checking:</p>
+            <ul style="margin:10px 0 0 20px; color:var(--muted);">
+              <li>If request body is JSON data, try with Content type:text/plain</li>
+              <li>If CORS origin not allowed, try with Content-type:application/x-www-form-urlencoded</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page32')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('page34')">
+          Next: Conclusion <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 34 -->
+    <section class="section" id="page34" data-title="Conclusion" data-page="34">
+      <div class="section-header">
+        <h2><span class="section-number">34</span> Conclusion & Credits</h2>
+        <div class="tag success"><i class="fas fa-check-circle"></i> Summary</div>
+      </div>
+      <p class="muted" style="font-size:16px; line-height:1.8; margin:20px 0;">
+        This checklist is your roadmap to finding bugs and earning bounties. Remember to always hack ethically, 
+        report responsibly, and never exceed the scope of your engagement. Happy hunting!
+      </p>
+      <div style="text-align:center; padding:30px; border:2px solid var(--accent); border-radius:var(--radius); margin:30px 0;">
+        <h1 style="color:var(--accent); font-size:32px; margin-bottom:20px;">THANKS!</h1>
+        <div style="font-size:18px; line-height:1.8;">
+          <p><strong>CEO:</strong> Jehad M. Ghaben</p>
+          <p><strong>Organizing Team:</strong> Eng. Omar Abu-Ghali</p>
+          <p><strong>Trainers:</strong> Eng. Hisham Eid, Ziad Ali, Eng. Saba'a Hussien</p>
+        </div>
+      </div>
+      <div style="background:rgba(0,255,136,0.05); padding:20px; border-radius:var(--radius); border-left:3px solid var(--success);">
+        <p style="margin:0; font-size:16px;">
+          <i class="fas fa-graduation-cap" style="color:var(--success); margin-right:10px;"></i>
+          <strong>Remember:</strong> Continuous learning and practice are key to becoming a successful bug bounty hunter. 
+          Stay curious, stay ethical, and keep hacking!
+        </p>
+      </div>
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page33')">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button class="btn page-nav-btn" onclick="scrollToSection('recon-commands')">
+          Next: Recon Commands <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Recon Commands Section with Tabs -->
+    <section class="section" id="recon-commands" data-title="Recon Commands">
+      <div class="section-header">
+        <h2>Subdomain Recon Roadmap</h2>
+        <div class="tag success"><i class="fas fa-terminal"></i> Interactive</div>
+      </div>
+      <p class="muted">Full commands block: subdomain enumeration, merging, probing, takeover checks, tech fingerprinting, additional recon and a quick workflow.</p>
+      
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="step1">1. Identify Target</button>
+        <button class="tab-btn" data-tab="step2">2. Discover Subdomains</button>
+        <button class="tab-btn" data-tab="step3">3. Merge & Deduplicate</button>
+        <button class="tab-btn" data-tab="step4">4. Check Live Hosts</button>
+        <button class="tab-btn" data-tab="step5">5. Takeover Checks</button>
+        <button class="tab-btn" data-tab="step6">6. Tech Detection</button>
+        <button class="tab-btn" data-tab="step7">7. Additional Recon</button>
+        <button class="tab-btn" data-tab="step8">8. Quick Workflow</button>
+      </div>
+      
+      <!-- Step 1 -->
+      <div class="tab-content active" id="tab-step1">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 1</div>
+        </div>
+        <pre data-copy>
+# 1. Identify the target
+# Start by choosing the main domain you want to test, e.g. example.com.
+# You usually get this from bug bounty platforms such as HackerOne or Bugcrowd.
+# Make sure you review the scope and authorization before proceeding.
+
+echo "Target: example.com"
+echo "Scope: *.example.com"
+echo "Authorization: Yes (via HackerOne/Bugcrowd)"
+        </pre>
+        <p class="muted">Always verify the scope and authorization before starting any reconnaissance.</p>
+      </div>
+      
+      <!-- Step 2 -->
+      <div class="tab-content" id="tab-step2">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 2</div>
+        </div>
+        <pre data-copy>
+# 2. Discover subdomains
+# Use a mix of tools to maximize your coverage. Different tools pull from different sources.
+
 subfinder -d example.com -o subfinder.txt
 assetfinder --subs-only example.com > assetfinder.txt
 amass enum -passive -d example.com -o amass.txt
 dnsx -w /usr/share/wordlists/amass/subdomains-top1mil-110000.txt -d example.com -silent -o dnsx.txt
 curl -s "https://crt.sh/?q=%25.example.com&output=json" | jq -r '.[].name_value' | sort -u > crtsh.txt
-    </pre>
-  </div>
-
-  <div class="section">
-    <h2>3. Merge and remove duplicates</h2>
-    <p>Combine results from all tools into one file and sort to keep only unique subdomains.</p>
-    <pre>
 cat subfinder.txt assetfinder.txt amass.txt crtsh.txt dnsx.txt > all_subs.txt
 sort -u all_subs.txt > unique_subs.txt
-    </pre>
-  </div>
-
-  <div class="section">
-    <h2>4. Check for live subdomains</h2>
-    <p>Test which subdomains respond over HTTP/HTTPS. This helps focus on active assets only.</p>
-    <pre>
 httpx -l unique_subs.txt -o live_subs.txt
 cat unique_subs.txt | httprobe > live_subs.txt
-    </pre>
-  </div>
-
-  <div class="section">
-    <h2>5. Check for subdomain takeover</h2>
-    <p>Look for dangling DNS records that may allow an attacker to claim the subdomain.</p>
-    <pre>
 subjack -w unique_subs.txt -t 50 -timeout 30 -o takeover.txt -ssl
-    </pre>
-  </div>
-
-  <div class="section">
-    <h2>6. Detect technologies and vulnerabilities</h2>
-    <p>Fingerprint technologies used by the site and run port/service scans.</p>
-    <pre>
-whatweb -i live_subs.txt -o whatweb.txt
-nmap -iL live_subs.txt -sV -T4 -oN nmap_scan.txt
-npx wappalyzer https://sub.example.com
-    </pre>
-  </div>
-
-  <div class="section">
-    <h2>7. Additional recon tools</h2>
-    <p>Get historical URLs, parameters and more surface area for fuzzing.</p>
-    <pre>
 cat live_subs.txt | katana > urls.txt
 cat live_subs.txt | waybackurls >> urls.txt 
 cat live_subs.txt | gau >> urls.txt
@@ -129,13 +2037,113 @@ sort -u urls.txt > unique_urls.txt
 httpx -l unique_urls.txt -o live_urls.txt
 dnsx -l subs.txt -a -resp
 naabu -iL live_subs.txt -o ports.txt
-    </pre>
-  </div>
 
-  <div class="section">
-    <h2>8. Quick example workflow</h2>
-    <p>Run a simple chain to quickly enumerate, probe, and scan.</p>
-    <pre>
+        </pre>
+      </div>
+      
+      <!-- Step 3 -->
+      <div class="tab-content" id="tab-step3">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 3</div>
+        </div>
+        <pre data-copy>
+# 3. Merge and remove duplicates
+# Combine results from all tools into one file and sort to keep only unique subdomains.
+
+cat subfinder.txt assetfinder.txt amass.txt crtsh.txt dnsx.txt > all_subs.txt
+sort -u all_subs.txt > unique_subs.txt
+
+# Count results
+echo "Total unique subdomains found: $(wc -l < unique_subs.txt)"
+        </pre>
+      </div>
+      
+      <!-- Step 4 -->
+      <div class="tab-content" id="tab-step4">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 4</div>
+        </div>
+        <pre data-copy>
+# 4. Check for live subdomains
+# Test which subdomains respond over HTTP/HTTPS. This helps focus on active assets only.
+
+httpx -l unique_subs.txt -o live_subs.txt
+# alternative:
+cat unique_subs.txt | httprobe > live_subs.txt
+
+# With more details
+httpx -l unique_subs.txt -sc -title -td -o live_detailed.txt
+        </pre>
+      </div>
+      
+      <!-- Step 5 -->
+      <div class="tab-content" id="tab-step5">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 5</div>
+        </div>
+        <pre data-copy>
+# 5. Check for subdomain takeover
+# Look for dangling DNS records that may allow an attacker to claim the subdomain.
+
+subjack -w unique_subs.txt -t 50 -timeout 30 -o takeover.txt -ssl
+# alternative tools:
+subzy run --targets=unique_subs.txt
+nuclei -t takeovers/ -l unique_subs.txt
+        </pre>
+      </div>
+      
+      <!-- Step 6 -->
+      <div class="tab-content" id="tab-step6">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 6</div>
+        </div>
+        <pre data-copy>
+# 6. Detect technologies and vulnerabilities
+# Fingerprint technologies used by the site and run port/service scans.
+
+whatweb -i live_subs.txt -o whatweb.txt
+nmap -iL live_subs.txt -sV -T4 -oN nmap_scan.txt
+npx wappalyzer https://sub.example.com
+
+# BuiltWith for tech profiling
+builtwith -v https://example.com
+        </pre>
+      </div>
+      
+      <!-- Step 7 -->
+      <div class="tab-content" id="tab-step7">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 7</div>
+        </div>
+        <pre data-copy>
+# 7. Additional recon tools
+# Get historical URLs, parameters and more surface area for fuzzing.
+
+cat live_subs.txt | katana > urls.txt
+cat live_subs.txt | waybackurls >> urls.txt 
+cat live_subs.txt | gau >> urls.txt
+sort -u urls.txt > unique_urls.txt
+httpx -l unique_urls.txt -o live_urls.txt
+dnsx -l subs.txt -a -resp
+naabu -iL live_subs.txt -o ports.txt
+        </pre>
+      </div>
+      
+      <!-- Step 8 -->
+      <div class="tab-content" id="tab-step8">
+        <div class="code-header">
+          <div class="code-language">bash</div>
+          <div class="tag info">Step 8</div>
+        </div>
+        <pre data-copy>
+# 8. Quick example workflow
+# Run a simple chain to quickly enumerate, probe, and scan.
+
 subfinder -d target.com -o s1.txt
 assetfinder --subs-only target.com > s2.txt
 dnsx -w /usr/share/wordlists/amass/subdomains-top1mil-110000.txt -d target.com -silent -o s3.txt
@@ -146,48 +2154,630 @@ sort -u all.txt > subs.txt
 httpx -l subs.txt -o live.txt
 subjack -w subs.txt -t 50 -o takeover.txt -ssl
 whatweb -i live.txt -o whatweb.txt
-    </pre>
-  </div>
 
-  <div class="section">
-    <h2>9. JS files and parameters discovery</h2>
-    <p>Extract JavaScript files and URL parameters for further testing like XSS or token leaks.</p>
-    <pre>
+# Additional recon
+cat live.txt | waybackurls > urls.txt
+cat live.txt | gau >> urls.txt
+sort -u urls.txt > unique_urls.txt
+        </pre>
+        <p class="muted" style="margin-top:15px;">
+          <i class="fas fa-lightbulb" style="color:var(--accent); margin-right:8px;"></i>
+          <strong>Keep learning.</strong> Every subdomain is a potential entry point.
+        </p>
+      </div>
+      
+      <!-- JS Files Section -->
+      <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+        <h3 style="color:var(--accent); margin-bottom:15px;">9. JS files and parameters discovery</h3>
+        <pre data-copy>
+# Extract JavaScript files and URL parameters for further testing like XSS or token leaks.
+
 awk '/\.js(\?|$)/ {print}' urls.txt > js_links.txt
 cat js_links.txt | mantra
 mkdir js && cd js && wget -i ../js_links.txt
 cat urls.txt | grep -oP '\?\K[^ ]+' | sort -u
-    </pre>
-  </div>
-
-    <div class="section">
-    <h2>CORS</h2>
-    <p>FIND CORS.</p>
-    <pre>
+        </pre>
+      </div>
+      
+      <!-- CORS Section -->
+      <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+        <h3 style="color:var(--accent); margin-bottom:15px;">CORS — FIND CORS</h3>
+        <pre data-copy>
+# Check for CORS misconfigurations
 while read url; do
     curl -s -I -H "Origin: https://evil.com" "$url" | \
     grep -iE "access-control-allow-origin|access-control-allow-credentials" && \
     echo "[Vulnerable?] $url"
 done < unique_urls.txt
+        </pre>
+        <p class="muted">Note: Run this against `unique_urls.txt` or `live_urls.txt`. Only run active checks within scope.</p>
+      </div>
+      
+      <div class="page-nav">
+        <button class="btn page-nav-btn" onclick="scrollToSection('page34')">
+          <i class="fas fa-arrow-left"></i> Previous Section
+        </button>
+        <button class="btn primary" onclick="copyAllCommands()">
+          <i class="fas fa-copy"></i> Copy All Recon Commands
+        </button>
+      </div>
+    </section>
 
-    </pre>
+    <!-- JS & Params dedicated -->
+    <section class="section" id="js-params" data-title="JS & Params Discovery">
+      <div class="section-header">
+        <h2>JS & Parameters Discovery (Detailed)</h2>
+        <div class="tag"><i class="fab fa-js-square"></i> JavaScript</div>
+      </div>
+      <pre data-copy>
+# extract js links
+awk '/\.js(\?|$)/ {print}' urls.txt > js_links.txt
+
+# quick download (be careful; obey robots & scope)
+mkdir -p js && cd js && wget -q -i ../js_links.txt
+
+# extract parameters
+cat urls.txt | grep -oP '\?\K[^ ]+' | sort -u > params.txt
+
+# search for tokens in JS (example)
+grep -RInE "api_key|token|access|client_secret" js/ || true
+
+# extract endpoints from JS files
+cat js_links.txt | while read url; do
+  echo "=== $url ==="
+  curl -s "$url" | grep -oE "['\"](https?:)?//[^'\"?#]+" | sort -u
+done > js_endpoints.txt
+      </pre>
+      <p class="muted">Always respect robots.txt and scope. Do not exfiltrate or misuse data.</p>
+    </section>
+
+    <!-- CORS Checks shortcut -->
+    <section class="section" id="cors-checks" data-title="CORS checks">
+      <div class="section-header">
+        <h2>CORS Quick Check</h2>
+        <div class="tag warning"><i class="fas fa-unlock-alt"></i> Security</div>
+      </div>
+      <pre data-copy>
+# quick automated CORS finder (parallel)
+cat unique_urls.txt | xargs -P30 -I% sh -c 'curl -s -I -H "Origin: https://evil.com" "%" | grep -iE "access-control-allow-origin|access-control-allow-credentials" && echo "[POTENTIAL CORS] %"'
+
+# alternative with more headers
+cat live_urls.txt | while read url; do
+  response=$(curl -s -I -H "Origin: https://attacker.com" "$url")
+  if echo "$response" | grep -qi "access-control-allow-origin: https://attacker.com"; then
+    if echo "$response" | grep -qi "access-control-allow-credentials: true"; then
+      echo "[CRITICAL CORS] $url - Credentials allowed"
+    else
+      echo "[CORS FOUND] $url"
+    fi
+  fi
+done
+      </pre>
+      <p class="muted">Parallel requests increase load — throttle to stay in-scope.</p>
+    </section>
+
+    <footer>
+      <p>All commands are intended for authorized security testing only. Always confirm scope, authorization, and legal rules before performing active scans.</p>
+      <p style="margin-top:10px; font-size:11px; opacity:0.7;">
+        <i class="fas fa-code"></i> Enhanced Workbook v2.0 | 
+        <i class="fas fa-user-shield"></i> Ethical Hacking | 
+        <i class="fas fa-heart" style="color:var(--danger);"></i> Stay Safe & Responsible
+      </p>
+    </footer>
+  </main>
+</div>
+
+<!-- Quick Start Modal -->
+<div id="quickStartModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:200; justify-content:center; align-items:center;">
+  <div style="background:var(--panel); border-radius:var(--radius); padding:25px; max-width:600px; width:90%; max-height:80vh; overflow:auto; border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="color:var(--accent); margin:0;"><i class="fas fa-rocket"></i> Quick Start Guide</h2>
+      <button class="btn small" id="closeModal"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div style="margin-bottom:15px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <div style="width:30px; height:30px; background:var(--accent); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">1</div>
+        <div>
+          <strong style="color:var(--accent);">Reconnaissance</strong>
+          <p style="margin:5px 0 0 0; font-size:13px;">Start with subdomain enumeration and live host detection.</p>
+        </div>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <div style="width:30px; height:30px; background:var(--accent2); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">2</div>
+        <div>
+          <strong style="color:var(--accent2);">Signup/Login Testing</strong>
+          <p style="margin:5px 0 0 0; font-size:13px;">Test authentication flows for vulnerabilities.</p>
+        </div>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <div style="width:30px; height:30px; background:var(--warning); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">3</div>
+        <div>
+          <strong style="color:var(--warning);">Password Reset Testing</strong>
+          <p style="margin:5px 0 0 0; font-size:13px;">Check password reset functionality for flaws.</p>
+        </div>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <div style="width:30px; height:30px; background:var(--danger); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">4</div>
+        <div>
+          <strong style="color:var(--danger);">Business Logic Testing</strong>
+          <p style="margin:5px 0 0 0; font-size:13px;">Look for logical flaws in application workflows.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div style="background:rgba(0,255,136,0.05); padding:15px; border-radius:8px; border-left:3px solid var(--accent);">
+      <p style="margin:0; font-size:13px;"><i class="fas fa-lightbulb" style="color:var(--accent); margin-right:8px;"></i> <strong>Pro Tip:</strong> Start with the Recon Commands cheatsheet for quick wins. Many bug bounty hunters find their first vulnerabilities during the recon phase.</p>
+    </div>
+    
+    <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn" onclick="scrollToSection('recon-commands')">Go to Recon Commands</button>
+      <button class="btn primary" id="startHunting">Start Hunting</button>
+    </div>
   </div>
+</div>
 
-  <footer>Keep learning. Every subdomain is a potential entry point.</footer>
-
-  <script>
-    const sections = document.querySelectorAll('.section');
-    function checkVisibility() {
-      const triggerBottom = window.innerHeight * 0.85;
-      sections.forEach(section => {
-        const sectionTop = section.getBoundingClientRect().top;
-        if(sectionTop < triggerBottom) {
-          section.classList.add('visible');
+<script>
+  // DOM Elements
+  const $ = (s, el=document) => el.querySelector(s);
+  const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+  
+  // State
+  let currentTheme = localStorage.getItem('bb_theme') || 'dark';
+  let readingMode = localStorage.getItem('bb_reading_mode') === 'true';
+  let completedPages = JSON.parse(localStorage.getItem('bb_completed_pages') || '[]');
+  
+  // Initialize
+  function init() {
+    applyTheme();
+    applyReadingMode();
+    setupNavigation();
+    setupTabs();
+    setupEventListeners();
+    updateProgress();
+    createCodeActions();
+    populateNav();
+    
+    // Mark first page as read by default
+    if (!completedPages.includes(1)) {
+      completedPages.push(1);
+      localStorage.setItem('bb_completed_pages', JSON.stringify(completedPages));
+      updateProgress();
+    }
+  }
+  
+  // Apply theme
+  function applyTheme() {
+    const root = document.documentElement;
+    if (currentTheme === 'light') {
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+    }
+    updateThemeButton();
+  }
+  
+  // Apply reading mode
+  function applyReadingMode() {
+    const root = document.documentElement;
+    if (readingMode) {
+      root.classList.add('reading-mode');
+    } else {
+      root.classList.remove('reading-mode');
+    }
+    updateReadingModeButton();
+  }
+  
+  // Update theme button
+  function updateThemeButton() {
+    const btn = $('#toggleTheme');
+    if (currentTheme === 'light') {
+      btn.innerHTML = '<i class="fas fa-sun icon"></i> <span>Light</span>';
+    } else {
+      btn.innerHTML = '<i class="fas fa-moon icon"></i> <span>Dark</span>';
+    }
+  }
+  
+  // Update reading mode button
+  function updateReadingModeButton() {
+    const btn = $('#toggleReadingMode');
+    if (readingMode) {
+      btn.innerHTML = '<i class="fas fa-book icon"></i> <span>Reading</span>';
+      btn.classList.add('strong');
+    } else {
+      btn.innerHTML = '<i class="fas fa-book-open icon"></i> <span>Reading</span>';
+      btn.classList.remove('strong');
+    }
+  }
+  
+  // Setup navigation
+  function setupNavigation() {
+    // Scroll to section
+    window.scrollToSection = function(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        // Mark as read
+        const page = parseInt(el.dataset.page);
+        if (page && !completedPages.includes(page)) {
+          completedPages.push(page);
+          localStorage.setItem('bb_completed_pages', JSON.stringify(completedPages));
+          updateProgress();
+        }
+        
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    };
+    
+    // Update active nav link on scroll
+    window.addEventListener('scroll', debounce(updateActiveNav, 100));
+    
+    // Initial update
+    updateActiveNav();
+  }
+  
+  // Setup tabs
+  function setupTabs() {
+    $$('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+        
+        // Deactivate all tabs
+        $$('.tab-btn').forEach(b => b.classList.remove('active'));
+        $$('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Activate selected tab
+        btn.classList.add('active');
+        $(`#tab-${tabId}`).classList.add('active');
+      });
+    });
+  }
+  
+  // Setup event listeners
+  function setupEventListeners() {
+    // Theme toggle
+    $('#toggleTheme').addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('bb_theme', currentTheme);
+      applyTheme();
+    });
+    
+    // Reading mode toggle
+    $('#toggleReadingMode').addEventListener('click', () => {
+      readingMode = !readingMode;
+      localStorage.setItem('bb_reading_mode', readingMode);
+      applyReadingMode();
+    });
+    
+    // Copy all
+    $('#copyAll').addEventListener('click', async () => {
+      try {
+        const all = $$('pre[data-copy]').map(p => p.textContent.trim()).join('\n\n###\n\n');
+        await navigator.clipboard.writeText(all);
+        showNotification('All code snippets copied to clipboard!', 'success');
+        $('#copyAll').innerHTML = '<i class="fas fa-check icon"></i> <span>Copied</span>';
+        setTimeout(() => {
+          $('#copyAll').innerHTML = '<i class="fas fa-copy icon"></i> <span>Copy All</span>';
+        }, 2000);
+      } catch(e) {
+        showNotification('Clipboard access denied — copy manually', 'error');
+      }
+    });
+    
+    // Download
+    $('#downloadHTML').addEventListener('click', () => {
+      const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bugbounty_workbook_enhanced.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showNotification('Workbook downloaded successfully!', 'success');
+    });
+    
+    // Print
+    $('#printBtn').addEventListener('click', () => {
+      window.print();
+    });
+    
+    // Quick start
+    $('#quickStart').addEventListener('click', () => {
+      $('#quickStartModal').style.display = 'flex';
+    });
+    
+    // Close modal
+    $('#closeModal').addEventListener('click', () => {
+      $('#quickStartModal').style.display = 'none';
+    });
+    
+    // Start hunting
+    $('#startHunting').addEventListener('click', () => {
+      $('#quickStartModal').style.display = 'none';
+      scrollToSection('recon-commands');
+    });
+    
+    // Search
+    $('#search').addEventListener('input', debounce((e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (q.length < 2) {
+        $$('section.section').forEach(sec => sec.classList.remove('hidden'));
+        return;
+      }
+      
+      $$('section.section').forEach(sec => {
+        const title = (sec.dataset.title || '').toLowerCase();
+        const body = sec.innerText.toLowerCase();
+        const hasMatch = title.includes(q) || body.includes(q);
+        sec.classList.toggle('hidden', !hasMatch);
+      });
+      
+      // Highlight search term
+      highlightText(q);
+    }, 300));
+    
+    // Progress bar
+    window.addEventListener('scroll', () => {
+      const doc = document.documentElement;
+      const scrolled = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+      $('#progress').style.width = scrolled + '%';
+    });
+    
+    // Mark section as read when scrolled into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const page = parseInt(entry.target.dataset.page);
+          if (page && !completedPages.includes(page)) {
+            completedPages.push(page);
+            localStorage.setItem('bb_completed_pages', JSON.stringify(completedPages));
+            updateProgress();
+          }
         }
       });
+    }, { threshold: 0.5 });
+    
+    $$('section.section[data-page]').forEach(section => {
+      observer.observe(section);
+    });
+  }
+  
+  // Create code actions
+  function createCodeActions() {
+    $$('pre[data-copy]').forEach(pre => {
+      if (pre.dataset.hooked) return;
+      pre.dataset.hooked = '1';
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-actions';
+      
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'btn small';
+      copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+      copyBtn.title = 'Copy code';
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(pre.textContent.trim());
+          copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+          copyBtn.style.color = 'var(--success)';
+          setTimeout(() => {
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.style.color = '';
+          }, 2000);
+          showNotification('Code copied to clipboard!', 'success');
+        } catch(e) {
+          showNotification('Clipboard access denied', 'error');
+        }
+      };
+      
+      wrapper.appendChild(copyBtn);
+      pre.style.position = 'relative';
+      pre.appendChild(wrapper);
+    });
+  }
+  
+  // Populate navigation
+  function populateNav() {
+    const navContainer = $('#navContents');
+    const sections = $$('section.section[data-page]');
+    
+    sections.forEach(section => {
+      const page = section.dataset.page;
+      const title = section.dataset.title;
+      const id = section.id;
+      
+      if (!title || !id) return;
+      
+      const a = document.createElement('a');
+      a.href = `#${id}`;
+      a.className = 'nav-link';
+      a.innerHTML = `
+        <i class="fas fa-file-alt nav-icon"></i>
+        PAGE ${page} — ${title}
+        <span class="page-indicator">${page}</span>
+      `;
+      
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        scrollToSection(id);
+      });
+      
+      navContainer.appendChild(a);
+    });
+  }
+  
+  // Update progress
+  function updateProgress() {
+    const total = $$('section.section[data-page]').length;
+    const completed = completedPages.length;
+    const percentage = Math.round((completed / total) * 100);
+    
+    $('#totalPages').textContent = total;
+    $('#completedPages').textContent = completed;
+    
+    // Update progress bar color based on completion
+    if (percentage >= 75) {
+      $('#progress').style.background = 'linear-gradient(90deg, var(--success), var(--accent))';
+    } else if (percentage >= 50) {
+      $('#progress').style.background = 'linear-gradient(90deg, var(--warning), var(--accent))';
+    } else {
+      $('#progress').style.background = 'linear-gradient(90deg, var(--accent), var(--accent2))';
     }
-    window.addEventListener('scroll', checkVisibility);
-    window.addEventListener('load', checkVisibility);
-  </script>
+    
+    // Update nav links
+    $$('.nav-link').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href.startsWith('#page')) {
+        const pageNum = parseInt(href.replace('#page', ''));
+        if (completedPages.includes(pageNum)) {
+          link.classList.add('active');
+          // Add checkmark
+          const icon = link.querySelector('.nav-icon');
+          if (icon) {
+            icon.className = 'fas fa-check-circle nav-icon';
+            icon.style.color = 'var(--success)';
+          }
+        }
+      }
+    });
+  }
+  
+  // Update active nav
+  function updateActiveNav() {
+    const scrollPos = window.scrollY + 100;
+    
+    $$('section.section').forEach(section => {
+      const id = section.id;
+      const top = section.offsetTop;
+      const bottom = top + section.offsetHeight;
+      
+      if (scrollPos >= top && scrollPos < bottom) {
+        $$('.nav-link').forEach(link => link.classList.remove('active'));
+        $(`.nav-link[href="#${id}"]`)?.classList.add('active');
+      }
+    });
+  }
+  
+  // Copy all recon commands
+  function copyAllCommands() {
+    const commands = [];
+    $$('#recon-commands pre[data-copy]').forEach(pre => {
+      commands.push(pre.textContent.trim());
+    });
+    
+    navigator.clipboard.writeText(commands.join('\n\n')).then(() => {
+      showNotification('All recon commands copied!', 'success');
+    });
+  }
+  
+  // Highlight search text
+  function highlightText(query) {
+    // Remove previous highlights
+    $$('.highlight').forEach(el => {
+      const parent = el.parentNode;
+      parent.replaceChild(document.createTextNode(el.textContent), el);
+      parent.normalize();
+    });
+    
+    if (!query) return;
+    
+    // Highlight in sections
+    $$('section.section:not(.hidden)').forEach(section => {
+      highlightInElement(section, query);
+    });
+  }
+  
+  function highlightInElement(element, query) {
+    const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    
+    let node;
+    while (node = walker.nextNode()) {
+      if (node.textContent.match(regex)) {
+        nodes.push(node);
+      }
+    }
+    
+    nodes.forEach(node => {
+      const span = document.createElement('span');
+      span.className = 'highlight';
+      span.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+      span.style.color = 'inherit';
+      span.style.padding = '1px 2px';
+      span.style.borderRadius = '2px';
+      
+      const newNode = node.parentNode.replaceChild(
+        span,
+        node
+      );
+      
+      span.innerHTML = newNode.textContent.replace(regex, '<mark style="background: rgba(255, 215, 0, 0.5); color: inherit; padding: 1px 2px; border-radius: 2px;">$1</mark>');
+    });
+  }
+  
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  
+  // Show notification
+  function showNotification(message, type = 'info') {
+    // Remove existing notification
+    const existing = $('.notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: ${type === 'success' ? 'var(--panel)' : type === 'error' ? 'var(--danger)' : 'var(--panel)'};
+      color: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'white' : 'var(--info)'};
+      border: 1px solid ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--info)'};
+      z-index: 10000;
+      font-family: var(--mono);
+      font-size: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    `;
+    
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    notification.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100px)';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+  
+  // Utility: Debounce function
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+  
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
 </body>
 </html>
