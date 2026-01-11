@@ -1,14 +1,1725 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <title>Clickjacking PoC — rtreefinance</title>
-  <style>body{font-family:Arial;margin:24px;}iframe{width:1500px;height:2000px;border:1px solid #ccc;}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المجموعة العلمية - مكتبة الكتب القانونية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.rtl.min.css">
+    <style>
+        :root {
+            --primary-color: #10b981; /* أخضر زمردي */
+            --primary-dark: #059669; /* أخضر داكن */
+            --primary-light: #34d399; /* أخضر فاتح */
+            --secondary-color: #ffffff; /* أبيض */
+            --accent-color: #047857; /* أخضر داكن للتأكيد */
+            --text-color: #f3f4f6; /* رمادي فاتح للنصوص في الوضع الداكن */
+            --text-light: #d1d5db; /* رمادي فاتح للنصوص الثانوية */
+            --background-dark: #111827; /* خلفية داكنة */
+            --background-card: #1f2937; /* خلفية البطاقات */
+            --background-section: #1a202c; /* خلفية الأقسام */
+            --border-color: #374151; /* لون الحدود الداكن */
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* إضافة متغيرات للوضع الفاتح للتبديل */
+        :root[data-theme="light"] {
+            --text-color: #1f2937; /* رمادي داكن للنصوص */
+            --text-light: #6b7280; /* رمادي فاتح */
+            --background-dark: #f9fafb; /* خلفية فاتحة */
+            --background-card: #ffffff; /* خلفية البطاقات فاتحة */
+            --background-section: #ffffff; /* خلفية الأقسام فاتحة */
+            --border-color: #e5e7eb; /* لون الحدود فاتح */
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* تصميم شريط التنقل */
+        .navbar {
+            background-color: var(--background-card);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        
+        .logo-main {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary-color);
+        }
+        
+        .logo-sub {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            margin: 0 5px;
+            padding: 8px 12px !important;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        /* زر التبديل بين الوضع الداكن والفاتح */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* قسم البطل */
+      .hero-section {
+    background: linear-gradient(rgba(17, 24, 39, 0.8), rgba(31, 41, 55, 0.9)), 
+                url('https://png.pngtree.com/background/20240121/original/pngtree-lawyers-in-the-law-library-study-textbook-man-photo-picture-image_7371776.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* تأثير بارالاكس */
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+    color: white;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section h1 {
+    font-weight: 800;
+    font-size: 3.2rem;
+    margin-bottom: 20px;
+    color: white;
+    position: relative;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section h1 span {
+    color: var(--primary-light);
+    position: relative;
+}
+
+.hero-section h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+    border-radius: 2px;
+}
+
+.hero-section .lead {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 700px;
+    margin: 0 auto 40px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section .btn-primary-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    padding: 15px 35px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.hero-section .btn-primary-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 100%;
+    background-color: var(--primary-dark);
+    transition: width 0.5s ease;
+    z-index: -1;
+}
+
+.hero-section .btn-primary-custom:hover::before {
+    width: 100%;
+    left: 0;
+    right: auto;
+}
+
+.hero-section .btn-primary-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    border-color: var(--primary-light);
+}
+
+/* تأثيرات إضافية */
+.hero-section .container::before {
+    content: '⚖️';
+    font-size: 4rem;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    opacity: 0.1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.hero-section .container::after {
+    content: '📚';
+    font-size: 4rem;
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    opacity: 0.1;
+    animation: float 8s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* تحسينات للجوال */
+@media (max-width: 768px) {
+    .hero-section {
+        background-attachment: scroll;
+        padding: 80px 0;
+        min-height: 70vh;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+    
+    .hero-section .container::before,
+    .hero-section .container::after {
+        display: none;
+    }
+}
+   
+        /* تصميم الأزرار */
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            padding: 12px 28px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.06);
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+        }
+        
+        .btn-outline-custom {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-custom:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-whatsapp {
+            background-color: #25D366;
+            border-color: #25D366;
+            color: white;
+            padding: 12px 28px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(37, 211, 102, 0.2), 0 2px 4px -1px rgba(37, 211, 102, 0.06);
+        }
+        
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+            border-color: #128C7E;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.2), 0 4px 6px -2px rgba(37, 211, 102, 0.05);
+        }
+        
+        /* تصميم الكتب */
+        .section-title {
+            color: var(--text-color);
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .book-card {
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            background-color: var(--background-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .book-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-light);
+        }
+        
+        .book-cover {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .book-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .book-info {
+            padding: 24px;
+        }
+        
+        .book-category {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .book-title {
+            color: var(--text-color);
+            font-weight: 700;
+            margin: 10px 0;
+            height: 60px;
+            overflow: hidden;
+            line-height: 1.3;
+            font-size: 1.1rem;
+        }
+        
+        .book-author {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        
+        .book-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .book-price {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 15px 0;
+        }
+        
+        /* تصميم التصنيفات */
+        .categories-section {
+            background-color: var(--background-section);
+            padding: 100px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .category-item {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 16px;
+            background-color: var(--background-card);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            height: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .category-item:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-color);
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            background-color: rgba(16, 185, 129, 0.1);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+        
+        .category-item h4 {
+            color: var(--text-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .category-item p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        /* تصميم طرق الدفع */
+        .payment-methods {
+            background-color: var(--background-section);
+            padding: 100px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .payment-card {
+            background: var(--background-card);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            height: 100%;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        
+        .payment-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-color);
+        }
+        
+        .vodafone-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        /* تصميم الفوتر */
+        .footer {
+            background-color: #0d1117;
+            color: #d1d5db;
+            padding: 80px 0 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer h5 {
+            color: white;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-light);
+            padding-right: 5px;
+        }
+        
+        .copyright {
+            border-top: 1px solid #374151;
+            padding-top: 25px;
+            margin-top: 60px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        
+        .contact-info {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .contact-info i {
+            color: var(--primary-color);
+            margin-left: 10px;
+            margin-top: 3px;
+        }
+        
+        /* زر واتساب عائم */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background-color: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-float:hover {
+            background-color: #128C7E;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.5);
+        }
+        
+        /* تصميم المودال */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            background-color: var(--background-card);
+            color: var(--text-color);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 24px;
+        }
+        
+        /* تصميم سلة التسوق */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* تحسينات التجاوب */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-section {
+                padding: 80px 0;
+            }
+            
+            .whatsapp-float {
+                bottom: 20px;
+                left: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* تأثيرات دخول */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* تصميم شريط التقدم */
+        .progress-bar {
+            height: 4px;
+            background-color: var(--primary-light);
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 0%;
+            z-index: 1001;
+            transition: width 0.3s;
+        }
+        
+        /* تصميم النصوص */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-color);
+        }
+        
+        p {
+            color: var(--text-light);
+        }
+        
+        /* تصميم قسم من نحن */
+        #about {
+            background-color: var(--background-section);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* قسم الاتصال */
+        #contact {
+            background-color: var(--background-dark);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* تخصيص للوضع الداكن */
+        .modal-title, .modal-body h4, .modal-body h5, .modal-body h6 {
+            color: var(--text-color);
+        }
+        
+        .modal-body .text-muted {
+            color: var(--text-light) !important;
+        }
+        
+        .selected-book {
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        
+        .selected-book:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
-<body>
-  <h3>Clickjacking PoC — rtreefinance</h3>
-  <p>Target: <code>https://www.rtreefinance.com/personal?kycStatus=0</code></p>
-  <iframe src="https://www.rtreefinance.com/personal?kycStatus=0" id="t"></iframe>
-  <p>If you see the site loaded inside the iframe, the page is frameable.</p>
+<body data-theme="dark">
+    <!-- شريط التقدم -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- زر واتساب عائم -->
+    <a href="https://wa.me/201234567890" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand logo-container" href="#">
+                <img src="logo.jpeg" alt="شعار المجموعة العلمية" class="logo-img">
+                <div class="logo-text">
+                    <div class="logo-main">المجموعة العلمية</div>
+                    <div class="logo-sub">للطباعة والنشر والتوزيع</div>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#categories">التصنيفات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#books">الكتب</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#payment">طرق الدفع</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">من نحن</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">اتصل بنا</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-primary-custom position-relative me-2" data-bs-toggle="modal" data-bs-target="#cartModal" id="cartButton">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="d-none d-md-inline"> الكتب المختارة</span>
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </button>
+                    
+                    <!-- زر التبديل بين الوضع الداكن والفاتح -->
+                    <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الداكن/الفاتح">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="hero-section fade-in">
+        <div class="container">
+            <h1>المكتبة القانونية <span>الرائدة</span> في العالم العربي</h1>
+            <p class="lead mb-4">نوفر لك أحدث الكتب والموسوعات القانونية في جميع التخصصات، مع نظام طلب سهل عبر واتساب</p>
+        </div>
+    </section>
+
+    <!-- قسم التصنيفات -->
+    <section id="categories" class="categories-section">
+        <div class="container">
+            <h2 class="section-title text-center fade-in">التخصصات القانونية</h2>
+            
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4 fade-in" style="animation-delay: 0.1s;">
+                    <div class="category-item">
+                        <div class="category-icon">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <h4>القانون الجنائي</h4>
+                        <p>كتب وموسوعات في الجرائم والعقوبات والإجراءات الجنائية</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6 mb-4 fade-in" style="animation-delay: 0.2s;">
+                    <div class="category-item">
+                        <div class="category-icon">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <h4>القانون الدستوري</h4>
+                        <p>دساتير ونظم سياسية وقضاء دستوري وحقوق وحريات</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6 mb-4 fade-in" style="animation-delay: 0.3s;">
+                    <div class="category-item">
+                        <div class="category-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h4>القانون التجاري</h4>
+                        <p>شركات وأوراق تجارية وعقود تجارية وإفلاس وتجارة دولية</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6 mb-4 fade-in" style="animation-delay: 0.4s;">
+                    <div class="category-item">
+                        <div class="category-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4>القانون الدولي</h4>
+                        <p>علاقات دولية وتحكيم ومنظمات دولية وقانون البحار</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الكتب -->
+    <section id="books" class="py-5">
+        <div class="container">
+            <h2 class="section-title fade-in">أحدث الإصدارات</h2>
+            
+            <div class="loading-spinner text-center py-5" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status" style="color: var(--primary-color) !important;">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-3">جاري تحميل الكتب...</p>
+            </div>
+            
+            <div class="row" id="booksContainer">
+                <!-- الكتب سيتم إضافتها بواسطة JavaScript -->
+            </div>
+            
+            <div class="text-center mt-5" id="loadMoreContainer">
+                <button class="btn btn-outline-custom btn-lg" onclick="loadMoreBooks()">عرض المزيد من الكتب <i class="fas fa-arrow-left ms-2"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم طرق الدفع -->
+    <section id="payment" class="payment-methods">
+        <div class="container">
+            <h2 class="section-title text-center fade-in">طريقة الدفع المتاحة</h2>
+            <p class="text-center mb-5 lead">نوفر لكم دفع آمن وسهل عبر فودافون كاش</p>
+            
+            <div class="row justify-content-center fade-in">
+                <div class="col-md-6 col-lg-4">
+                    <div class="payment-card">
+                        <!-- لوجو فودافون كاش -->
+                        <div style="background-color: #e60000; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <span style="color: white; font-weight: bold; font-size: 24px;">V</span>
+                        </div>
+                        <h4>فودافون كاش</h4>
+                        <p class="mb-3">ادفع بسهولة وأمان عبر فودافون كاش</p>
+                        <p class="fw-bold mt-3" style="color: #e60000;">رقم المحفظة: 01012345678</p>
+                        <p class="text-muted small mt-3">يرجى إرسال إشعار الدفع على واتساب بعد التحويل</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-5 fade-in" style="animation-delay: 0.2s;">
+                <div class="col-md-8 offset-md-2">
+                    <div class="p-4 rounded" style="background-color: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <h5 class="text-center mb-3" style="color: var(--primary-color);">طريقة الشراء:</h5>
+                        <div class="row text-start mt-3">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3" style="background-color: var(--primary-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">1</div>
+                                    <div>اختر الكتب التي تريدها من القائمة</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3" style="background-color: var(--primary-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">2</div>
+                                    <div>اضغط على زر "الكتب المختارة" في الأعلى</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3" style="background-color: var(--primary-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">3</div>
+                                    <div>اضغط على "إرسال الطلب عبر واتساب"</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3" style="background-color: var(--primary-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">4</div>
+                                    <div>سنقوم بالتواصل معك عبر واتساب لتأكيد الطلب</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم من نحن -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row align-items-center fade-in">
+                <div class="col-lg-6">
+                    <h2 class="section-title mb-4">عن المجموعة العلمية</h2>
+                    <p class="mb-4">تأسست <strong>المجموعة العلمية للطباعة والنشر والتوزيع</strong> عام 1995 كمكتبة متخصصة في إصدار الكتب القانونية والموسوعات القضائية، بهدف تزويد القانونيين والمهتمين بأحدث المراجع وأدقها في شتى فروع القانون.</p>
+                    
+                    <p class="mb-4">نحن نعمل مع أشهر المؤلفين والباحثين القانونيين في العالم العربي لنشر أعمالهم وإتاحتها للطلبة والمحامين والقضائة وأعضاء النيابة والهيئات القضائية.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>أكثر من 2000 عنوان قانوني</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>شحن لجميع الدول العربية</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>توصيل سريع خلال 2-5 أيام</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>دعم فني ومساعدة في البحث</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="rounded overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1588666309990-d68f08e3d4c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="مكتبة المجموعة العلمية">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الاتصال -->
+    <section id="contact" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5 fade-in">اتصل بنا</h2>
+            <div class="row fade-in" style="animation-delay: 0.1s;">
+                <div class="col-md-4 text-center mb-4">
+                    <div class="p-4 rounded h-100" style="background-color: var(--background-card); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+                        <div class="mb-3" style="background-color: rgba(59, 130, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-phone fa-lg text-primary"></i>
+                        </div>
+                        <h4>اتصل بنا</h4>
+                        <p class="mb-2">+20 123 456 7890</p>
+                        <p class="mb-0">+20 987 654 3210</p>
+                        <p class="mt-3 text-muted small">الأحد - الخميس: 9 ص - 5 م</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="p-4 rounded h-100" style="background-color: var(--background-card); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+                        <div class="mb-3" style="background-color: rgba(34, 197, 94, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fab fa-whatsapp fa-lg text-success"></i>
+                        </div>
+                        <h4>واتساب</h4>
+                        <p class="mb-2">+20 123 456 7890</p>
+                        <p class="mb-3">للطلبات والاستفسارات</p>
+                        <a href="https://wa.me/201234567890" class="btn btn-whatsapp btn-sm mt-2" target="_blank">تواصل معنا على واتساب</a>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="p-4 rounded h-100" style="background-color: var(--background-card); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+                        <div class="mb-3" style="background-color: rgba(239, 68, 68, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-map-marker-alt fa-lg text-danger"></i>
+                        </div>
+                        <h4>العنوان</h4>
+                        <p>15 شارع القاضي الفاضل، وسط البلد، القاهرة، مصر</p>
+                        <p class="mt-3 text-muted small">الفرع الرئيسي: القاهرة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row fade-in">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="logo-container mb-3">
+                        <div class="logo-text">
+                            <div class="logo-main" style="color: white;">المجموعة العلمية</div>
+                            <div class="logo-sub" style="color: #9ca3af;">للطباعة والنشر والتوزيع</div>
+                        </div>
+                    </div>
+                    <p class="mb-3" style="color: #9ca3af;">مكتبة متخصصة في الكتب القانونية منذ 1995، نسعى لنشر المعرفة القانونية وتطوير الفكر القانوني العربي.</p>
+                    <div class="contact-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>القاهرة - مصر: 15 شارع القاضي الفاضل، وسط البلد</span>
+                    </div>
+                    <div class="contact-info">
+                        <i class="fas fa-phone"></i>
+                        <span>+20 123 456 7890</span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>روابط سريعة</h5>
+                    <div class="footer-links">
+                        <a href="#">الرئيسية</a>
+                        <a href="#categories">التصنيفات</a>
+                        <a href="#books">الكتب</a>
+                        <a href="#payment">طرق الدفع</a>
+                        <a href="#about">من نحن</a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>التصنيفات الرئيسية</h5>
+                    <div class="footer-links">
+                        <a href="#" data-category="قانون جنائي">القانون الجنائي</a>
+                        <a href="#" data-category="قانون مدني">القانون المدني</a>
+                        <a href="#" data-category="قانون دستوري">القانون الدستوري</a>
+                        <a href="#" data-category="قانون تجاري">القانون التجاري</a>
+                        <a href="#" data-category="قانون دولي">القانون الدولي</a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>تابعنا على</h5>
+                    <div class="d-flex mt-3 mb-4">
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center me-3" style="background-color: #374151; color: white; width: 40px; height: 40px; border-radius: 50%;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center me-3" style="background-color: #374151; color: white; width: 40px; height: 40px; border-radius: 50%;">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center me-3" style="background-color: #374151; color: white; width: 40px; height: 40px; border-radius: 50%;">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center" style="background-color: #374151; color: white; width: 40px; height: 40px; border-radius: 50%;">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    <h5 class="mt-4">طريقة الدفع</h5>
+                    <div class="mt-2">
+                        <div style="background-color: #e60000; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">
+                            V
+                        </div>
+                        <span class="ms-2">فودافون كاش</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© <span id="currentYear"></span> المجموعة العلمية للطباعة والنشر والتوزيع. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- مودال عربة التسوق -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">الكتب المختارة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body cart-modal">
+                    <div id="selectedBooksList">
+                        <!-- الكتب المختارة ستظهر هنا -->
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex justify-content-between">
+                            <h5>الإجمالي:</h5>
+                            <h5 id="totalPrice" class="book-total">0 ج.م</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-whatsapp" onclick="sendOrderViaWhatsApp()">
+                        <i class="fab fa-whatsapp me-2"></i> إرسال الطلب عبر واتساب
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال تفاصيل الكتاب -->
+    <div class="modal fade" id="bookDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookModalTitle">تفاصيل الكتاب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img id="bookModalImage" src="" class="img-fluid rounded" alt="صورة الكتاب" style="height: 300px; object-fit: cover; width: 100%;">
+                        </div>
+                        <div class="col-md-7">
+                            <h4 id="bookModalBookTitle" class="mb-2"></h4>
+                            <p id="bookModalAuthor" class="text-muted mb-3"></p>
+                            <p id="bookModalDescription" class="mb-4"></p>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <p><strong>التصنيف:</strong> <span id="bookModalCategory" class="badge bg-primary"></span></p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>سنة النشر:</strong> <span id="bookModalYear"></span></p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>عدد الصفحات:</strong> <span id="bookModalPages"></span></p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>الناشر:</strong> <span id="bookModalPublisher"></span></p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-4 pt-3 border-top">
+                                <h4 class="mb-0" id="bookModalPrice" style="color: var(--primary-color);"></h4>
+                                <button type="button" class="btn btn-primary-custom" id="bookModalSelectBtn">
+                                    <i class="fas fa-plus-circle me-2"></i> اختر هذا الكتاب
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // متغيرات عامة
+        let allBooks = [];
+        let selectedBooks = [];
+        let displayedCount = 0;
+        const booksPerPage = 8;
+        let currentBookId = null;
+
+        // تحميل الكتب من ملف JSON
+        async function loadBooks() {
+            try {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                
+                // في حالة حقيقية، ستكون هذه هي الطريقة:
+                // const response = await fetch('books.json');
+                // const data = await response.json();
+                // allBooks = data.books;
+                
+                // لمحاكاة جلب البيانات من ملف JSON
+                allBooks = [
+                    {
+                        id: 1,
+                        title: "أصول المحاكمات الجزائية - النظرية العامة للإثبات",
+                        author: "د. محمد زكي أبو عامر",
+                        category: "قانون جنائي",
+                        price: 120,
+                        image: "https://images.unsplash.com/photo-1589391886085-8b6b0ac72a1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "كتاب متخصص في أصول المحاكمات الجزائية ونظرية الإثبات في القانون الجنائي. يعتبر مرجعًا أساسيًا للطلبة والمحامين والقضاة.",
+                        year: 2023,
+                        pages: 450,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 2,
+                        title: "القضاء الدستوري والمبادئ الدستورية العليا",
+                        author: "د. محمود حافظ",
+                        category: "قانون دستوري",
+                        price: 95,
+                        image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "دراسة معمقة في القضاء الدستوري والمبادئ الدستورية العليا في النظام القانوني. يحلل دور القضاء الدستوري في حماية الحقوق.",
+                        year: 2022,
+                        pages: 320,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 3,
+                        title: "الشركات التجارية في التشريع المصري",
+                        author: "د. أحمد شوقي السيد",
+                        category: "قانون تجاري",
+                        price: 150,
+                        image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "مرجع شامل لأنواع الشركات التجارية في التشريع المصري وأحكامها القانونية. يتناول أحدث التعديلات التشريعية.",
+                        year: 2023,
+                        pages: 520,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 4,
+                        title: "التحكيم التجاري الدولي - النظرية والتطبيق",
+                        author: "د. ياسمين فرحات",
+                        category: "قانون دولي",
+                        price: 180,
+                        image: "https://images.unsplash.com/photo-1548092372-2b8c6e1c5b73?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "تحليل شامل لنظام التحكيم التجاري الدولي من الناحية النظرية والتطبيقية. مع دراسة أحكام المحاكم الدولية.",
+                        year: 2022,
+                        pages: 480,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 5,
+                        title: "قانون العقوبات - القسم العام",
+                        author: "د. علي حسين خلف",
+                        category: "قانون جنائي",
+                        price: 110,
+                        image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "مرجع أساسي في قانون العقوبات والقسم العام. يشرح نظريات التجريم والعقاب والتسبيب.",
+                        year: 2023,
+                        pages: 380,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 6,
+                        title: "النظام الدستوري المصري",
+                        author: "د. إبراهيم درويش",
+                        category: "قانون دستوري",
+                        price: 85,
+                        image: "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "تحليل للنظام الدستوري المصري وتطوراته التاريخية. دراسة مقارنة مع الدساتير العربية.",
+                        year: 2022,
+                        pages: 290,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 7,
+                        title: "الأوراق التجارية والعمليات المصرفية",
+                        author: "د. خالد مصطفى",
+                        category: "قانون تجاري",
+                        price: 130,
+                        image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "دراسة في الأوراق التجارية والعمليات المصرفية في القانون التجاري. مع التطبيقات العملية.",
+                        year: 2023,
+                        pages: 410,
+                        publisher: "المجموعة العلمية"
+                    },
+                    {
+                        id: 8,
+                        title: "القانون الدولي الإنساني",
+                        author: "د. سارة محمد",
+                        category: "قانون دولي",
+                        price: 160,
+                        image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        description: "مرجع في القانون الدولي الإنساني وحماية المدنيين في النزاعات المسلحة. دراسة حالة للنزاعات المعاصرة.",
+                        year: 2022,
+                        pages: 360,
+                        publisher: "المجموعة العلمية"
+                    }
+                ];
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+                displayBooks();
+                
+            } catch (error) {
+                console.error('حدث خطأ في تحميل الكتب:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('booksContainer').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4>حدث خطأ في تحميل الكتب</h4>
+                        <p>يرجى المحاولة مرة أخرى</p>
+                    </div>
+                `;
+            }
+        }
+
+        // تحميل الكتب المختارة من localStorage
+        function loadSelectedBooks() {
+            const savedBooks = localStorage.getItem('selectedBooks');
+            if (savedBooks) {
+                selectedBooks = JSON.parse(savedBooks);
+                updateCartBadge();
+            }
+        }
+
+        // حفظ الكتب المختارة في localStorage
+        function saveSelectedBooks() {
+            localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+            updateCartBadge();
+            updateCartModal();
+        }
+
+        // تحديث عداد السلة
+        function updateCartBadge() {
+            const cartBadge = document.getElementById('cartBadge');
+            cartBadge.textContent = selectedBooks.length;
+            
+            if (selectedBooks.length > 0) {
+                cartBadge.style.display = 'flex';
+            } else {
+                cartBadge.style.display = 'none';
+            }
+        }
+
+        // إضافة كتاب للسلة
+        function selectBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (book && !selectedBooks.some(b => b.id === bookId)) {
+                selectedBooks.push({...book, quantity: 1});
+                saveSelectedBooks();
+                
+                // إشعار نجاح
+                showNotification(`تم إضافة "${book.title}" إلى قائمة الكتب المختارة`);
+            } else {
+                showNotification("هذا الكتاب مضاف بالفعل إلى قائمة الكتب المختارة", "warning");
+            }
+        }
+
+        // إزالة كتاب من السلة
+        function removeBook(bookId) {
+            selectedBooks = selectedBooks.filter(book => book.id !== bookId);
+            saveSelectedBooks();
+            showNotification("تم إزالة الكتاب من قائمة الكتب المختارة");
+        }
+
+        // عرض تفاصيل الكتاب
+        function showBookDetails(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) return;
+            
+            currentBookId = bookId;
+            
+            document.getElementById('bookModalTitle').textContent = book.title;
+            document.getElementById('bookModalBookTitle').textContent = book.title;
+            document.getElementById('bookModalAuthor').textContent = book.author;
+            document.getElementById('bookModalDescription').textContent = book.description;
+            document.getElementById('bookModalCategory').textContent = book.category;
+            document.getElementById('bookModalPrice').textContent = `${book.price} ج.م`;
+            document.getElementById('bookModalYear').textContent = book.year;
+            document.getElementById('bookModalPages').textContent = book.pages;
+            document.getElementById('bookModalPublisher').textContent = book.publisher;
+            document.getElementById('bookModalImage').src = book.image;
+            
+            // تحديث زر الاختيار
+            const selectBtn = document.getElementById('bookModalSelectBtn');
+            if (selectedBooks.some(b => b.id === bookId)) {
+                selectBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> مضاف بالفعل';
+                selectBtn.disabled = true;
+            } else {
+                selectBtn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> اختر هذا الكتاب';
+                selectBtn.disabled = false;
+                selectBtn.onclick = function() { 
+                    selectBook(bookId); 
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('bookDetailsModal'));
+                    modal.hide();
+                };
+            }
+            
+            // عرض المودال
+            const modal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+            modal.show();
+        }
+
+        // تحديث مودال السلة
+        function updateCartModal() {
+            const booksList = document.getElementById('selectedBooksList');
+            const totalPriceElement = document.getElementById('totalPrice');
+            
+            if (selectedBooks.length === 0) {
+                booksList.innerHTML = '<p class="text-center text-muted py-4">لم تقم باختيار أي كتب بعد</p>';
+                totalPriceElement.textContent = '0 ج.م';
+                return;
+            }
+            
+            let booksHTML = '';
+            let totalPrice = 0;
+            
+            selectedBooks.forEach(book => {
+                totalPrice += book.price;
+                booksHTML += `
+                    <div class="selected-book d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">${book.title}</h6>
+                            <small class="text-muted">${book.author} - ${book.category}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3 fw-bold">${book.price} ج.م</span>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeBook(${book.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            booksList.innerHTML = booksHTML;
+            totalPriceElement.textContent = `${totalPrice} ج.م`;
+        }
+
+        // إرسال الطلب عبر واتساب
+        function sendOrderViaWhatsApp() {
+            if (selectedBooks.length === 0) {
+                showNotification("يرجى اختيار كتب أولاً", "warning");
+                return;
+            }
+            
+            let message = "السلام عليكم، أريد طلب الكتب التالية من المجموعة العلمية:\n\n";
+            let totalPrice = 0;
+            
+            selectedBooks.forEach((book, index) => {
+                message += `${index + 1}. ${book.title}\n`;
+                message += `   المؤلف: ${book.author}\n`;
+                message += `   السعر: ${book.price} ج.م\n`;
+                message += `   التصنيف: ${book.category}\n\n`;
+                totalPrice += book.price;
+            });
+            
+            message += `\nإجمالي السعر: ${totalPrice} ج.م\n\n`;
+            message += `معلومات العميل:\n`;
+            message += `الاسم: __________\n`;
+            message += `الهاتف: __________\n`;
+            message += `العنوان: __________\n\n`;
+            message += `طريقة الدفع:\n`;
+            message += `✓ فودافون كاش\n`;
+            message += `رقم فودافون كاش: 01012345678\n\n`;
+            message += `شكراً لكم!`;
+            
+            // ترميز الرسالة للرابط
+            const encodedMessage = encodeURIComponent(message);
+            
+            // رقم واتساب المكتبة (يمكنك تغييره لرقمك)
+            const whatsappNumber = "201234567890";
+            
+            // فتح رابط واتساب
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+        }
+
+        // عرض الكتب في الصفحة
+        function displayBooks() {
+            const booksContainer = document.getElementById('booksContainer');
+            const booksToShow = allBooks.slice(displayedCount, displayedCount + booksPerPage);
+            
+            if (booksToShow.length === 0) {
+                document.getElementById('loadMoreContainer').style.display = 'none';
+                return;
+            }
+            
+            let booksHTML = '';
+            
+            booksToShow.forEach(book => {
+                const isSelected = selectedBooks.some(b => b.id === book.id);
+                
+                booksHTML += `
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in" style="animation-delay: ${0.1 + (displayedCount/booksPerPage)*0.1}s">
+                        <div class="book-card">
+                            <div class="book-cover" style="background-image: url('${book.image}')">
+                                <span class="book-badge">${book.category}</span>
+                            </div>
+                            <div class="book-info">
+                                <div class="book-category">${book.category}</div>
+                                <h3 class="book-title">${book.title}</h3>
+                                <div class="book-author">${book.author}</div>
+                                <div class="book-details">
+                                    <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
+                                    <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
+                                </div>
+                                <div class="book-price">${book.price} ج.م</div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" onclick="${isSelected ? '' : `selectBook(${book.id})`}" ${isSelected ? 'disabled' : ''}>
+                                        <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
+                                        ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
+                                    </button>
+                                    <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
+                                        <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            booksContainer.innerHTML += booksHTML;
+            displayedCount += booksPerPage;
+            
+            if (displayedCount >= allBooks.length) {
+                document.getElementById('loadMoreContainer').style.display = 'none';
+            }
+        }
+
+        // تحميل المزيد من الكتب
+        function loadMoreBooks() {
+            displayBooks();
+        }
+
+        // عرض إشعار
+        function showNotification(message, type = 'success') {
+            // إنشاء عنصر الإشعار
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                left: 20px;
+                z-index: 1050;
+                max-width: 350px;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                border: none;
+                border-radius: 12px;
+                background-color: ${type === 'success' ? '#059669' : '#f59e0b'};
+                color: white;
+            `;
+            
+            let icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="color: white; font-size: 1.2rem;">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div>${message}</div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // إزالة الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // تصفية الكتب حسب التصنيف
+        function filterByCategory(category) {
+            displayedCount = 0;
+            const booksContainer = document.getElementById('booksContainer');
+            booksContainer.innerHTML = '';
+            
+            const filteredBooks = category === 'all' 
+                ? allBooks 
+                : allBooks.filter(book => book.category === category);
+            
+            // عرض الكتب المصفاة
+            const booksToShow = filteredBooks.slice(0, booksPerPage);
+            
+            let booksHTML = '';
+            
+            booksToShow.forEach(book => {
+                const isSelected = selectedBooks.some(b => b.id === book.id);
+                
+                booksHTML += `
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in">
+                        <div class="book-card">
+                            <div class="book-cover" style="background-image: url('${book.image}')">
+                                <span class="book-badge">${book.category}</span>
+                            </div>
+                            <div class="book-info">
+                                <div class="book-category">${book.category}</div>
+                                <h3 class="book-title">${book.title}</h3>
+                                <div class="book-author">${book.author}</div>
+                                <div class="book-details">
+                                    <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
+                                    <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
+                                </div>
+                                <div class="book-price">${book.price} ج.م</div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" onclick="${isSelected ? '' : `selectBook(${book.id})`}" ${isSelected ? 'disabled' : ''}>
+                                        <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
+                                        ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
+                                    </button>
+                                    <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
+                                        <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            booksContainer.innerHTML = booksHTML;
+            displayedCount = booksToShow.length;
+            
+            document.getElementById('loadMoreContainer').style.display = 
+                displayedCount < filteredBooks.length ? 'block' : 'none';
+            
+            // تغيير زر تحميل المزيد ليعرض الكتب المتبقية من التصنيف
+            const loadMoreBtn = document.querySelector('#loadMoreContainer button');
+            loadMoreBtn.onclick = function() {
+                loadMoreFilteredBooks(filteredBooks);
+            };
+            
+            // التمرير إلى قسم الكتب
+            document.getElementById('books').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // شريط التقدم عند التمرير
+        function updateProgressBar() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        }
+
+        // وظيفة التبديل بين الوضع الداكن والفاتح
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            // تحديث الأيقونة
+            const themeIcon = document.getElementById('themeIcon');
+            if (newTheme === 'dark') {
+                themeIcon.className = 'fas fa-moon';
+            } else {
+                themeIcon.className = 'fas fa-sun';
+            }
+            
+            // حفظ التفضيل في localStorage
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // تعيين السنة الحالية في الفوتر
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // تحميل الكتب المختارة
+            loadSelectedBooks();
+            
+            // تحميل الكتب من ملف JSON
+            loadBooks();
+            
+            // تفعيل التنقل السلس
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if(targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // إضافة تصفية الكتب حسب التصنيف في الفوتر
+            document.querySelectorAll('.footer-links a[data-category]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('data-category');
+                    filterByCategory(category);
+                });
+            });
+            // تفعيل التنقل السلس
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        console.log('تم النقر على رابط تنقل سلس', this.getAttribute('href'));
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if(targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if(targetElement) {
+            console.log('العنصر المستهدف موجود:', targetElement);
+            window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: 'smooth'
+            });
+        } else {
+            console.log('لم يتم العثور على العنصر:', targetId);
+        }
+    });
+});
+            
+            // تحديث مودال السلة عند فتحه
+            document.getElementById('cartModal').addEventListener('show.bs.modal', updateCartModal);
+            
+            // تحديث شريط التقدم عند التمرير
+            window.onscroll = function() { updateProgressBar() };
+            
+            // تفعيل زر تبديل الوضع الداكن/الفاتح
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // تحميل تفضيل المستخدم للوضع الداكن/الفاتح من localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                const themeIcon = document.getElementById('themeIcon');
+                if (savedTheme === 'dark') {
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    themeIcon.className = 'fas fa-sun';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
