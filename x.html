@@ -602,7 +602,7 @@
             align-items: flex-start;
         }
         
-        .contact-info i {
+        .contact-بصo i {
             color: var(--primary-color);
             margin-left: 10px;
             margin-top: 3px;
@@ -889,6 +889,163 @@
                 width: 100%;
             }
         }
+        
+        /* قسم البحث والتصفية */
+        .search-filter-section {
+            background-color: var(--background-section);
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background-color: var(--background-card);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        .search-box button {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .category-chip {
+            padding: 8px 16px;
+            background-color: var(--background-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .category-chip:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .category-chip.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .results-info {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: var(--background-card);
+            border-radius: 8px;
+            border-right: 3px solid var(--primary-color);
+        }
+        
+        /* أنماط ترقيم الصفحات */
+        .pagination-container {
+            margin-top: 40px;
+        }
+        
+        .pagination {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .page-item .page-link {
+            background-color: var(--background-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            margin: 2px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .page-item .page-link:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .page-item.disabled .page-link {
+            color: var(--text-light);
+            background-color: var(--background-section);
+        }
+        
+        /* أنماط الرسائل */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--border-color);
+        }
+        
+        /* تحسينات للجوال */
+        @media (max-width: 768px) {
+            .category-filter {
+                justify-content: center;
+            }
+            
+            .search-box input {
+                padding: 12px 45px 12px 15px;
+            }
+            
+            .pagination .page-link {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -1074,6 +1231,32 @@
         <div class="container">
             <h2 class="section-title fade-in">أحدث الإصدارات</h2>
             
+            <!-- قسم البحث والتصفية -->
+            <div class="search-filter-section fade-in">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="ابحث عن كتاب، مؤلف، أو موضوع...">
+                            <button id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="filter-section">
+                            <label class="filter-label">التصنيفات:</label>
+                            <div class="category-filter" id="categoryFilter">
+                                <!-- سيتم ملؤها بواسطة JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-info" id="resultsInfo">
+                    عرض الكتب 1-10 من <span id="totalBooksCount">0</span>
+                </div>
+            </div>
+            
             <div class="loading-spinner text-center py-5" id="loadingSpinner">
                 <div class="spinner-border text-primary" role="status" style="color: var(--primary-color) !important;">
                     <span class="visually-hidden">جاري التحميل...</span>
@@ -1085,8 +1268,20 @@
                 <!-- الكتب سيتم إضافتها بواسطة JavaScript -->
             </div>
             
-            <div class="text-center mt-5" id="loadMoreContainer">
-                <button class="btn btn-outline-custom btn-lg" onclick="loadMoreBooks()">عرض المزيد من الكتب <i class="fas fa-arrow-left ms-2"></i></button>
+            <!-- رسالة عدم وجود نتائج -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-book-open"></i>
+                <h4>لا توجد كتب تطابق بحثك</h4>
+                <p>حاول البحث بكلمات أخرى أو تغيير عوامل التصفية</p>
+            </div>
+            
+            <!-- ترقيم الصفحات -->
+            <div class="pagination-container" id="paginationContainer" style="display: none;">
+                <nav aria-label="ترقيم الصفحات">
+                    <ul class="pagination" id="pagination">
+                        <!-- سيتم ملؤها بواسطة JavaScript -->
+                    </ul>
+                </nav>
             </div>
         </div>
     </section>
@@ -1276,7 +1471,7 @@
                         <i class="fas fa-map-marker-alt"></i>
                         <span>القاهرة - مصر: 15 شارع القاضي الفاضل، وسط البلد</span>
                     </div>
-                    <div class="contact-info">
+                    <div class="contact-6o">
                         <i class="fas fa-phone"></i>
                         <span>+20 123 456 7890</span>
                     </div>
@@ -1417,18 +1612,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        let allBooks = [];
-        let selectedBooks = [];
-        let displayedCount = 0;
-        const booksPerPage = 8;
-        let currentBookId = null;
-        let filteredBooks = [];
-
-        async function loadBooks() {
-            try {
-                document.getElementById('loadingSpinner').style.display = 'block';
-                
-                allBooks =[
+        let allBooks = [
   {
     "id": 1,
     "title": "الرقابة الماليَّة قبل الصرف ومدى أهميتها في الحفاظ على المال العام",
@@ -3326,461 +3510,623 @@
     "publisher": "المجموعة العلمية"
   }
 ];
-                
-                document.getElementById('loadingSpinner').style.display = 'none';
-                displayBooks();
-                
-            } catch (error) {
-                console.error('حدث خطأ في تحميل الكتب:', error);
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('booksContainer').innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
-                        <h4>حدث خطأ في تحميل الكتب</h4>
-                        <p>يرجى المحاولة مرة أخرى</p>
-                    </div>
-                `;
-            }
-        }
+        
+        let selectedBooks = [];
+let currentPage = 1;
+const booksPerPage = 10;
+let currentBookId = null;
+let filteredBooks = [];
+let currentCategory = 'all';
+let currentSearch = '';
 
-        function loadSelectedBooks() {
-            const savedBooks = localStorage.getItem('selectedBooks');
-            if (savedBooks) {
-                selectedBooks = JSON.parse(savedBooks);
-                updateCartBadge();
-                updateMobileCartSummary();
-            }
-        }
+async function loadBooks() {
+    try {
+        document.getElementById('loadingSpinner').style.display = 'block';
+        
+        // تهيئة المتغيرات
+        filteredBooks = [...allBooks]; // استخدام نسخة من الكتب
+        currentPage = 1;
+        
+        // إعداد البحث والتصفية
+        setupSearchAndFilter();
+        
+        // عرض الكتب
+        displayBooks();
+        
+        document.getElementById('loadingSpinner').style.display = 'none';
+        
+    } catch (error) {
+        console.error('حدث خطأ في تحميل الكتب:', error);
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('booksContainer').innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <h4>حدث خطأ في تحميل الكتب</h4>
+                <p>يرجى المحاولة مرة أخرى</p>
+            </div>
+        `;
+    }
+}
 
-        function saveSelectedBooks() {
-            localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+function loadSelectedBooks() {
+    const savedBooks = localStorage.getItem('selectedBooks');
+    if (savedBooks) {
+        try {
+            selectedBooks = JSON.parse(savedBooks);
             updateCartBadge();
-            updateCartModal();
             updateMobileCartSummary();
+        } catch (e) {
+            selectedBooks = [];
+            localStorage.setItem('selectedBooks', JSON.stringify([]));
         }
+    }
+}
 
-        function updateCartBadge() {
-            const cartBadge = document.getElementById('cartBadge');
-            const mobileCartBadge = document.getElementById('mobileCartBadge');
-            
-            cartBadge.textContent = selectedBooks.length;
-            mobileCartBadge.textContent = selectedBooks.length;
-            
-            if (selectedBooks.length > 0) {
-                cartBadge.style.display = 'flex';
-                mobileCartBadge.style.display = 'flex';
-            } else {
-                cartBadge.style.display = 'none';
-                mobileCartBadge.style.display = 'none';
-            }
+function saveSelectedBooks() {
+    localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+    updateCartBadge();
+    updateMobileCartSummary();
+}
+
+function updateCartBadge() {
+    const cartBadge = document.getElementById('cartBadge');
+    const mobileCartBadge = document.getElementById('mobileCartBadge');
+    
+    cartBadge.textContent = selectedBooks.length;
+    mobileCartBadge.textContent = selectedBooks.length;
+    
+    if (selectedBooks.length > 0) {
+        cartBadge.style.display = 'flex';
+        mobileCartBadge.style.display = 'flex';
+    } else {
+        cartBadge.style.display = 'none';
+        mobileCartBadge.style.display = 'none';
+    }
+}
+
+function updateMobileCartSummary() {
+    const mobileCartCount = document.getElementById('mobileCartCount');
+    const mobileCartTotal = document.getElementById('mobileCartTotal');
+    
+    let totalPrice = 0;
+    selectedBooks.forEach(book => {
+        totalPrice += book.price;
+    });
+    
+    mobileCartCount.textContent = `${selectedBooks.length} ${selectedBooks.length === 1 ? 'كتاب' : 'كتب'}`;
+    mobileCartTotal.textContent = `${totalPrice} ج.م`;
+}
+
+function selectBook(bookId) {
+    const book = allBooks.find(b => b.id === bookId);
+    if (book && !selectedBooks.some(b => b.id === bookId)) {
+        selectedBooks.push({...book, quantity: 1});
+        saveSelectedBooks();
+        showNotification(`تم إضافة "${book.title}" إلى قائمة الكتب المختارة`);
+        
+        // تحديث عرض الكتب لتغيير حالة الزر
+        displayBooks();
+    } else {
+        showNotification("هذا الكتاب مضاف بالفعل إلى قائمة الكتب المختارة", "warning");
+    }
+}
+
+function removeBook(bookId) {
+    selectedBooks = selectedBooks.filter(book => book.id !== bookId);
+    saveSelectedBooks();
+    showNotification("تم إزالة الكتاب من قائمة الكتب المختارة");
+    
+    // تحديث مودال السلة إذا كان مفتوحًا
+    const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+    if (modal) {
+        updateCartModal();
+    }
+}
+
+function showBookDetails(bookId) {
+    const book = allBooks.find(b => b.id === bookId);
+    if (!book) return;
+    
+    currentBookId = bookId;
+    
+    document.getElementById('bookModalTitle').textContent = book.title;
+    document.getElementById('bookModalBookTitle').textContent = book.title;
+    document.getElementById('bookModalAuthor').textContent = book.author;
+    document.getElementById('bookModalDescription').textContent = book.description;
+    document.getElementById('bookModalCategory').textContent = book.category;
+    document.getElementById('bookModalPrice').textContent = `${book.price} ج.م`;
+    document.getElementById('bookModalYear').textContent = book.year;
+    document.getElementById('bookModalPages').textContent = book.pages;
+    document.getElementById('bookModalPublisher').textContent = book.publisher;
+    document.getElementById('bookModalImage').src = book.image || 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+    
+    const selectBtn = document.getElementById('bookModalSelectBtn');
+    if (selectedBooks.some(b => b.id === bookId)) {
+        selectBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> مضاف بالفعل';
+        selectBtn.disabled = true;
+    } else {
+        selectBtn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> اختر هذا الكتاب';
+        selectBtn.disabled = false;
+        selectBtn.onclick = function() { 
+            selectBook(bookId); 
+            const modal = bootstrap.Modal.getInstance(document.getElementById('bookDetailsModal'));
+            modal.hide();
+        };
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+    modal.show();
+}
+
+function updateCartModal() {
+    const booksList = document.getElementById('selectedBooksList');
+    const totalPriceElement = document.getElementById('totalPrice');
+    
+    if (selectedBooks.length === 0) {
+        booksList.innerHTML = '<p class="text-center text-muted py-4">لم تقم باختيار أي كتب بعد</p>';
+        totalPriceElement.textContent = '0 ج.م';
+        return;
+    }
+    
+    let booksHTML = '';
+    let totalPrice = 0;
+    
+    selectedBooks.forEach(book => {
+        totalPrice += book.price;
+        booksHTML += `
+            <div class="selected-book d-flex justify-content-between align-items-center">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">${book.title}</h6>
+                    <small class="text-muted">${book.author} - ${book.category}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="me-3 fw-bold">${book.price} ج.م</span>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeBook(${book.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    booksList.innerHTML = booksHTML;
+    totalPriceElement.textContent = `${totalPrice} ج.م`;
+}
+
+function sendOrderViaWhatsApp() {
+    if (selectedBooks.length === 0) {
+        showNotification("يرجى اختيار كتب أولاً", "warning");
+        return;
+    }
+    
+    let message = "السلام عليكم، أريد طلب الكتب التالية من المجموعة العلمية:\n\n";
+    let totalPrice = 0;
+    
+    selectedBooks.forEach((book, index) => {
+        message += `${index + 1}. ${book.title}\n`;
+        message += `   المؤلف: ${book.author}\n`;
+        message += `   السعر: ${book.price} ج.م\n`;
+        message += `   التصنيف: ${book.category}\n\n`;
+        totalPrice += book.price;
+    });
+    
+    message += `\nإجمالي السعر: ${totalPrice} ج.م\n\n`;
+    message += `معلومات العميل:\n`;
+    message += `الاسم: __________\n`;
+    message += `الهاتف: __________\n`;
+    message += `العنوان: __________\n\n`;
+    message += `طريقة الدفع:\n`;
+    message += `✓ فودافون كاش\n`;
+    message += `رقم فودافون كاش: 01012345678\n\n`;
+    message += `شكراً لكم!`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappNumber = "201090729608";
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+}
+
+function setupSearchAndFilter() {
+    // جمع جميع التصنيفات الفريدة
+    const categories = [...new Set(allBooks.map(book => book.category))];
+    const categoryFilter = document.getElementById('categoryFilter');
+    
+    // إضافة زر "الكل"
+    categoryFilter.innerHTML = `
+        <div class="category-chip ${currentCategory === 'all' ? 'active' : ''}" 
+             onclick="filterByCategory('all')">الكل</div>
+    `;
+    
+    // إضافة التصنيفات
+    categories.forEach(category => {
+        categoryFilter.innerHTML += `
+            <div class="category-chip ${currentCategory === category ? 'active' : ''}" 
+                 onclick="filterByCategory('${category}')">${category}</div>
+        `;
+    });
+    
+    // إعداد حدث البحث
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        currentSearch = e.target.value.trim().toLowerCase();
+        currentPage = 1;
+        applyFilters();
+    });
+    
+    document.getElementById('searchButton').addEventListener('click', function() {
+        currentSearch = document.getElementById('searchInput').value.trim().toLowerCase();
+        currentPage = 1;
+        applyFilters();
+    });
+    
+    // البحث عند الضغط على Enter
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            currentSearch = e.target.value.trim().toLowerCase();
+            currentPage = 1;
+            applyFilters();
         }
+    });
+}
 
-        function updateMobileCartSummary() {
-            const mobileCartCount = document.getElementById('mobileCartCount');
-            const mobileCartTotal = document.getElementById('mobileCartTotal');
-            
-            let totalPrice = 0;
-            selectedBooks.forEach(book => {
-                totalPrice += book.price;
-            });
-            
-            mobileCartCount.textContent = `${selectedBooks.length} ${selectedBooks.length === 1 ? 'كتاب' : 'كتب'}`;
-            mobileCartTotal.textContent = `${totalPrice} ج.م`;
-        }
+function applyFilters() {
+    // تصفية حسب التصنيف
+    if (currentCategory === 'all') {
+        filteredBooks = [...allBooks];
+    } else {
+        filteredBooks = allBooks.filter(book => book.category === currentCategory);
+    }
+    
+    // تصفية حسب البحث
+    if (currentSearch) {
+        filteredBooks = filteredBooks.filter(book => 
+            book.title.toLowerCase().includes(currentSearch) ||
+            book.author.toLowerCase().includes(currentSearch) ||
+            book.description.toLowerCase().includes(currentSearch) ||
+            book.category.toLowerCase().includes(currentSearch)
+        );
+    }
+    
+    // تحديث عرض النتائج
+    displayBooks();
+}
 
-        function selectBook(bookId) {
-            const book = allBooks.find(b => b.id === bookId);
-            if (book && !selectedBooks.some(b => b.id === bookId)) {
-                selectedBooks.push({...book, quantity: 1});
-                saveSelectedBooks();
-                showNotification(`تم إضافة "${book.title}" إلى قائمة الكتب المختارة`);
-            } else {
-                showNotification("هذا الكتاب مضاف بالفعل إلى قائمة الكتب المختارة", "warning");
-            }
-        }
-
-        function removeBook(bookId) {
-            selectedBooks = selectedBooks.filter(book => book.id !== bookId);
-            saveSelectedBooks();
-            showNotification("تم إزالة الكتاب من قائمة الكتب المختارة");
-        }
-
-        function showBookDetails(bookId) {
-            const book = allBooks.find(b => b.id === bookId);
-            if (!book) return;
-            
-            currentBookId = bookId;
-            
-            document.getElementById('bookModalTitle').textContent = book.title;
-            document.getElementById('bookModalBookTitle').textContent = book.title;
-            document.getElementById('bookModalAuthor').textContent = book.author;
-            document.getElementById('bookModalDescription').textContent = book.description;
-            document.getElementById('bookModalCategory').textContent = book.category;
-            document.getElementById('bookModalPrice').textContent = `${book.price} ج.م`;
-            document.getElementById('bookModalYear').textContent = book.year;
-            document.getElementById('bookModalPages').textContent = book.pages;
-            document.getElementById('bookModalPublisher').textContent = book.publisher;
-            document.getElementById('bookModalImage').src = book.image;
-            
-            const selectBtn = document.getElementById('bookModalSelectBtn');
-            if (selectedBooks.some(b => b.id === bookId)) {
-                selectBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> مضاف بالفعل';
-                selectBtn.disabled = true;
-            } else {
-                selectBtn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> اختر هذا الكتاب';
-                selectBtn.disabled = false;
-                selectBtn.onclick = function() { 
-                    selectBook(bookId); 
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('bookDetailsModal'));
-                    modal.hide();
-                };
-            }
-            
-            const modal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
-            modal.show();
-        }
-
-        function updateCartModal() {
-            const booksList = document.getElementById('selectedBooksList');
-            const totalPriceElement = document.getElementById('totalPrice');
-            
-            if (selectedBooks.length === 0) {
-                booksList.innerHTML = '<p class="text-center text-muted py-4">لم تقم باختيار أي كتب بعد</p>';
-                totalPriceElement.textContent = '0 ج.م';
-                return;
-            }
-            
-            let booksHTML = '';
-            let totalPrice = 0;
-            
-            selectedBooks.forEach(book => {
-                totalPrice += book.price;
-                booksHTML += `
-                    <div class="selected-book d-flex justify-content-between align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">${book.title}</h6>
-                            <small class="text-muted">${book.author} - ${book.category}</small>
+function displayBooks() {
+    const booksContainer = document.getElementById('booksContainer');
+    const resultsInfo = document.getElementById('resultsInfo');
+    const totalBooksCount = document.getElementById('totalBooksCount');
+    const noResults = document.getElementById('noResults');
+    const paginationContainer = document.getElementById('paginationContainer');
+    
+    // إخفاء رسالة التحميل
+    document.getElementById('loadingSpinner').style.display = 'none';
+    
+    // التحقق من وجود نتائج
+    if (filteredBooks.length === 0) {
+        booksContainer.innerHTML = '';
+        noResults.style.display = 'block';
+        paginationContainer.style.display = 'none';
+        resultsInfo.style.display = 'none';
+        return;
+    }
+    
+    noResults.style.display = 'none';
+    resultsInfo.style.display = 'block';
+    paginationContainer.style.display = 'block';
+    
+    // تحديث معلومات النتائج
+    const startIndex = (currentPage - 1) * booksPerPage;
+    const endIndex = Math.min(startIndex + booksPerPage, filteredBooks.length);
+    totalBooksCount.textContent = filteredBooks.length;
+    resultsInfo.innerHTML = `عرض الكتب ${startIndex + 1}-${endIndex} من <span id="totalBooksCount">${filteredBooks.length}</span>`;
+    
+    // عرض الكتب للصفحة الحالية
+    const booksToShow = filteredBooks.slice(startIndex, endIndex);
+    let booksHTML = '';
+    
+    booksToShow.forEach(book => {
+        const isSelected = selectedBooks.some(b => b.id === book.id);
+        
+        booksHTML += `
+            <div class="col-lg-3 col-md-6 mb-4 fade-in">
+                <div class="book-card">
+                    <div class="book-cover" style="background-image: url('${book.image || 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}')">
+                        <span class="book-badge">${book.category}</span>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-category">${book.category}</div>
+                        <h3 class="book-title">${book.title}</h3>
+                        <div class="book-author">${book.author}</div>
+                        <div class="book-details">
+                            <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
+                            <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <span class="me-3 fw-bold">${book.price} ج.م</span>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeBook(${book.id})">
-                                <i class="fas fa-trash"></i>
+                        <div class="book-price">${book.price} ج.م</div>
+                        <div class="book-buttons-container">
+                            <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" 
+                                    onclick="${isSelected ? '' : `selectBook(${book.id})`}" 
+                                    ${isSelected ? 'disabled' : ''}>
+                                <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
+                                ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
+                            </button>
+                            <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
+                                <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
                             </button>
                         </div>
                     </div>
-                `;
-            });
-            
-            booksList.innerHTML = booksHTML;
-            totalPriceElement.textContent = `${totalPrice} ج.م`;
-        }
-
-        function sendOrderViaWhatsApp() {
-            if (selectedBooks.length === 0) {
-                showNotification("يرجى اختيار كتب أولاً", "warning");
-                return;
-            }
-            
-            let message = "السلام عليكم، أريد طلب الكتب التالية من المجموعة العلمية:\n\n";
-            let totalPrice = 0;
-            
-            selectedBooks.forEach((book, index) => {
-                message += `${index + 1}. ${book.title}\n`;
-                message += `   المؤلف: ${book.author}\n`;
-                message += `   السعر: ${book.price} ج.م\n`;
-                message += `   التصنيف: ${book.category}\n\n`;
-                totalPrice += book.price;
-            });
-            
-            message += `\nإجمالي السعر: ${totalPrice} ج.م\n\n`;
-            message += `معلومات العميل:\n`;
-            message += `الاسم: __________\n`;
-            message += `الهاتف: __________\n`;
-            message += `العنوان: __________\n\n`;
-            message += `طريقة الدفع:\n`;
-            message += `✓ فودافون كاش\n`;
-            message += `رقم فودافون كاش: 01012345678\n\n`;
-            message += `شكراً لكم!`;
-            
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappNumber = "201090729608";
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
-        }
-
-        function displayBooks() {
-            const booksContainer = document.getElementById('booksContainer');
-            const booksToShow = allBooks.slice(displayedCount, displayedCount + booksPerPage);
-            
-            if (booksToShow.length === 0) {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-                return;
-            }
-            
-            let booksHTML = '';
-            
-            booksToShow.forEach(book => {
-                const isSelected = selectedBooks.some(b => b.id === book.id);
-                
-                booksHTML += `
-                    <div class="col-lg-3 col-md-6 mb-4 fade-in" style="animation-delay: ${0.1 + (displayedCount/booksPerPage)*0.1}s">
-                        <div class="book-card">
-                            <div class="book-cover" style="background-image: url('${book.image}')">
-                                <span class="book-badge">${book.category}</span>
-                            </div>
-                            <div class="book-info">
-                                <div class="book-category">${book.category}</div>
-                                <h3 class="book-title">${book.title}</h3>
-                                <div class="book-author">${book.author}</div>
-                                <div class="book-details">
-                                    <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
-                                    <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
-                                </div>
-                                <div class="book-price">${book.price} ج.م</div>
-                                <div class="book-buttons-container">
-                                    <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" onclick="${isSelected ? '' : `selectBook(${book.id})`}" ${isSelected ? 'disabled' : ''}>
-                                        <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
-                                        ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
-                                    </button>
-                                    <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
-                                        <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            booksContainer.innerHTML += booksHTML;
-            displayedCount += booksPerPage;
-            
-            if (displayedCount >= allBooks.length) {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-            }
-        }
-
-        function loadMoreBooks() {
-            displayBooks();
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-            notification.style.cssText = `
-                top: 20px;
-                left: 20px;
-                z-index: 9999;
-                max-width: 350px;
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                border: none;
-                border-radius: 12px;
-                background-color: ${type === 'success' ? '#059669' : '#f59e0b'};
-                color: white;
-            `;
-            
-            let icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-            
-            notification.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="color: white; font-size: 1.2rem;">
-                        <i class="fas ${icon}"></i>
-                    </div>
-                    <div>${message}</div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    });
+    
+    booksContainer.innerHTML = booksHTML;
+    
+    // إنشاء ترقيم الصفحات
+    createPagination();
+}
+
+function createPagination() {
+    const pagination = document.getElementById('pagination');
+    const paginationContainer = document.getElementById('paginationContainer');
+    const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
+    
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // زر الصفحة السابقة
+    if (currentPage > 1) {
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" aria-label="السابق">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        paginationHTML += `
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="السابق">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+            </li>
+        `;
+    }
+    
+    // أرقام الصفحات
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // ضبط startPage إذا كان عدد الصفحات أقل من maxVisiblePages
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // إضافة النقاط إذا كانت هناك صفحات مخفية
+    if (startPage > 1) {
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(1)">1</a>
+            </li>
+            ${startPage > 2 ? '<li class="page-item disabled"><span class="page-link">...</span></li>' : ''}
+        `;
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        if (i === currentPage) {
+            paginationHTML += `
+                <li class="page-item active">
+                    <span class="page-link">${i}</span>
+                </li>
             `;
-            
-            document.body.appendChild(notification);
-            
+        } else {
+            paginationHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                </li>
+            `;
+        }
+    }
+    
+    // إضافة النقاط إذا كانت هناك صفحات مخفية
+    if (endPage < totalPages) {
+        paginationHTML += `
+            ${endPage < totalPages - 1 ? '<li class="page-item disabled"><span class="page-link">...</span></li>' : ''}
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a>
+            </li>
+        `;
+    }
+    
+    // زر الصفحة التالية
+    if (currentPage < totalPages) {
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" aria-label="التالي">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        paginationHTML += `
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="التالي">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+            </li>
+        `;
+    }
+    
+    pagination.innerHTML = paginationHTML;
+}
+
+function changePage(pageNumber) {
+    currentPage = pageNumber;
+    displayBooks();
+    
+    // التمرير إلى قسم الكتب
+    window.scrollTo({
+        top: document.getElementById('books').offsetTop - 100,
+        behavior: 'smooth'
+    });
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    currentPage = 1;
+    
+    // تحديث حالة أزرار التصنيف
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.classList.remove('active');
+    });
+    
+    const activeChip = [...document.querySelectorAll('.category-chip')].find(chip => 
+        chip.textContent === category || (category === 'all' && chip.textContent === 'الكل')
+    );
+    
+    if (activeChip) {
+        activeChip.classList.add('active');
+    }
+    
+    applyFilters();
+}
+
+function showNotification(message, type = 'success') {
+    // إزالة أي إشعارات سابقة
+    const existingNotifications = document.querySelectorAll('.custom-notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `custom-notification alert alert-${type === 'success' ? 'success' : 'warning'} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999;
+        max-width: 350px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        border: none;
+        border-radius: 12px;
+        background-color: ${type === 'success' ? '#10b981' : '#f59e0b'};
+        color: white;
+        padding: 15px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    let icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <div class="me-3" style="font-size: 1.2rem;">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div>${message}</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // إضافة أنيميشن
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.add('fade');
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.remove();
+                    style.remove();
                 }
-            }, 3000);
+            }, 300);
         }
+    }, 3000);
+}
 
-        function filterByCategory(category) {
-            displayedCount = 0;
-            const booksContainer = document.getElementById('booksContainer');
-            booksContainer.innerHTML = '';
-            
-            filteredBooks = category === 'all' 
-                ? allBooks 
-                : allBooks.filter(book => book.category === category);
-            
-            const booksToShow = filteredBooks.slice(0, booksPerPage);
-            
-            let booksHTML = '';
-            
-            booksToShow.forEach(book => {
-                const isSelected = selectedBooks.some(b => b.id === book.id);
-                
-                booksHTML += `
-                    <div class="col-lg-3 col-md-6 mb-4 fade-in">
-                        <div class="book-card">
-                            <div class="book-cover" style="background-image: url('${book.image}')">
-                                <span class="book-badge">${book.category}</span>
-                            </div>
-                            <div class="book-info">
-                                <div class="book-category">${book.category}</div>
-                                <h3 class="book-title">${book.title}</h3>
-                                <div class="book-author">${book.author}</div>
-                                <div class="book-details">
-                                    <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
-                                    <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
-                                </div>
-                                <div class="book-price">${book.price} ج.م</div>
-                                <div class="book-buttons-container">
-                                    <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" onclick="${isSelected ? '' : `selectBook(${book.id})`}" ${isSelected ? 'disabled' : ''}>
-                                        <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
-                                        ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
-                                    </button>
-                                    <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
-                                        <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            booksContainer.innerHTML = booksHTML;
-            displayedCount = booksToShow.length;
-            
-            document.getElementById('loadMoreContainer').style.display = 
-                displayedCount < filteredBooks.length ? 'block' : 'none';
-            
-            const loadMoreBtn = document.querySelector('#loadMoreContainer button');
-            loadMoreBtn.onclick = function() {
-                loadMoreFilteredBooks();
-            };
-            
-            document.getElementById('books').scrollIntoView({ behavior: 'smooth' });
-        }
+function updateProgressBar() {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById("progressBar").style.width = scrolled + "%";
+}
 
-        function loadMoreFilteredBooks() {
-            const booksContainer = document.getElementById('booksContainer');
-            const booksToShow = filteredBooks.slice(displayedCount, displayedCount + booksPerPage);
-            
-            if (booksToShow.length === 0) {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-                return;
-            }
-            
-            let booksHTML = '';
-            
-            booksToShow.forEach(book => {
-                const isSelected = selectedBooks.some(b => b.id === book.id);
-                
-                booksHTML += `
-                    <div class="col-lg-3 col-md-6 mb-4 fade-in">
-                        <div class="book-card">
-                            <div class="book-cover" style="background-image: url('${book.image}')">
-                                <span class="book-badge">${book.category}</span>
-                            </div>
-                            <div class="book-info">
-                                <div class="book-category">${book.category}</div>
-                                <h3 class="book-title">${book.title}</h3>
-                                <div class="book-author">${book.author}</div>
-                                <div class="book-details">
-                                    <span><i class="far fa-calendar me-1"></i> ${book.year}</span>
-                                    <span><i class="fas fa-file-alt me-1"></i> ${book.pages} صفحة</span>
-                                </div>
-                                <div class="book-price">${book.price} ج.م</div>
-                                <div class="book-buttons-container">
-                                    <button class="btn ${isSelected ? 'btn-outline-custom' : 'btn-primary-custom'}" onclick="${isSelected ? '' : `selectBook(${book.id})`}" ${isSelected ? 'disabled' : ''}>
-                                        <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'} me-2"></i>
-                                        ${isSelected ? 'مضاف' : 'اختر هذا الكتاب'}
-                                    </button>
-                                    <button class="btn btn-outline-custom" onclick="showBookDetails(${book.id})">
-                                        <i class="fas fa-info-circle me-2"></i> تفاصيل الكتاب
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            booksContainer.innerHTML += booksHTML;
-            displayedCount += booksPerPage;
-            
-            if (displayedCount >= filteredBooks.length) {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-            }
-        }
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    const themeIcon = document.getElementById('themeIcon');
+    if (newTheme === 'dark') {
+        themeIcon.className = 'fas fa-moon';
+    } else {
+        themeIcon.className = 'fas fa-sun';
+    }
+    
+    localStorage.setItem('theme', newTheme);
+}
 
-        function updateProgressBar() {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById("progressBar").style.width = scrolled + "%";
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    
+    loadSelectedBooks();
+    loadBooks();
+    
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
             
-            const themeIcon = document.getElementById('themeIcon');
-            if (newTheme === 'dark') {
-                themeIcon.className = 'fas fa-moon';
-            } else {
-                themeIcon.className = 'fas fa-sun';
-            }
+            const targetId = this.getAttribute('href');
+            if(targetId === '#') return;
             
-            localStorage.setItem('theme', newTheme);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-            
-            loadSelectedBooks();
-            loadBooks();
-            
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    if(targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if(targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
+            const targetElement = document.querySelector(targetId);
+            if(targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
                 });
-            });
-            
-            document.querySelectorAll('.footer-links a[data-category]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const category = this.getAttribute('data-category');
-                    filterByCategory(category);
-                });
-            });
-            
-            document.getElementById('cartModal').addEventListener('show.bs.modal', updateCartModal);
-            
-            window.onscroll = function() { updateProgressBar() };
-            
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                const themeIcon = document.getElementById('themeIcon');
-                if (savedTheme === 'dark') {
-                    themeIcon.className = 'fas fa-moon';
-                } else {
-                    themeIcon.className = 'fas fa-sun';
-                }
             }
         });
+    });
+    
+    document.querySelectorAll('.footer-links a[data-category]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            filterByCategory(category);
+            
+            window.scrollTo({
+                top: document.getElementById('books').offsetTop - 80,
+                behavior: 'smooth'
+            });
+        });
+    });
+    
+    document.getElementById('cartModal').addEventListener('show.bs.modal', updateCartModal);
+    
+    window.onscroll = function() { updateProgressBar() };
+    
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        const themeIcon = document.getElementById('themeIcon');
+        if (savedTheme === 'dark') {
+            themeIcon.className = 'fas fa-moon';
+        } else {
+            themeIcon.className = 'fas fa-sun';
+        }
+    }
+});
     </script>
 </body>
 </html>
