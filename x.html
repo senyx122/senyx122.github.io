@@ -1137,6 +1137,66 @@
         </div>
     </section>
 
+    <!-- قسم الكتب -->
+    <section id="books" class="py-5">
+        <div class="container">
+            <h2 class="section-title fade-in">أحدث الإصدارات</h2>
+            
+            <!-- قسم البحث والتصفية -->
+            <div class="search-filter-section fade-in">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="ابحث عن كتاب، مؤلف، أو موضوع...">
+                            <button id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="filter-section">
+                            <label class="filter-label">التصنيفات:</label>
+                            <div class="category-filter" id="categoryFilter">
+                                <!-- سيتم ملؤها بواسطة JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-info" id="resultsInfo">
+                    عرض الكتب 1-10 من <span id="totalBooksCount">0</span>
+                </div>
+            </div>
+            
+            <div class="loading-spinner text-center py-5" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status" style="color: var(--primary-color) !important;">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-3">جاري تحميل الكتب...</p>
+            </div>
+            
+            <div class="row" id="booksContainer">
+                <!-- الكتب سيتم إضافتها بواسطة JavaScript -->
+            </div>
+            
+            <!-- رسالة عدم وجود نتائج -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-book-open"></i>
+                <h4>لا توجد كتب تطابق بحثك</h4>
+                <p>حاول البحث بكلمات أخرى أو تغيير عوامل التصفية</p>
+            </div>
+            
+            <!-- ترقيم الصفحات -->
+            <div class="pagination-container" id="paginationContainer" style="display: none;">
+                <nav aria-label="ترقيم الصفحات">
+                    <ul class="pagination" id="pagination">
+                        <!-- سيتم ملؤها بواسطة JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+    
     <!-- قسم التصنيفات -->
     <section id="categories" class="categories-section">
         <div class="container">
@@ -1226,66 +1286,6 @@
         </div>
     </section>
 
-    <!-- قسم الكتب -->
-    <section id="books" class="py-5">
-        <div class="container">
-            <h2 class="section-title fade-in">أحدث الإصدارات</h2>
-            
-            <!-- قسم البحث والتصفية -->
-            <div class="search-filter-section fade-in">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="ابحث عن كتاب، مؤلف، أو موضوع...">
-                            <button id="searchButton">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="filter-section">
-                            <label class="filter-label">التصنيفات:</label>
-                            <div class="category-filter" id="categoryFilter">
-                                <!-- سيتم ملؤها بواسطة JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="results-info" id="resultsInfo">
-                    عرض الكتب 1-10 من <span id="totalBooksCount">0</span>
-                </div>
-            </div>
-            
-            <div class="loading-spinner text-center py-5" id="loadingSpinner">
-                <div class="spinner-border text-primary" role="status" style="color: var(--primary-color) !important;">
-                    <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-                <p class="mt-3">جاري تحميل الكتب...</p>
-            </div>
-            
-            <div class="row" id="booksContainer">
-                <!-- الكتب سيتم إضافتها بواسطة JavaScript -->
-            </div>
-            
-            <!-- رسالة عدم وجود نتائج -->
-            <div class="no-results" id="noResults" style="display: none;">
-                <i class="fas fa-book-open"></i>
-                <h4>لا توجد كتب تطابق بحثك</h4>
-                <p>حاول البحث بكلمات أخرى أو تغيير عوامل التصفية</p>
-            </div>
-            
-            <!-- ترقيم الصفحات -->
-            <div class="pagination-container" id="paginationContainer" style="display: none;">
-                <nav aria-label="ترقيم الصفحات">
-                    <ul class="pagination" id="pagination">
-                        <!-- سيتم ملؤها بواسطة JavaScript -->
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </section>
-
     <!-- قسم طرق الدفع -->
     <section id="payment" class="payment-methods">
         <div class="container">
@@ -1302,7 +1302,7 @@
                         </div>
                         <h4>فودافون كاش</h4>
                         <p class="mb-3">ادفع بسهولة وأمان عبر فودافون كاش</p>
-                        <p class="fw-bold mt-3" style="color: #e60000;">رقم المحفظة: 01012345678</p>
+                        <p class="fw-bold mt-3" style="color: #e60000;">رقم المحفظة: 01090</p>
                         <p class="text-muted small mt-3">يرجى إرسال إشعار الدفع على واتساب بعد التحويل</p>
                     </div>
                 </div>
