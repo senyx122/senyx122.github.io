@@ -2192,7 +2192,35 @@ done < unique_urls.txt
         </pre>
         <p class="muted">Note: Run this against `unique_urls.txt` or `live_urls.txt`. Only run active checks within scope.</p>
       </div>
-      
+      <!-- XSS Section -->
+<div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+  <h3 style="color:var(--accent); margin-bottom:15px;">XSS — DISCOVER & PREPARE</h3>
+
+  <pre data-copy>
+# Discover reflected XSS (passive + active)
+(
+  echo "shop.turbo-eg.com" | gau
+  echo "https://shop.turbo-eg.com" | katana -silent -jc -kf -ps
+) | \
+gf xss | \
+uro | \
+gxss | \
+kxss | \
+tee xss_output.txt
+
+# Extract vulnerable URLs and prepare for fuzzing
+grep -oP 'URL: \K\S+' xss_output.txt \
+| sed 's/=[^&]*/=FUZZ/g' \
+| sort -u > final.txt
+  </pre>
+
+  <p class="muted">
+    Note: This section performs XSS discovery and post-processing in one workflow.<br>
+    Results are <b>candidates only</b> — always verify manually in the browser or Burp.<br>
+    Run active crawling only on in-scope targets.
+  </p>
+</div>
+
       <div class="page-nav">
         <button class="btn page-nav-btn" onclick="scrollToSection('page34')">
           <i class="fas fa-arrow-left"></i> Previous Section
