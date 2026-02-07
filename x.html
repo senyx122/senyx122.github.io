@@ -1,1225 +1,538 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CV | Ahmed Amr Mohamed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="سيرة ذاتية احترافية لأحمد عمرو محمد - إدارة فروع وشركات شحن وقيادة فرق عمل">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for icons -->
+    <title>Mohamed Amr Mohamed - Cybersecurity Professional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --primary: #1a365d;
-            --primary-light: #2d4a8a;
-            --secondary: #2c5282;
-            --accent: #38b2ac;
-            --light-bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #2d3748;
-            --text-light: #4a5568;
-            --muted: #718096;
-            --border: #e2e8f0;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --radius: 12px;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-
-        html, body {
-            height: 100%;
-            font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
-            color: var(--text);
+        
+        :root {
+            --primary-color: #007bff;
+            --primary-dark: #0056b3;
+            --secondary-color: #6c757d;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --accent-color: #17a2b8;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            padding: 20px;
         }
-
+        
         .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-
-        .top-controls {
+        
+        /* Header Styles */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding: 15px 20px;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
-        .logo i {
-            color: var(--accent);
-        }
-
-        .lang-toggle {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: 'Cairo', sans-serif;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 30px 40px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
             color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(44, 82, 130, 0.2);
-        }
-
-        .btn-secondary {
-            background: var(--light-bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .cv {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 40px 30px 30px;
-            position: relative;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 30px;
             flex-wrap: wrap;
         }
-
-        .profile-img-container {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .profile-img-container:hover {
-            transform: scale(1.03);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .profile-img-container:hover::after {
-            content: 'تغيير الصورة';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .profile-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        
         .profile-info {
             flex: 1;
             min-width: 300px;
         }
-
+        
         .profile-info h1 {
-            font-size: 32px;
+            font-size: 2.5rem;
             margin-bottom: 8px;
             font-weight: 700;
         }
-
-        .profile-info .subtitle {
-            font-size: 18px;
-            margin-bottom: 12px;
-            opacity: 0.9;
+        
+        .profile-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
             font-weight: 400;
+            opacity: 0.9;
         }
-
-        .profile-info .tagline {
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.15);
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin-top: 10px;
-            font-weight: 500;
+        
+        .contact-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
         }
-
-        .contact-info {
+        
+        .contact-details p {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        
+        .contact-details a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .contact-details a:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        
+        .btn-container {
+            display: flex;
             gap: 15px;
             margin-top: 20px;
         }
-
-        .contact-item {
-            display: flex;
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px 12px;
-            border-radius: 20px;
+            transition: var(--transition);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
-
+        
+        .btn:hover {
+            background-color: white;
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+        
+        .btn-primary {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--light-color);
+            color: var(--primary-dark);
+        }
+        
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--box-shadow);
+            margin-left: 30px;
+        }
+        
+        /* Main Content Styles */
         .content {
-            padding: 30px;
+            padding: 40px;
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
         }
-
-        @media (max-width: 768px) {
+        
+        @media (max-width: 992px) {
             .content {
                 grid-template-columns: 1fr;
             }
-            
-            .header-content {
-                justify-content: center;
-                text-align: center;
-            }
-            
-            .profile-img-container {
-                width: 150px;
-                height: 150px;
-            }
         }
-
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Section Styles */
         .section {
-            margin-bottom: 25px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
         }
-
-        .section-title {
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--accent);
-            font-size: 22px;
-            font-weight: 700;
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .section h2 {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .section-title i {
-            color: var(--accent);
+        
+        .section h2 i {
+            color: var(--accent-color);
         }
-
-        .timeline {
+        
+        .section p {
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .section ul {
+            list-style: none;
+        }
+        
+        .section ul li {
+            margin-bottom: 15px;
+            padding-left: 25px;
             position: relative;
-            padding-left: 20px;
+            line-height: 1.5;
         }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-            padding-left: 20px;
-        }
-
-        .timeline-item:before {
-            content: '';
-            position: absolute;
-            left: -6px;
-            top: 8px;
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-
-        .timeline-item:after {
-            content: '';
+        
+        .section ul li:before {
+            content: "▸";
+            color: var(--primary-color);
             position: absolute;
             left: 0;
-            top: 8px;
-            bottom: -20px;
-            width: 2px;
-            background: var(--border);
+            font-weight: bold;
         }
-
-        .timeline-item:last-child:after {
-            display: none;
+        
+        .section ul li strong {
+            color: var(--dark-color);
         }
-
-        .timeline-content {
-            background: var(--light-bg);
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 3px solid var(--secondary);
-        }
-
-        .timeline-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--primary);
-        }
-
-        .timeline-duration {
-            color: var(--accent);
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
+        
+        /* Skills Section */
         .skills-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
-
-        .skill {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: linear-gradient(to right, var(--secondary), var(--primary-light));
+        
+        .skill-tag {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
             color: white;
-            font-size: 14px;
-            font-weight: 500;
-            transition: transform 0.2s ease;
-        }
-
-        .skill:hover {
-            transform: translateY(-2px);
-        }
-
-        .languages-list {
-            list-style: none;
-        }
-
-        .language-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed var(--border);
-        }
-
-        .language-level {
-            color: var(--accent);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
             font-weight: 600;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            gap: 15px;
-            background: var(--light-bg);
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        footer {
-            padding: 20px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 14px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* Modal styles for editing */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 600px;
-            border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-title {
-            font-size: 22px;
-            color: var(--primary);
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--muted);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 16px;
-            transition: border 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .image-upload-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin: 20px 0;
-            padding: 20px;
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            background: var(--light-bg);
-        }
-
-        .image-preview {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid var(--border);
-        }
-
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .upload-btn {
+            transition: var(--transition);
             display: inline-block;
-            padding: 10px 20px;
-            background: var(--primary);
+        }
+        
+        .skill-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(0, 123, 255, 0.2);
+        }
+        
+        /* Projects Section */
+        .project-item {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .project-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background-color: var(--dark-color);
             color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s ease;
+            margin-top: 20px;
         }
-
-        .upload-btn:hover {
-            background: var(--secondary);
+        
+        .footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: var(--transition);
         }
-
-        #fileInput {
-            display: none;
+        
+        .footer a:hover {
+            text-decoration: underline;
+            color: white;
         }
-
-        /* Print styles */
+        
+        /* Responsive Design */
+        @media screen and (max-width: 992px) {
+            .header {
+                padding: 25px 30px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-info {
+                order: 2;
+                margin-top: 25px;
+            }
+            
+            .profile-img {
+                order: 1;
+                margin-left: 0;
+                width: 160px;
+                height: 160px;
+            }
+            
+            .btn-container {
+                justify-content: center;
+            }
+            
+            .content {
+                padding: 30px;
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .profile-info h1 {
+                font-size: 2rem;
+            }
+            
+            .profile-info h3 {
+                font-size: 1.1rem;
+            }
+            
+            .contact-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+            
+            .profile-img {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .profile-info h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section h2 {
+                font-size: 1.4rem;
+            }
+        }
+        
+        /* Print Styles */
         @media print {
             body {
-                background: #fff;
+                background: white;
+                padding: 0;
             }
             
-            .top-controls, .actions {
-                display: none;
-            }
-            
-            .cv {
+            .container {
                 box-shadow: none;
-                margin: 0;
             }
             
-            header {
-                background: #1a365d !important;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .profile-img-container:hover::after {
+            .btn {
                 display: none;
+            }
+            
+            .section:hover {
+                transform: none;
+                box-shadow: none;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="top-controls">
-        <div class="logo">
-            <i class="fas fa-file-alt"></i>
-            <span>السيرة الذاتية الاحترافية</span>
-        </div>
-        <div class="controls-right">
-            <div class="lang-toggle">
-                <button class="btn btn-primary" id="btn-ar">
-                    <i class="fas fa-language"></i>
-                    عربي
-                </button>
-                <button class="btn btn-secondary" id="btn-en">
-                    <i class="fas fa-language"></i>
-                    English
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="cv" id="cv-root">
-        <header>
-            <div class="header-content">
-                <div class="profile-img-container" id="profileImgContainer">
-                    <img id="profile-img" class="profile-img" src="https://i.ibb.co/35zTw61g/IMG-20260201-WA0002.jpg" alt="Ahmed Amr Mohamed">
-                    <input type="file" id="fileInput" accept="image/*">
+    <div class="container">
+        <header class="header">
+            <div class="profile-info">
+                <h1>Mohamed Amr Mohamed</h1>
+                <h3>Penetration Tester | Red Team Specialist | Bug Hunter</h3>
+                
+                <div class="contact-details">
+                    <p><i class="fas fa-phone"></i> 01090729608</p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:senyx122@gmail.com">senyx122@gmail.com</a></p>
+                    <p><i class="fas fa-globe"></i> <a href="https://senyx122.github.io">senyx122.github.io</a></p>
+                    <p><i class="fas fa-map-marker-alt"></i> Giza, Egypt</p>
                 </div>
-                <div class="profile-info">
-                    <h1 id="name">أحمد عمرو محمد</h1>
-                    <p class="subtitle" id="subtitle">
-                        <i class="fas fa-user"></i> 20 سنة
-                        <span style="margin: 0 10px">|</span>
-                        <i class="fas fa-map-marker-alt"></i> إمبابة، الجيزة
-                    </p>
-                    <p class="tagline" id="tagline">إدارة فروع • شركات شحن • قيادة فرق عمل</p>
-                    
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span id="phone">+20 100 123 4567</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <span id="email">ahmed.amr@example.com</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-briefcase"></i>
-                            <span id="experience-years">2+ سنوات خبرة</span>
-                        </div>
-                    </div>
+                
+                <div class="btn-container">
+                    <a href="mailto:senyx122@gmail.com" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Contact Me
+                    </a>
+                    <a href="#" class="btn">
+                        <i class="fas fa-download"></i> Download CV
+                    </a>
                 </div>
             </div>
+            
+            <img src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" 
+                 alt="Mohamed Amr Mohamed" class="profile-img">
         </header>
 
         <div class="content">
-            <div class="main-content">
+            <main class="main-content">
                 <section class="section">
-                    <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        <span id="expTitle">الخبرات العملية</span>
-                    </h2>
-                    <div class="timeline" id="experience">
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="exp1Title">مالك شركة إيچيل إكسبريس</div>
-                                <span class="timeline-duration" id="exp1Duration">يونيو 2025 - الحاضر (سنة)</span>
-                                <p id="exp1Desc">إدارة وتشغيل شركة شحن متكاملة، الإشراف على فريق من المندوبين، متابعة وتسليم الطلبات، تطوير استراتيجيات العمل لتحسين الأداء.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="exp2Title">مدير فرع فيصل – شركة تربو</div>
-                                <span class="timeline-duration" id="exp2Duration">يوليو 2024 - مايو 2025 (11 شهر)</span>
-                                <p id="exp2Desc">إدارة فرع الشركة في فيصل، الإشراف على فريق العمل، متابعة أداء المندوبين، تحقيق أهداف المبيعات والتوصيل.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="exp3Title">تيم ليدر – شركة المميز الأردنية</div>
-                                <span class="timeline-duration" id="exp3Duration">مارس 2024 - يونيو 2024 (3 شهور)</span>
-                                <p id="exp3Desc">قيادة فريق عمل مكون من 8 أفراد، تدريب أعضاء الفريق الجدد، متابعة وتقييم الأداء، حل المشكلات التشغيلية.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="exp4Title">مندوب – شركة تربو (فرع فيصل)</div>
-                                <span class="timeline-duration" id="exp4Duration">سبتمبر 2023 - فبراير 2024 (6 شهور)</span>
-                                <p id="exp4Desc">توصيل الطلبات للمستخدمين، التعامل مع العملاء، تحقيق معدل رضا عالٍ، الحفاظ على دقة وتسليم الطلبات في الوقت المحدد.</p>
-                            </div>
-                        </div>
+                    <h2><i class="fas fa-user"></i> Professional Summary</h2>
+                    <p>
+                        Web Security Researcher and Bug Bounty Hunter with hands-on experience in identifying, responsibly disclosing, 
+                        and mitigating security vulnerabilities across multiple public and independent programs. Skilled in web application 
+                        and API security testing, including authentication, access control, and input validation issues. Known for resourcefulness 
+                        and clear reporting aligned with industry best practices.
+                    </p>
+                </section>
+
+                <section class="section">
+                    <h2><i class="fas fa-briefcase"></i> Projects</h2>
+                    <div class="project-item">
+                        <h3>CjScan</h3>
+                        <p>A security tool designed for researchers to automate vulnerability discovery related to clickjacking and cross-site scripting. Provides comprehensive scanning and reporting capabilities for web application security testing.</p>
+                    </div>
+                    <div class="project-item">
+                        <h3>Redirect_Fox</h3>
+                        <p>An open-source tool written in Bash for detecting open redirect vulnerabilities across web applications. Features advanced detection algorithms and customizable scanning parameters for security professionals.</p>
                     </div>
                 </section>
-                
+
                 <section class="section">
-                    <h2 class="section-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span id="educationTitle">التعليم والمؤهلات</span>
-                    </h2>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="edu1Title">دبلوم إدارة الأعمال</div>
-                                <span class="timeline-duration" id="edu1Duration">أكتوبر 2023 - مايو 2024</span>
-                                <p id="edu1Desc">معهد التكنولوجيا التطبيقية، الجيزة - تخصص إدارة الأعمال والمشاريع الصغيرة</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-title" id="edu2Title">شهادة الثانوية العامة</div>
-                                <span class="timeline-duration" id="edu2Duration">سبتمبر 2020 - يونيو 2023</span>
-                                <p id="edu2Desc">مدرسة النهضة الثانوية، إمبابة - شعبة علمي علوم</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-            
-            <div class="sidebar">
-                <section class="section">
-                    <h2 class="section-title">
-                        <i class="fas fa-star"></i>
-                        <span id="skillsTitle">المهارات</span>
-                    </h2>
-                    <div class="skills-container" id="skillsList">
-                        <!-- Skills will be populated by JavaScript -->
-                    </div>
-                </section>
-                
-                <section class="section">
-                    <h2 class="section-title">
-                        <i class="fas fa-language"></i>
-                        <span id="langTitle">اللغات</span>
-                    </h2>
-                    <ul class="languages-list">
-                        <li class="language-item">
-                            <span id="lang1Name">العربية</span>
-                            <span class="language-level" id="lang1Level">اللغة الأم</span>
-                        </li>
-                        <li class="language-item">
-                            <span id="lang2Name">الإنجليزية</span>
-                            <span class="language-level" id="lang2Level">متقدم (مكتوبة ومحادثة)</span>
-                        </li>
+                    <h2><i class="fas fa-star"></i> Strengths</h2>
+                    <ul>
+                        <li><strong>Resourcefulness:</strong> Able to leverage diverse resources and OSINT to solve complex security problems effectively.</li>
+                        <li><strong>Clear Communication:</strong> Skilled at presenting technical findings in a clear, actionable manner to both technical and non-technical stakeholders.</li>
+                        <li><strong>Collaboration & Leadership:</strong> Proven experience in leading security audits and working effectively within teams to improve security measures and implement robust security frameworks.</li>
+                        <li><strong>Continuous Learning:</strong> Committed to staying updated with the latest security threats, tools, and mitigation techniques in the rapidly evolving cybersecurity landscape.</li>
                     </ul>
                 </section>
-                
+            </main>
+
+            <aside class="sidebar">
                 <section class="section">
-                    <h2 class="section-title">
-                        <i class="fas fa-certificate"></i>
-                        <span id="certTitle">الشهادات</span>
-                    </h2>
-                    <ul class="languages-list">
-                        <li class="language-item">
-                            <span id="cert1">إدارة الفرق وقيادة المشاريع</span>
-                        </li>
-                        <li class="language-item">
-                            <span id="cert2">مباديء إدارة العمليات اللوجستية</span>
-                        </li>
-                        <li class="language-item">
-                            <span id="cert3">Microsoft Excel للمستوى المتقدم</span>
-                        </li>
+                    <h2><i class="fas fa-graduation-cap"></i> Education & Certifications</h2>
+                    <ul>
+                        <li><strong>Certified Red Team Operations Management (CRTOM)</strong> – CyberWarFare Labs (CWL), 2025</li>
+                        <li><strong>Web Red Team Analyst (WEB-RTA)</strong> – CyberWarFare Labs (CWL), 2026</li>
+                        <li><strong>Hack The Box – Starting Point</strong>, 2025</li>
+                        <li><strong>OSCP (In Progress)</strong> – Offensive Security</li>
                     </ul>
                 </section>
-            </div>
+
+                <section class="section">
+                    <h2><i class="fas fa-code"></i> Technical Skills</h2>
+                    <div class="skills-container">
+                        <span class="skill-tag">Python (Security)</span>
+                        <span class="skill-tag">SQL</span>
+                        <span class="skill-tag">PHP</span>
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">Golang</span>
+                        <span class="skill-tag">Metasploit</span>
+                        <span class="skill-tag">Burp Suite</span>
+                        <span class="skill-tag">OWASP ZAP</span>
+                        <span class="skill-tag">SQLmap</span>
+                        <span class="skill-tag">Kali Linux</span>
+                        <span class="skill-tag">Network Security</span>
+                        <span class="skill-tag">Vulnerability Assessment</span>
+                        <span class="skill-tag">Penetration Testing</span>
+                        <span class="skill-tag">Web App Security</span>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2><i class="fas fa-language"></i> Languages</h2>
+                    <ul>
+                        <li><strong>Arabic:</strong> Native</li>
+                        <li><strong>English:</strong> Professional Proficiency</li>
+                    </ul>
+                </section>
+            </aside>
         </div>
 
-        <div class="actions">
-            <button class="btn btn-primary" id="downloadPdf">
-                <i class="fas fa-download"></i>
-                <span id="downloadText">تحميل PDF</span>
-            </button>
-            <button class="btn btn-secondary" id="editBtn">
-                <i class="fas fa-edit"></i>
-                <span id="editText">تعديل المعلومات</span>
-            </button>
-            <button class="btn btn-secondary" id="previewBtn">
-                <i class="fas fa-print"></i>
-                <span id="previewText">معاينة وطباعة</span>
-            </button>
-        </div>
-
-        <footer id="footer">
-            © 2026 - السيرة الذاتية الاحترافية | أحمد عمرو محمد
+        <footer class="footer">
+            <p>Created with <i class="fas fa-heart" style="color: #e74c3c;"></i> by Mohamed Amr Mohamed</p>
+            <p>Connect with me: 
+                <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a> | 
+                <a href="#"><i class="fab fa-github"></i> GitHub</a> | 
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">Last updated: July 2024</p>
         </footer>
     </div>
-</div>
 
-<!-- Edit Modal -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="modalTitle">تعديل المعلومات الشخصية</h2>
-            <button class="close-modal" id="closeModal">&times;</button>
-        </div>
-        <form id="editForm">
-            <div class="image-upload-container">
-                <div class="image-preview">
-                    <img id="modalImagePreview" src="https://i.ibb.co/35zTw61g/IMG-20260201-WA0002.jpg" alt="صورة شخصية">
-                </div>
-                <label for="modalFileInput" class="upload-btn">
-                    <i class="fas fa-upload"></i> اختر صورة جديدة
-                </label>
-                <input type="file" id="modalFileInput" accept="image/*">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="editName">الاسم الكامل</label>
-                    <input type="text" class="form-input" id="editName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="editAge">العمر</label>
-                    <input type="text" class="form-input" id="editAge" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="editLocation">العنوان</label>
-                <input type="text" class="form-input" id="editLocation" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="editTagline">الوصف المهني</label>
-                <input type="text" class="form-input" id="editTagline" required>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="editPhone">رقم الهاتف</label>
-                    <input type="text" class="form-input" id="editPhone" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="editEmail">البريد الإلكتروني</label>
-                    <input type="email" class="form-input" id="editEmail" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <button type="submit" class="btn btn-primary" style="flex: 1">
-                    <i class="fas fa-save"></i>
-                    حفظ التعديلات
-                </button>
-                <button type="button" class="btn btn-secondary" id="cancelEdit" style="flex: 1">
-                    <i class="fas fa-times"></i>
-                    إلغاء
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- html2pdf bundle -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-
-<script>
-    // Bilingual content mapping
-    const texts = {
-        ar: {
-            name: 'أحمد عمرو محمد',
-            subtitle: '20 سنة – إمبابة، الجيزة',
-            tagline: 'إدارة فروع • شركات شحن • قيادة فرق عمل',
-            phone: '+20 100 123 4567',
-            email: 'ahmed.amr@example.com',
-            experienceYears: '2+ سنوات خبرة',
-            
-            expTitle: 'الخبرات العملية',
-            exp1Title: 'مالك شركة إيچيل إكسبريس',
-            exp1Duration: 'يونيو 2025 - الحاضر (سنة)',
-            exp1Desc: 'إدارة وتشغيل شركة شحن متكاملة، الإشراف على فريق من المندوبين، متابعة وتسليم الطلبات، تطوير استراتيجيات العمل لتحسين الأداء.',
-            
-            exp2Title: 'مدير فرع فيصل – شركة تربو',
-            exp2Duration: 'يوليو 2024 - مايو 2025 (11 شهر)',
-            exp2Desc: 'إدارة فرع الشركة في فيصل، الإشراف على فريق العمل، متابعة أداء المندوبين، تحقيق أهداف المبيعات والتوصيل.',
-            
-            exp3Title: 'تيم ليدر – شركة المميز الأردنية',
-            exp3Duration: 'مارس 2024 - يونيو 2024 (3 شهور)',
-            exp3Desc: 'قيادة فريق عمل مكون من 8 أفراد، تدريب أعضاء الفريق الجدد، متابعة وتقييم الأداء، حل المشكلات التشغيلية.',
-            
-            exp4Title: 'مندوب – شركة تربو (فرع فيصل)',
-            exp4Duration: 'سبتمبر 2023 - فبراير 2024 (6 شهور)',
-            exp4Desc: 'توصيل الطلبات للمستخدمين، التعامل مع العملاء، تحقيق معدل رضا عالٍ، الحفاظ على دقة وتسليم الطلبات في الوقت المحدد.',
-            
-            educationTitle: 'التعليم والمؤهلات',
-            edu1Title: 'دبلوم إدارة الأعمال',
-            edu1Duration: 'أكتوبر 2023 - مايو 2024',
-            edu1Desc: 'معهد التكنولوجيا التطبيقية، الجيزة - تخصص إدارة الأعمال والمشاريع الصغيرة',
-            
-            edu2Title: 'شهادة الثانوية العامة',
-            edu2Duration: 'سبتمبر 2020 - يونيو 2023',
-            edu2Desc: 'مدرسة النهضة الثانوية، إمبابة - شعبة علمي علوم',
-            
-            skillsTitle: 'المهارات',
-            skills: ['إدارة الفرق', 'تشغيل شركات الشحن', 'متابعة المندوبين', 'Microsoft Excel متقدم', 'العمل تحت الضغط', 'التخطيط الاستراتيجي', 'خدمة العملاء', 'إدارة الوقت'],
-            
-            langTitle: 'اللغات',
-            lang1Name: 'العربية',
-            lang1Level: 'اللغة الأم',
-            lang2Name: 'الإنجليزية',
-            lang2Level: 'متقدم (مكتوبة ومحادثة)',
-            
-            certTitle: 'الشهادات',
-            cert1: 'إدارة الفرق وقيادة المشاريع',
-            cert2: 'مباديء إدارة العمليات اللوجستية',
-            cert3: 'Microsoft Excel للمستوى المتقدم',
-            
-            downloadText: 'تحميل PDF',
-            editText: 'تعديل المعلومات',
-            previewText: 'معاينة وطباعة',
-            modalTitle: 'تعديل المعلومات الشخصية',
-            footer: '© 2026 - السيرة الذاتية الاحترافية | أحمد عمرو محمد',
-            changePhotoText: 'تغيير الصورة'
-        },
-        en: {
-            name: 'Ahmed Amr Mohamed',
-            subtitle: '20 years old – Imbaba, Giza',
-            tagline: 'Branch Management • Shipping Operations • Team Leadership',
-            phone: '+20 100 123 4567',
-            email: 'ahmed.amr@example.com',
-            experienceYears: '2+ years of experience',
-            
-            expTitle: 'Work Experience',
-            exp1Title: 'Owner – Agile Express Company',
-            exp1Duration: 'June 2025 - Present (1 year)',
-            exp1Desc: 'Managing and operating a complete shipping company, supervising a team of delivery agents, tracking and delivering orders, developing business strategies to improve performance.',
-            
-            exp2Title: 'Branch Manager (Faisal) – Turbo Company',
-            exp2Duration: 'July 2024 - May 2025 (11 months)',
-            exp2Desc: 'Managing the company branch in Faisal, supervising the work team, monitoring the performance of delivery agents, achieving sales and delivery targets.',
-            
-            exp3Title: 'Team Leader – Al-Momayaz Company (Jordan)',
-            exp3Duration: 'March 2024 - June 2024 (3 months)',
-            exp3Desc: 'Leading a team of 8 members, training new team members, monitoring and evaluating performance, solving operational problems.',
-            
-            exp4Title: 'Delivery Agent – Turbo (Faisal Branch)',
-            exp4Duration: 'September 2023 - February 2024 (6 months)',
-            exp4Desc: 'Delivering orders to customers, dealing with clients, achieving high satisfaction rate, maintaining accuracy and timely delivery of orders.',
-            
-            educationTitle: 'Education & Qualifications',
-            edu1Title: 'Diploma in Business Administration',
-            edu1Duration: 'October 2023 - May 2024',
-            edu1Desc: 'Institute of Applied Technology, Giza - Specialization in Business Administration and Small Projects',
-            
-            edu2Title: 'High School Certificate',
-            edu2Duration: 'September 2020 - June 2023',
-            edu2Desc: 'Al-Nahda Secondary School, Imbaba - Science Section',
-            
-            skillsTitle: 'Skills',
-            skills: ['Team Management', 'Shipping Operations', 'Agent Tracking', 'Advanced Microsoft Excel', 'Working Under Pressure', 'Strategic Planning', 'Customer Service', 'Time Management'],
-            
-            langTitle: 'Languages',
-            lang1Name: 'Arabic',
-            lang1Level: 'Native',
-            lang2Name: 'English',
-            lang2Level: 'Advanced (Written & Spoken)',
-            
-            certTitle: 'Certifications',
-            cert1: 'Team Management & Project Leadership',
-            cert2: 'Principles of Logistics Operations Management',
-            cert3: 'Advanced Microsoft Excel',
-            
-            downloadText: 'Download PDF',
-            editText: 'Edit Info',
-            previewText: 'Preview & Print',
-            modalTitle: 'Edit Personal Information',
-            footer: '© 2026 - Professional CV | Ahmed Amr Mohamed',
-            changePhotoText: 'Change Photo'
-        }
-    };
-
-    // DOM references
-    const btnAr = document.getElementById('btn-ar');
-    const btnEn = document.getElementById('btn-en');
-    const nameEl = document.getElementById('name');
-    const subtitleEl = document.getElementById('subtitle');
-    const taglineEl = document.getElementById('tagline');
-    const phoneEl = document.getElementById('phone');
-    const emailEl = document.getElementById('email');
-    const experienceYearsEl = document.getElementById('experience-years');
-    const expTitleEl = document.getElementById('expTitle');
-    const exp1TitleEl = document.getElementById('exp1Title');
-    const exp1DurationEl = document.getElementById('exp1Duration');
-    const exp1DescEl = document.getElementById('exp1Desc');
-    const exp2TitleEl = document.getElementById('exp2Title');
-    const exp2DurationEl = document.getElementById('exp2Duration');
-    const exp2DescEl = document.getElementById('exp2Desc');
-    const exp3TitleEl = document.getElementById('exp3Title');
-    const exp3DurationEl = document.getElementById('exp3Duration');
-    const exp3DescEl = document.getElementById('exp3Desc');
-    const exp4TitleEl = document.getElementById('exp4Title');
-    const exp4DurationEl = document.getElementById('exp4Duration');
-    const exp4DescEl = document.getElementById('exp4Desc');
-    const educationTitleEl = document.getElementById('educationTitle');
-    const edu1TitleEl = document.getElementById('edu1Title');
-    const edu1DurationEl = document.getElementById('edu1Duration');
-    const edu1DescEl = document.getElementById('edu1Desc');
-    const edu2TitleEl = document.getElementById('edu2Title');
-    const edu2DurationEl = document.getElementById('edu2Duration');
-    const edu2DescEl = document.getElementById('edu2Desc');
-    const skillsTitleEl = document.getElementById('skillsTitle');
-    const skillsListEl = document.getElementById('skillsList');
-    const langTitleEl = document.getElementById('langTitle');
-    const lang1NameEl = document.getElementById('lang1Name');
-    const lang1LevelEl = document.getElementById('lang1Level');
-    const lang2NameEl = document.getElementById('lang2Name');
-    const lang2LevelEl = document.getElementById('lang2Level');
-    const certTitleEl = document.getElementById('certTitle');
-    const cert1El = document.getElementById('cert1');
-    const cert2El = document.getElementById('cert2');
-    const cert3El = document.getElementById('cert3');
-    const downloadBtn = document.getElementById('downloadPdf');
-    const downloadTextEl = document.getElementById('downloadText');
-    const editBtn = document.getElementById('editBtn');
-    const editTextEl = document.getElementById('editText');
-    const previewBtn = document.getElementById('previewBtn');
-    const previewTextEl = document.getElementById('previewText');
-    const footerEl = document.getElementById('footer');
-    
-    // Image upload elements
-    const profileImgContainer = document.getElementById('profileImgContainer');
-    const fileInput = document.getElementById('fileInput');
-    const profileImg = document.getElementById('profile-img');
-    
-    // Modal elements
-    const editModal = document.getElementById('editModal');
-    const closeModal = document.getElementById('closeModal');
-    const cancelEdit = document.getElementById('cancelEdit');
-    const editForm = document.getElementById('editForm');
-    const modalTitleEl = document.getElementById('modalTitle');
-    const editName = document.getElementById('editName');
-    const editAge = document.getElementById('editAge');
-    const editLocation = document.getElementById('editLocation');
-    const editTagline = document.getElementById('editTagline');
-    const editPhone = document.getElementById('editPhone');
-    const editEmail = document.getElementById('editEmail');
-    const modalImagePreview = document.getElementById('modalImagePreview');
-    const modalFileInput = document.getElementById('modalFileInput');
-
-    // Current language state
-    let currentLang = 'ar';
-
-    // Function to set language
-    function setLanguage(lang) {
-        currentLang = lang;
-        const t = texts[lang];
-        
-        // Update HTML direction and font
-        if (lang === 'ar') {
-            document.documentElement.lang = 'ar';
-            document.documentElement.dir = 'rtl';
-            document.body.style.fontFamily = "'Cairo', 'Noto Sans Arabic', sans-serif";
-            document.body.style.textAlign = 'right';
-        } else {
-            document.documentElement.lang = 'en';
-            document.documentElement.dir = 'ltr';
-            document.body.style.fontFamily = "'Noto Sans Arabic', 'Cairo', sans-serif";
-            document.body.style.textAlign = 'left';
-        }
-        
-        // Update content
-        nameEl.textContent = t.name;
-        subtitleEl.innerHTML = `<i class="fas fa-user"></i> ${t.subtitle.split(' – ')[0]} <span style="margin: 0 10px">|</span> <i class="fas fa-map-marker-alt"></i> ${t.subtitle.split(' – ')[1]}`;
-        taglineEl.textContent = t.tagline;
-        phoneEl.textContent = t.phone;
-        emailEl.textContent = t.email;
-        experienceYearsEl.textContent = t.experienceYears;
-        expTitleEl.textContent = t.expTitle;
-        exp1TitleEl.textContent = t.exp1Title;
-        exp1DurationEl.textContent = t.exp1Duration;
-        exp1DescEl.textContent = t.exp1Desc;
-        exp2TitleEl.textContent = t.exp2Title;
-        exp2DurationEl.textContent = t.exp2Duration;
-        exp2DescEl.textContent = t.exp2Desc;
-        exp3TitleEl.textContent = t.exp3Title;
-        exp3DurationEl.textContent = t.exp3Duration;
-        exp3DescEl.textContent = t.exp3Desc;
-        exp4TitleEl.textContent = t.exp4Title;
-        exp4DurationEl.textContent = t.exp4Duration;
-        exp4DescEl.textContent = t.exp4Desc;
-        educationTitleEl.textContent = t.educationTitle;
-        edu1TitleEl.textContent = t.edu1Title;
-        edu1DurationEl.textContent = t.edu1Duration;
-        edu1DescEl.textContent = t.edu1Desc;
-        edu2TitleEl.textContent = t.edu2Title;
-        edu2DurationEl.textContent = t.edu2Duration;
-        edu2DescEl.textContent = t.edu2Desc;
-        skillsTitleEl.textContent = t.skillsTitle;
-        
-        // Update skills
-        skillsListEl.innerHTML = '';
-        t.skills.forEach(skill => {
-            const skillEl = document.createElement('div');
-            skillEl.className = 'skill';
-            skillEl.textContent = skill;
-            skillsListEl.appendChild(skillEl);
-        });
-        
-        langTitleEl.textContent = t.langTitle;
-        lang1NameEl.textContent = t.lang1Name;
-        lang1LevelEl.textContent = t.lang1Level;
-        lang2NameEl.textContent = t.lang2Name;
-        lang2LevelEl.textContent = t.lang2Level;
-        certTitleEl.textContent = t.certTitle;
-        cert1El.textContent = t.cert1;
-        cert2El.textContent = t.cert2;
-        cert3El.textContent = t.cert3;
-        downloadTextEl.textContent = t.downloadText;
-        editTextEl.textContent = t.editText;
-        previewTextEl.textContent = t.previewText;
-        modalTitleEl.textContent = t.modalTitle;
-        footerEl.textContent = t.footer;
-        
-        // Update button states
-        if (lang === 'ar') {
-            btnAr.className = 'btn btn-primary';
-            btnEn.className = 'btn btn-secondary';
-        } else {
-            btnAr.className = 'btn btn-secondary';
-            btnEn.className = 'btn btn-primary';
-        }
-        
-        // Update form placeholders
-        const currentSubtitle = t.subtitle.split(' – ');
-        editName.value = t.name;
-        editAge.value = currentSubtitle[0].replace(' سنة', '').replace(' years old', '').trim();
-        editLocation.value = currentSubtitle[1];
-        editTagline.value = t.tagline;
-        editPhone.value = t.phone;
-        editEmail.value = t.email;
-        
-        // Update image preview in modal
-        modalImagePreview.src = profileImg.src;
-    }
-
-    // Function to handle image upload
-    function handleImageUpload(event, isModal = false) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (isModal) {
-                    modalImagePreview.src = e.target.result;
-                } else {
-                    profileImg.src = e.target.result;
-                    // Also update modal preview if modal is open
-                    if (editModal.style.display === 'flex') {
-                        modalImagePreview.src = e.target.result;
-                    }
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Function to open edit modal
-    function openEditModal() {
-        editModal.style.display = 'flex';
-        // Set current values in form
-        const currentSubtitle = texts[currentLang].subtitle.split(' – ');
-        editName.value = texts[currentLang].name;
-        editAge.value = currentSubtitle[0].replace(' سنة', '').replace(' years old', '').trim();
-        editLocation.value = currentSubtitle[1];
-        editTagline.value = texts[currentLang].tagline;
-        editPhone.value = texts[currentLang].phone;
-        editEmail.value = texts[currentLang].email;
-        modalImagePreview.src = profileImg.src;
-    }
-
-    // Function to close edit modal
-    function closeEditModal() {
-        editModal.style.display = 'none';
-    }
-
-    // Function to update profile from form
-    function updateProfile(e) {
-        e.preventDefault();
-        
-        // Update profile elements
-        nameEl.textContent = editName.value;
-        
-        // Update subtitle based on language
-        if (currentLang === 'ar') {
-            subtitleEl.innerHTML = `<i class="fas fa-user"></i> ${editAge.value} سنة <span style="margin: 0 10px">|</span> <i class="fas fa-map-marker-alt"></i> ${editLocation.value}`;
-        } else {
-            subtitleEl.innerHTML = `<i class="fas fa-user"></i> ${editAge.value} years old <span style="margin: 0 10px">|</span> <i class="fas fa-map-marker-alt"></i> ${editLocation.value}`;
-        }
-        
-        taglineEl.textContent = editTagline.value;
-        phoneEl.textContent = editPhone.value;
-        emailEl.textContent = editEmail.value;
-        
-        // Update profile image
-        profileImg.src = modalImagePreview.src;
-        
-        // Update texts object with new values
-        texts[currentLang].name = editName.value;
-        texts[currentLang].subtitle = `${editAge.value}${currentLang === 'ar' ? ' سنة' : ' years old'} – ${editLocation.value}`;
-        texts[currentLang].tagline = editTagline.value;
-        texts[currentLang].phone = editPhone.value;
-        texts[currentLang].email = editEmail.value;
-        
-        // Update the other language as well
-        const otherLang = currentLang === 'ar' ? 'en' : 'ar';
-        texts[otherLang].name = editName.value;
-        texts[otherLang].tagline = editTagline.value;
-        texts[otherLang].phone = editPhone.value;
-        texts[otherLang].email = editEmail.value;
-        
-        // Update experience years if age changed
-        const age = parseInt(editAge.value);
-        if (age >= 20) {
-            const expYears = age - 18;
-            texts[currentLang].experienceYears = currentLang === 'ar' ? `${expYears}+ سنوات خبرة` : `${expYears}+ years of experience`;
-            experienceYearsEl.textContent = texts[currentLang].experienceYears;
-            
-            // Update other language
-            texts[otherLang].experienceYears = otherLang === 'ar' ? `${expYears}+ سنوات خبرة` : `${expYears}+ years of experience`;
-        }
-        
-        closeEditModal();
-    }
-
-    // Function to download PDF
-    function downloadPDF() {
-        const element = document.getElementById('cv-root');
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `${nameEl.textContent.replace(/\s+/g, '_')}_CV.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            },
-            jsPDF: { 
-                unit: 'in', 
-                format: 'a4', 
-                orientation: 'portrait',
-                compress: true
+    <script>
+        // Simple script for smooth scrolling and print functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event to download button
+            const downloadBtn = document.querySelector('.btn:nth-child(2)');
+            if(downloadBtn) {
+                downloadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('CV download functionality would be implemented here.');
+                });
             }
-        };
-
-        // Show loading state
-        const originalText = downloadTextEl.textContent;
-        downloadTextEl.textContent = currentLang === 'ar' ? 'جارٍ التحضير...' : 'Preparing...';
-        downloadBtn.disabled = true;
-
-        // Generate PDF
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Restore button
-            downloadBtn.disabled = false;
-            downloadTextEl.textContent = originalText;
-        }).catch(err => {
-            console.error('PDF generation error:', err);
-            downloadBtn.disabled = false;
-            downloadTextEl.textContent = originalText;
-            alert(currentLang === 'ar' ? 'حدث خطأ أثناء إنشاء الملف. حاول مرة أخرى.' : 'An error occurred while generating the file. Please try again.');
+            
+            // Add subtle animation to skill tags on hover
+            const skillTags = document.querySelectorAll('.skill-tag');
+            skillTags.forEach(tag => {
+                tag.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                
+                tag.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Add year dynamically to footer
+            const yearSpan = document.querySelector('footer p:last-child');
+            if(yearSpan) {
+                const currentYear = new Date().getFullYear();
+                yearSpan.textContent = yearSpan.textContent.replace('2024', currentYear);
+            }
         });
-    }
-
-    // Initialize
-    setLanguage('ar');
-
-    // Event listeners
-    btnAr.addEventListener('click', () => setLanguage('ar'));
-    btnEn.addEventListener('click', () => setLanguage('en'));
-    
-    // Image upload from profile picture
-    profileImgContainer.addEventListener('click', () => {
-        fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', (e) => handleImageUpload(e, false));
-    
-    // Image upload from modal
-    modalFileInput.addEventListener('change', (e) => handleImageUpload(e, true));
-    
-    // Modal events
-    editBtn.addEventListener('click', openEditModal);
-    closeModal.addEventListener('click', closeEditModal);
-    cancelEdit.addEventListener('click', closeEditModal);
-    editForm.addEventListener('submit', updateProfile);
-    downloadBtn.addEventListener('click', downloadPDF);
-    previewBtn.addEventListener('click', () => window.print());
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === editModal) {
-            closeEditModal();
-        }
-    });
-</script>
-
+    </script>
 </body>
 </html>
