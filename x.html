@@ -5,6 +5,8 @@ fetch("https://www.spreaker.com/livewire-0e8bb4db/update", {
   headers: {
     "Content-Type": "application/json"
   },
-  body: JSON.stringify({...})
+  body: JSON.stringify({
+    test: "csrf"
+  })
 });
 </script>
