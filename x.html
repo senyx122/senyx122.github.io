@@ -1,12 +1,522 @@
+بناءً على طلبك، قمت بإعادة تصميم الصفحة لتشمل الأسماء التي ذكرتها (11 اسماً) مع إمكانية إدخال أرقام (قيم X و Y) لكل اسم، ثم يتم عرض الرسم البياني والحل الإحصائي بناءً على هذه البيانات. يمكنك الآن تعديل القيم لكل شخص مباشرة من الجدول ورؤية النقاط على الرسم البياني.
+
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الرسم البياني للبيانات - أسماء الطلاب</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0a0f1c;
+      font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+      color: #eef2ff;
+      padding: 28px 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: rgba(12, 18, 34, 0.96);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 28px;
+      padding: 1.5rem;
+      margin-bottom: 1.8rem;
+      backdrop-filter: blur(2px);
+    }
+    .hero {
+      background: linear-gradient(125deg, #0a1022, #030712);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      border-right: 4px solid #38bdf8;
+      padding-right: 14px;
+      margin-bottom: 1rem;
+      color: #f0f9ff;
+    }
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .badge {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+    }
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      align-items: start;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    th {
+      background: rgba(56, 189, 248, 0.18);
+      padding: 12px 6px;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px 6px;
+      text-align: center;
+      border-bottom: 1px solid #1e2a44;
+      background: rgba(8, 14, 26, 0.7);
+    }
+    .input-cell {
+      background: #0f172f;
+      border: 1px solid #2d3a5e;
+      border-radius: 12px;
+      padding: 8px 6px;
+      text-align: center;
+      color: #f1f5f9;
+      width: 90px;
+      outline: none;
+    }
+    .input-cell:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+    .btn-group {
+      display: flex;
+      gap: 14px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: linear-gradient(95deg, #2c7da0, #1e4a6b);
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    button.secondary {
+      background: linear-gradient(95deg, #334155, #1e293b);
+      border: 1px solid #4b5563;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .stat-card {
+      background: rgba(15, 25, 45, 0.8);
+      border: 1px solid #2d3a5e;
+      border-radius: 24px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #b9e2ff;
+    }
+    .formula-card {
+      background: #0a0f1e;
+      border-radius: 24px;
+      padding: 12px;
+      text-align: center;
+      font-family: monospace;
+      font-size: 1.1rem;
+      border-right: 5px solid #38bdf8;
+      margin: 12px 0;
+    }
+    .solution-box {
+      background: #071125;
+      border-radius: 20px;
+      padding: 1rem;
+      border: 1px solid #2c3e66;
+      line-height: 1.6;
+    }
+    canvas {
+      background: #030712;
+      border-radius: 20px;
+      border: 1px solid #2d3e60;
+      width: 100%;
+      max-height: 360px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #7e8aa2;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 900px) {
+      .two-columns { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card hero">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 48px; height: 48px; background: linear-gradient(145deg, #38bdf8, #1e4a6b); border-radius: 20px;"></div>
+      <div>
+        <div style="font-size: 0.8rem;">نظام الرسم البياني للبيانات</div>
+        <div style="font-weight: 800;">أرقام الرسم البياني لكل اسم</div>
+      </div>
+    </div>
+    <h1>📊 عرض البيانات بالأسماء والقيم</h1>
+    <p>الجدول التالي يحتوي على أسماء الطلاب (11 اسماً) مع إمكانية إدخال قيم (X , Y) لكل اسم. يتم تحديث الرسم البياني وحساب معادلة الانحدار تلقائياً.</p>
+    <div class="badge-group">
+      <div class="badge">✅ يشمل جميع الأسماء المطلوبة</div>
+      <div class="badge">🔢 تعديل الأرقام مباشرة</div>
+      <div class="badge">📈 رسم بياني تفاعلي</div>
+    </div>
+  </div>
+
+  <div class="two-columns">
+    <!-- العمود الأيمن: جدول الأسماء والأرقام -->
+    <div class="card">
+      <h2>📋 جدول البيانات: الاسم + القيم (X, Y)</h2>
+      <div class="table-wrapper">
+        <table id="namesTable">
+          <thead>
+            <tr><th>#</th><th>الاسم</th><th>X (المتغير)</th><th>Y (القيمة)</th><th>ΔX</th><th>ΔY</th></tr>
+          </thead>
+          <tbody id="namesTbody"></tbody>
+        </table>
+      </div>
+      <div class="btn-group">
+        <button id="updateBtn">🔄 تحديث الرسم والحل</button>
+        <button id="resetBtn" class="secondary">↺ إعادة القيم الافتراضية</button>
+      </div>
+      <p style="font-size:0.75rem; margin-top: 12px; color:#9bb3d0;">✏️ يمكنك تعديل أي قيمة X أو Y – سيتم إعادة حساب الانحدار والرسم البياني فور الضغط على "تحديث".</p>
+    </div>
+
+    <!-- العمود الأيسر: الرسم البياني + النتائج -->
+    <div>
+      <div class="card">
+        <h2>📈 الرسم البياني (النقاط حسب الأسماء)</h2>
+        <canvas id="scatterChart" width="500" height="320"></canvas>
+        <p class="small" style="font-size:0.7rem; margin-top: 8px;">كل نقطة تمثل اسماً من الجدول. الخط المتقطع الأخضر: خط الانحدار الخطي (أفضل تقريب).</p>
+      </div>
+      <div class="card">
+        <h2>🧮 نتائج التحليل الإحصائي</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">عدد النقاط</div><div class="stat-value" id="statN">-</div></div>
+          <div class="stat-card"><div class="stat-label">الميل (Slope)</div><div class="stat-value" id="statSlope">-</div></div>
+          <div class="stat-card"><div class="stat-label">المقطع (Intercept)</div><div class="stat-value" id="statIntercept">-</div></div>
+          <div class="stat-card"><div class="stat-label">تقدير عند آخر X</div><div class="stat-value" id="statPred">-</div></div>
+        </div>
+        <div class="formula-card" id="equationText">y = m·x + b</div>
+        <div class="solution-box" id="solutionDetails">اضغط "تحديث" لعرض خطوات الحل والمعادلة التفصيلية.</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    تم إنشاء الرسم البياني بناءً على الأسماء المدخلة وقيم X,Y. يمكنك تغيير الأرقام لتناسب بياناتك.
+  </div>
+</div>
+
 <script>
-fetch("https://www.spreaker.com/livewire-0e8bb4db/update", {
-  method: "POST",
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    test: "csrf"
-  })
-});
+  // قائمة الأسماء المطلوبة (11 اسماً)
+  const NAMES_LIST = [
+    "محمد علاء الدين علي احمد",
+    "محمد محمود سويلم",
+    "معاذ احمد محمد محمود",
+    "عبدالرحمن ايمن انور حسن",
+    "محمد حازم عبدالهادي مؤنس",
+    "محمد هشام زين العابدين",
+    "عبدالرحمن اشرف فتحى حسين",
+    "محمد اشرف مصطفي دكتور حسن انيس",
+    "احمد هشام",
+    "محمد كمال",
+    "احمد ايمن"
+  ];
+
+  // القيم الافتراضية: X = الترتيب (1 إلى 11) ، Y = قيم عشوائية منطقية تبدأ من 10 وتزيد تدريجياً
+  const DEFAULT_VALUES = [
+    { x: 1.0, y: 5.2 },
+    { x: 2.0, y: 6.8 },
+    { x: 3.0, y: 8.1 },
+    { x: 4.0, y: 9.5 },
+    { x: 5.0, y: 10.4 },
+    { x: 6.0, y: 12.0 },
+    { x: 7.0, y: 13.2 },
+    { x: 8.0, y: 14.5 },
+    { x: 9.0, y: 15.0 },
+    { x: 10.0, y: 16.3 },
+    { x: 11.0, y: 17.8 }
+  ];
+
+  // بناء مصفوفة البيانات (كل عنصر: { name, x, y })
+  let dataPoints = [];
+  function initData() {
+    dataPoints = [];
+    for (let i = 0; i < NAMES_LIST.length; i++) {
+      dataPoints.push({
+        name: NAMES_LIST[i],
+        x: DEFAULT_VALUES[i].x,
+        y: DEFAULT_VALUES[i].y
+      });
+    }
+  }
+  initData();
+
+  let chartInstance = null;
+
+  // دوال مساعدة
+  function formatNum(n, decimals = 2) {
+    if (n === undefined || isNaN(n)) return '-';
+    return Number(n).toFixed(decimals).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  }
+
+  // حساب الانحدار الخطي (المربعات الصغرى)
+  function computeRegression(points) {
+    const n = points.length;
+    if (n < 2) return { slope: 0, intercept: 0 };
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    for (let p of points) {
+      sumX += p.x;
+      sumY += p.y;
+      sumXY += p.x * p.y;
+      sumX2 += p.x * p.x;
+    }
+    const denom = n * sumX2 - sumX * sumX;
+    if (Math.abs(denom) < 1e-9) return { slope: 0, intercept: sumY / n };
+    const slope = (n * sumXY - sumX * sumY) / denom;
+    const intercept = (sumY - slope * sumX) / n;
+    return { slope, intercept };
+  }
+
+  // بناء الجدول وعرض الأسماء مع حقول إدخال X,Y
+  function buildNamesTable() {
+    const tbody = document.getElementById('namesTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    for (let i = 0; i < dataPoints.length; i++) {
+      const point = dataPoints[i];
+      const prev = i > 0 ? dataPoints[i-1] : null;
+      let deltaX = '', deltaY = '';
+      if (prev) {
+        deltaX = formatNum(point.x - prev.x, 3);
+        deltaY = formatNum(point.y - prev.y, 3);
+      }
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="font-weight:bold;">${i+1}</td>
+        <td style="text-align:right; max-width:180px; white-space: nowrap; overflow-x: auto;">${point.name}</td>
+        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="x" value="${point.x}" style="width:80px;"></td>
+        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="y" value="${point.y}" style="width:80px;"></td>
+        <td>${deltaX || '-'}</td>
+        <td>${deltaY || '-'}</td>
+      `;
+      tbody.appendChild(row);
+    }
+    // ربط الأحداث للتعديل المباشر
+    document.querySelectorAll('#namesTable .input-cell').forEach(inp => {
+      inp.removeEventListener('input', handleInputChange);
+      inp.addEventListener('input', handleInputChange);
+    });
+  }
+
+  function handleInputChange(e) {
+    const idx = parseInt(e.target.dataset.index);
+    const field = e.target.dataset.field;
+    let val = parseFloat(e.target.value);
+    if (isNaN(val)) val = 0;
+    if (idx >= 0 && idx < dataPoints.length) {
+      dataPoints[idx][field] = val;
+    }
+  }
+
+  // مزامنة البيانات من الحقول (للتأكد قبل التحديث)
+  function syncDataFromTable() {
+    const inputs = document.querySelectorAll('#namesTable .input-cell');
+    inputs.forEach(inp => {
+      const idx = parseInt(inp.dataset.index);
+      const field = inp.dataset.field;
+      let val = parseFloat(inp.value);
+      if (isNaN(val)) val = 0;
+      if (idx >= 0 && idx < dataPoints.length) {
+        dataPoints[idx][field] = val;
+      }
+    });
+  }
+
+  // تحديث الرسم البياني والإحصائيات
+  function updateChartAndStats() {
+    syncDataFromTable();  // التأكد من أحدث القيم
+    if (dataPoints.length === 0) return;
+    const regression = computeRegression(dataPoints);
+    const slope = regression.slope;
+    const intercept = regression.intercept;
+
+    // نقاط خط الانحدار (لكل X موجود)
+    const fitted = dataPoints.map(p => ({ x: p.x, y: slope * p.x + intercept }));
+    const lastPoint = dataPoints[dataPoints.length-1];
+    const predictedLast = slope * lastPoint.x + intercept;
+
+    // تحديث بطاقات الإحصائيات
+    document.getElementById('statN').innerText = dataPoints.length;
+    document.getElementById('statSlope').innerText = formatNum(slope, 4);
+    document.getElementById('statIntercept').innerText = formatNum(intercept, 4);
+    document.getElementById('statPred').innerText = formatNum(predictedLast, 4);
+    document.getElementById('equationText').innerHTML = `📐 Y = ${formatNum(slope,4)} · X + ${formatNum(intercept,4)}`;
+
+    // تفاصيل الحل
+    let deltasText = '';
+    for (let i = 1; i < dataPoints.length; i++) {
+      const dx = dataPoints[i].x - dataPoints[i-1].x;
+      const dy = dataPoints[i].y - dataPoints[i-1].y;
+      deltasText += `ΔX${i}=${formatNum(dx,3)} , ΔY${i}=${formatNum(dy,3)} &nbsp;&nbsp;`;
+      if (i % 2 === 0 && i !== dataPoints.length-1) deltasText += '<br>';
+    }
+    const solutionHtml = `
+      <strong>📐 تحليل الانحدار الخطي (طريقة المربعات الصغرى):</strong><br>
+      • عدد النقاط: ${dataPoints.length}<br>
+      • الميل العام (Slope): ${formatNum(slope,5)}<br>
+      • المقطع (Intercept): ${formatNum(intercept,5)}<br>
+      • معادلة الخط النهائية: <span dir="ltr">Y = ${formatNum(slope,5)} X + ${formatNum(intercept,5)}</span><br>
+      • تقدير Y عند آخر قيمة X (${formatNum(lastPoint.x)}) = ${formatNum(predictedLast,5)}<br>
+      • الفروق بين النقاط المتتالية:<br> ${deltasText || 'لا توجد فروق كافية'}
+    `;
+    document.getElementById('solutionDetails').innerHTML = solutionHtml;
+
+    // إعداد الرسم البياني باستخدام Chart.js
+    const ctx = document.getElementById('scatterChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+
+    // إعداد التسميات (الأسماء) للـ tooltip
+    const chartDataPoints = dataPoints.map((p, idx) => ({
+      x: p.x,
+      y: p.y,
+      label: `${idx+1}- ${p.name.substring(0, 18)}`
+    }));
+
+    chartInstance = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: 'البيانات (كل اسم)',
+            data: chartDataPoints,
+            backgroundColor: '#3b82f6',
+            borderColor: '#60a5fa',
+            borderWidth: 2,
+            pointRadius: 7,
+            pointHoverRadius: 10,
+            showLine: true,
+            tension: 0.1,
+            order: 2
+          },
+          {
+            label: 'خط الانحدار (أفضل تقريب)',
+            data: fitted,
+            type: 'line',
+            borderColor: '#22c55e',
+            borderWidth: 2.5,
+            borderDash: [8, 6],
+            pointRadius: 0,
+            fill: false,
+            order: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const raw = context.raw;
+                let nameLabel = '';
+                if (raw.label) nameLabel = raw.label;
+                else if (dataPoints[context.dataIndex]) nameLabel = dataPoints[context.dataIndex].name;
+                return `${nameLabel} : (${formatNum(raw.x,2)}, ${formatNum(raw.y,2)})`;
+              }
+            },
+            backgroundColor: '#0f172f',
+            titleColor: '#e2e8f0',
+            bodyColor: '#cbd5e6'
+          },
+          legend: {
+            labels: { color: '#cbd5f0', font: { size: 11 } },
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'قيمة X (المتغير المستقل)', color: '#9bb3d0' },
+            ticks: { color: '#b9cef0' },
+            grid: { color: 'rgba(71, 85, 105, 0.3)' }
+          },
+          y: {
+            title: { display: true, text: 'قيمة Y (المتغير التابع)', color: '#9bb3d0' },
+            ticks: { color: '#b9cef0' },
+            grid: { color: 'rgba(71, 85, 105, 0.3)' }
+          }
+        }
+      }
+    });
+  }
+
+  // إعادة تعيين البيانات إلى القيم الافتراضية (مع الأسماء نفسها)
+  function resetToDefault() {
+    for (let i = 0; i < dataPoints.length; i++) {
+      dataPoints[i].x = DEFAULT_VALUES[i].x;
+      dataPoints[i].y = DEFAULT_VALUES[i].y;
+    }
+    buildNamesTable();      // إعادة بناء الجدول لعرض القيم الجديدة
+    updateChartAndStats();  // تحديث الرسم البياني والنتائج
+  }
+
+  // حدث التحديث الكامل (مزامنة + بناء الجدول + تحديث الرسم)
+  function fullUpdate() {
+    syncDataFromTable();
+    buildNamesTable();      // إعادة بناء الجدول لتحديث قيم ΔX, ΔY
+    updateChartAndStats();
+  }
+
+  // ربط الأزرار
+  document.getElementById('updateBtn')?.addEventListener('click', fullUpdate);
+  document.getElementById('resetBtn')?.addEventListener('click', resetToDefault);
+
+  // التهيئة الأولية
+  buildNamesTable();
+  updateChartAndStats();
 </script>
+</body>
+</html>
+```
