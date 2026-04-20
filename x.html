@@ -3,464 +3,808 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>الرسم البياني للبيانات - أسماء الطلاب</title>
+  <title>نظام التحليل الهندسي للبيانات</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <style>
+    :root {
+      --bg: #f3f6fb;
+      --bg-soft: #e9eef5;
+      --card: #ffffff;
+      --card-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #5b6b7f;
+      --border: rgba(15, 23, 42, 0.08);
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --accent: #2563eb;
+      --accent-2: #0f766e;
+      --accent-3: #7c3aed;
+      --good: #059669;
+      --danger: #ef4444;
+      --table-head: #dbe7ff;
+      --table-row: #fbfdff;
+      --input-bg: #f8fbff;
+      --chip: #eef4ff;
+      --chip-text: #1e3a8a;
+      --code-bg: #eef4ff;
+      --code-text: #0f172a;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #07111d;
+      --bg-soft: #0c1726;
+      --card: #0f1a2a;
+      --card-soft: #111d2e;
+      --text: #e8eef8;
+      --muted: #9fb1c7;
+      --border: rgba(148, 163, 184, 0.14);
+      --shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+      --accent: #60a5fa;
+      --accent-2: #22c55e;
+      --accent-3: #a78bfa;
+      --good: #34d399;
+      --danger: #fb7185;
+      --table-head: #18273a;
+      --table-row: #0d1725;
+      --input-bg: #0f1c30;
+      --chip: rgba(96, 165, 250, 0.10);
+      --chip-text: #dbeafe;
+      --code-bg: #0b1625;
+      --code-text: #e5eefb;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    body {
-      background: #0a0f1c;
-      font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
-      color: #eef2ff;
-      padding: 28px 20px;
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
     }
-    .container {
-      max-width: 1400px;
+
+    body {
+      background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(124, 58, 237, 0.06), transparent 25%),
+        linear-gradient(180deg, var(--bg), var(--bg-soft));
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.75;
+      padding: 18px;
+      direction: rtl;
+    }
+
+    .main-container {
+      max-width: 1240px;
       margin: 0 auto;
     }
+
     .card {
-      background: rgba(12, 18, 34, 0.96);
-      border: 1px solid rgba(71, 85, 105, 0.4);
-      border-radius: 28px;
-      padding: 1.5rem;
-      margin-bottom: 1.8rem;
-      backdrop-filter: blur(2px);
-    }
-    .hero {
-      background: linear-gradient(125deg, #0a1022, #030712);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-    }
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      border-right: 4px solid #38bdf8;
-      padding-right: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
       margin-bottom: 1rem;
-      color: #f0f9ff;
     }
+
+    .hero {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,251,255,0.98));
+      border: 1px solid rgba(37, 99, 235, 0.10);
+    }
+
+    body[data-theme="dark"] .hero {
+      background: linear-gradient(180deg, rgba(15, 26, 42, 0.98), rgba(12, 21, 34, 0.98));
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    h2 {
+      font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.9rem;
+      padding-right: 12px;
+      border-right: 4px solid var(--accent);
+    }
+
+    .top-strip {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      margin-bottom: 16px;
+    }
+
     .badge-group {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
+
     .badge {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 6px 16px;
-      border-radius: 40px;
-      font-size: 0.8rem;
+      background: var(--chip);
+      border: 1px solid rgba(37, 99, 235, 0.12);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--chip-text);
     }
+
     .two-columns {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.8rem;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 1rem;
       align-items: start;
     }
-    .table-wrapper {
-      overflow-x: auto;
+
+    .grid-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 6px;
+    }
+
+    .data-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 16px;
+    }
+
     table {
       width: 100%;
+      min-width: 760px;
       border-collapse: collapse;
-      font-size: 0.85rem;
-      border-radius: 20px;
+      font-size: 0.92rem;
       overflow: hidden;
     }
-    th {
-      background: rgba(56, 189, 248, 0.18);
-      padding: 12px 6px;
-      font-weight: 600;
+
+    thead th {
+      background: var(--table-head);
+      color: var(--text);
+      font-weight: 800;
+      padding: 11px 8px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+      white-space: nowrap;
     }
-    td {
-      padding: 10px 6px;
+
+    tbody td {
+      background: var(--table-row);
+      padding: 9px 6px;
       text-align: center;
-      border-bottom: 1px solid #1e2a44;
-      background: rgba(8, 14, 26, 0.7);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+      white-space: nowrap;
     }
-    .input-cell {
-      background: #0f172f;
-      border: 1px solid #2d3a5e;
+
+    .input-cell, .quiz-select {
+      width: 92px;
+      background: var(--input-bg);
+      border: 1px solid rgba(37, 99, 235, 0.14);
       border-radius: 12px;
       padding: 8px 6px;
       text-align: center;
-      color: #f1f5f9;
-      width: 90px;
+      color: var(--text);
+      font-weight: 700;
       outline: none;
+      font-size: 0.95rem;
+      transition: 0.16s ease;
     }
-    .input-cell:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+
+    .quiz-select {
+      width: 100%;
+      text-align: right;
+      font-weight: 600;
     }
+
+    .input-cell:focus, .quiz-select:focus {
+      border-color: rgba(37, 99, 235, 0.55);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
     .btn-group {
       display: flex;
-      gap: 14px;
-      margin-top: 18px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
     }
+
     button {
-      background: linear-gradient(95deg, #2c7da0, #1e4a6b);
-      border: none;
-      padding: 10px 24px;
-      border-radius: 40px;
-      font-weight: 700;
-      color: white;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 0.92rem;
+      font-weight: 800;
       cursor: pointer;
-      transition: 0.1s;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+      transition: transform 0.16s ease, filter 0.16s ease;
     }
+
     button.secondary {
-      background: linear-gradient(95deg, #334155, #1e293b);
-      border: 1px solid #4b5563;
+      background: linear-gradient(135deg, #334155, #1e293b);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
     }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      gap: 0.8rem;
       margin-bottom: 1rem;
     }
+
     .stat-card {
-      background: rgba(15, 25, 45, 0.8);
-      border: 1px solid #2d3a5e;
-      border-radius: 24px;
-      padding: 12px;
+      background: linear-gradient(180deg, var(--card), var(--card-soft));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 10px;
       text-align: center;
     }
+
     .stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      color: #9ca3af;
+      font-size: 0.74rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
     }
+
     .stat-value {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #b9e2ff;
+      font-size: clamp(1.1rem, 4vw, 1.75rem);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.2;
+      word-break: break-word;
     }
+
     .formula-card {
-      background: #0a0f1e;
-      border-radius: 24px;
-      padding: 12px;
-      text-align: center;
-      font-family: monospace;
-      font-size: 1.1rem;
-      border-right: 5px solid #38bdf8;
+      border-radius: 16px;
+      padding: 13px 16px;
       margin: 12px 0;
-    }
-    .solution-box {
-      background: #071125;
-      border-radius: 20px;
-      padding: 1rem;
-      border: 1px solid #2c3e66;
-      line-height: 1.6;
-    }
-    canvas {
-      background: #030712;
-      border-radius: 20px;
-      border: 1px solid #2d3e60;
-      width: 100%;
-      max-height: 360px;
-    }
-    .footer {
+      border-right: 4px solid var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 1rem;
+      font-weight: 800;
       text-align: center;
-      margin-top: 1.5rem;
-      color: #7e8aa2;
-      font-size: 0.75rem;
+      background: var(--code-bg);
+      color: var(--code-text);
+      overflow-wrap: anywhere;
     }
-    @media (max-width: 900px) {
-      .two-columns { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .solution-box {
+      background: linear-gradient(180deg, var(--card-soft), var(--card));
+      border-radius: 18px;
+      padding: 0.95rem;
+      border: 1px solid var(--border);
+      font-size: 0.93rem;
+      line-height: 1.8;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .quiz-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .quiz-item {
+      background: linear-gradient(180deg, var(--card-soft), var(--card));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .quiz-question {
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 0.96rem;
+    }
+
+    .quiz-feedback {
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .quiz-feedback.ok {
+      color: var(--good);
+    }
+
+    .quiz-feedback.bad {
+      color: var(--danger);
+    }
+
+    canvas {
+      background: linear-gradient(180deg, var(--card), var(--card-soft));
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      width: 100%;
+      height: auto;
+      max-height: 330px;
+      display: block;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 1.2rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .plain-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    .mini-box-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mini-box {
+      background: var(--chip);
+      border: 1px solid rgba(37, 99, 235, 0.12);
+      border-radius: 14px;
+      padding: 7px 12px;
+      color: var(--chip-text);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .theme-toggle {
+      background: linear-gradient(135deg, #334155, #111827);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+      min-width: 142px;
+    }
+
+    body[data-theme="dark"] .theme-toggle {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8);
+    }
+
+    @media (max-width: 980px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 1rem;
+        border-radius: 18px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .input-cell {
+        width: 84px;
+        font-size: 0.9rem;
+      }
+
+      .theme-toggle {
+        min-width: 100%;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        padding: 12px 10px;
+      }
+
+      .formula-card {
+        font-size: 0.92rem;
+      }
     }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="main-container">
   <div class="card hero">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <div style="width: 48px; height: 48px; background: linear-gradient(145deg, #38bdf8, #1e4a6b); border-radius: 20px;"></div>
-      <div>
-        <div style="font-size: 0.8rem;">نظام الرسم البياني للبيانات</div>
-        <div style="font-weight: 800;">أرقام الرسم البياني لكل اسم</div>
+    <div class="top-strip"></div>
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <div style="font-size:0.84rem; color:var(--muted);">نظام تحليل البيانات</div>
+          <h1>معادلة الانحدار والتمثيل البياني</h1>
+        </div>
+
+        <button id="themeToggle" class="theme-toggle" type="button">تفعيل الوضع الليلي</button>
       </div>
-      <div class="card" style="margin-top:20px;">
-  <h2>👨‍🎓 فريق العمل (طلاب المشروع)</h2>
-  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:10px; font-size:0.9rem; color:#cbd5f0;">
-    <div>1. محمد علاء الدين علي احمد</div>
-    <div>2. محمد محمود سويلم</div>
-    <div>3. معاذ احمد محمد محمود</div>
-    <div>4. عبدالرحمن ايمن انور حسن</div>
-    <div>5. محمد حازم عبدالهادي مؤنس</div>
-    <div>6. محمد هشام زين العابدين</div>
-    <div>7. عبدالرحمن اشرف فتحى حسين</div>
-    <div>8. محمد اشرف مصطفى الدكاترة حسن انيس</div>
-    <div>9. احمد هشام</div>
-    <div>10. محمد كمال</div>
-  </div>
-</div>
+
+      <p style="color:var(--muted); max-width: 820px; font-size:0.95rem;">
+        واجهة مهنية متجاوبة مع الهاتف، تعرض جدول البيانات، الانحدار الخطي، والرسم البياني بشكل واضح ومريح للقراءة.
+      </p>
+
+      <div class="badge-group">
+        <div class="badge">تحليل رقمي دقيق</div>
+        <div class="badge">انحدار خطي</div>
+        <div class="badge">تصميم متجاوب</div>
+        <div class="badge">واجهة احترافية</div>
+      </div>
     </div>
-    <h1>📊 عرض البيانات بالأسماء والقيم</h1>
-    <p>الجدول التالي يحتوي على أسماء الطلاب (11 اسماً) مع إمكانية إدخال قيم (X , Y) لكل اسم. يتم تحديث الرسم البياني وحساب معادلة الانحدار تلقائياً.</p>
-    <div class="badge-group">
-      <div class="badge">✅ يشمل جميع الأسماء المطلوبة</div>
-      <div class="badge">🔢 تعديل الأرقام مباشرة</div>
-      <div class="badge">📈 رسم بياني تفاعلي</div>
+
+    <div class="card" style="margin-top:18px; background:var(--card-soft);">
+      <h2>فريق العمل</h2>
+      <div class="plain-list">
+        <div>1. محمد علاء الدين علي احمد</div>
+        <div>2. محمد محمود سويلم</div>
+        <div>3. معاذ احمد محمد محمود</div>
+        <div>4. عبدالرحمن ايمن انور حسن</div>
+        <div>5. محمد حازم عبدالهادي مؤنس</div>
+        <div>6. محمد هشام زين العابدين</div>
+        <div>7. عبدالرحمن اشرف فتحى حسين</div>
+        <div>8. محمد اشرف مصطفى</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--card-soft);">
+      <h2>إشراف أكاديمي</h2>
+      <div class="plain-list">
+        <div>د/ حسن أنيس</div>
+        <div>د/ أحمد هشام</div>
+        <div>د/ محمد كمال</div>
+      </div>
     </div>
   </div>
 
   <div class="two-columns">
-    <!-- العمود الأيمن: جدول الأسماء والأرقام -->
-    <div class="card">
-      <h2>📋 جدول البيانات: الاسم + القيم (X, Y)</h2>
-      <div class="table-wrapper">
-        <table id="namesTable">
-          <thead>
-            <tr><th>#</th><th>الاسم</th><th>X (المتغير)</th><th>Y (القيمة)</th><th>ΔX</th><th>ΔY</th></tr>
-          </thead>
-          <tbody id="namesTbody"></tbody>
-        </table>
-      </div>
-      <div class="btn-group">
-        <button id="updateBtn">🔄 تحديث الرسم والحل</button>
-        <button id="resetBtn" class="secondary">↺ إعادة القيم الافتراضية</button>
-      </div>
-      <p style="font-size:0.75rem; margin-top: 12px; color:#9bb3d0;">✏️ يمكنك تعديل أي قيمة X أو Y – سيتم إعادة حساب الانحدار والرسم البياني فور الضغط على "تحديث".</p>
-    </div>
-
-    <!-- العمود الأيسر: الرسم البياني + النتائج -->
     <div>
       <div class="card">
-        <h2>📈 الرسم البياني (النقاط حسب الأسماء)</h2>
-        <canvas id="scatterChart" width="500" height="320"></canvas>
-        <p class="small" style="font-size:0.7rem; margin-top: 8px;">كل نقطة تمثل اسماً من الجدول. الخط المتقطع الأخضر: خط الانحدار الخطي (أفضل تقريب).</p>
+        <h2>البيانات الأساسية</h2>
+        <div class="section-subtitle">يمكن تعديل قيم X و Y مباشرة، ثم تحديث الرسم والحل.</div>
+
+        <div class="data-table-wrapper" style="margin-top:12px;">
+          <table id="dataTable">
+            <thead>
+              <tr><th>#</th><th>X</th><th>Y</th><th>ΔX</th><th>ΔY</th><th>الميل الجزئي</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="btn-group">
+          <button id="updateBtn" type="button">تحديث الرسم والحل</button>
+          <button id="resetBtn" class="secondary" type="button">استعادة القيم الأصلية</button>
+        </div>
+
+        <div style="margin-top: 14px; background: var(--code-bg); border-radius: 16px; padding: 0.8rem 0.9rem; font-size: 0.82rem; border: 1px solid var(--border); color: var(--text);">
+          يتم حساب الفروق ΔX و ΔY تلقائياً بناءً على ترتيب النقاط، والميل الجزئي يعكس التغير بين كل نقطة والتي تليها.
+        </div>
       </div>
+    </div>
+
+    <div class="grid-right">
       <div class="card">
-        <h2>🧮 نتائج التحليل الإحصائي</h2>
+        <h2>التمثيل البياني وخط الانحدار</h2>
+        <canvas id="scatterChart" width="500" height="320"></canvas>
+        <p style="font-size: 0.78rem; margin-top: 10px; color: var(--muted);">
+          النقاط الزرقاء تمثل البيانات الفعلية، والخط المتقطع الأخضر يمثل أفضل تقريب خطي.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>الحل الإحصائي والانحدار</h2>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">عدد النقاط</div><div class="stat-value" id="statN">-</div></div>
-          <div class="stat-card"><div class="stat-label">الميل (Slope)</div><div class="stat-value" id="statSlope">-</div></div>
-          <div class="stat-card"><div class="stat-label">المقطع (Intercept)</div><div class="stat-value" id="statIntercept">-</div></div>
-          <div class="stat-card"><div class="stat-label">تقدير عند آخر X</div><div class="stat-value" id="statPred">-</div></div>
+          <div class="stat-card"><div class="stat-label">الميل</div><div class="stat-value" id="statSlope">-</div></div>
+          <div class="stat-card"><div class="stat-label">المقطع</div><div class="stat-value" id="statIntercept">-</div></div>
+          <div class="stat-card"><div class="stat-label">آخر تقدير</div><div class="stat-value" id="statPred">-</div></div>
         </div>
+
         <div class="formula-card" id="equationText">y = m·x + b</div>
-        <div class="solution-box" id="solutionDetails">اضغط "تحديث" لعرض خطوات الحل والمعادلة التفصيلية.</div>
+
+        <div class="solution-box" id="solutionDetails">
+          اضغط على "تحديث الرسم والحل" لعرض التحليل الكامل والحسابات التفصيلية.
+        </div>
       </div>
     </div>
   </div>
-  <div class="footer">
-    تم إنشاء الرسم البياني بناءً على الأسماء المدخلة وقيم X,Y. يمكنك تغيير الأرقام لتناسب بياناتك.
+
+  <div class="card">
+    <h2>اختبار سريع مع الحل</h2>
+    <div class="section-subtitle">اختر الإجابة الصحيحة ثم اضغط تصحيح الاختبار.</div>
+
+    <div class="quiz-grid">
+      <div class="quiz-item">
+        <div class="quiz-question">1) ماذا يمثل الميل في معادلة الخط المستقيم؟</div>
+        <select class="quiz-select" id="q1">
+          <option value="">اختر الإجابة</option>
+          <option value="a">معدل التغير بين X و Y</option>
+          <option value="b">قيمة Y عندما X = 0</option>
+          <option value="c">عدد النقاط</option>
+        </select>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2) ماذا يمثل المقطع الصادي؟</div>
+        <select class="quiz-select" id="q2">
+          <option value="">اختر الإجابة</option>
+          <option value="a">قيمة Y عندما X = 0</option>
+          <option value="b">ميل الخط</option>
+          <option value="c">أكبر قيمة في الجدول</option>
+        </select>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3) ما الطريقة المستخدمة لحساب خط الانحدار؟</div>
+        <select class="quiz-select" id="q3">
+          <option value="">اختر الإجابة</option>
+          <option value="a">طريقة المربعات الصغرى</option>
+          <option value="b">طريقة التجميع العشوائي</option>
+          <option value="c">طريقة الترتيب الأبجدي</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-group" style="margin-top:14px;">
+      <button id="checkQuizBtn" type="button">تصحيح الاختبار</button>
+      <button id="showQuizSolutionBtn" class="secondary" type="button">إظهار الحل</button>
+    </div>
+
+    <div id="quizResult" class="solution-box" style="margin-top:14px; display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h2>الخلاصة النهائية</h2>
+    <p style="color:var(--text); font-size:0.95rem;">
+      تم إنجاز هذا المشروع باستخدام أدوات تحليل البيانات والمعادلات الرياضية القياسية. يعتمد النظام على حساب الانحدار الخطي بطريقة المربعات الصغرى، مع إمكانية تعديل المدخلات ورسم العلاقة بين المتغيرات بشكل مباشر.
+    </p>
+    <div class="mini-box-row">
+      <div class="mini-box">خطوات الحل موثقة</div>
+      <div class="mini-box">معادلة انحدار ديناميكية</div>
+      
+    </div>
+  </div>
+
+  <div class="footer-note">
+    تحليل البيانات وفق معادلة الخط المستقيم | جميع الحقوق محفوظة
   </div>
 </div>
 
 <script>
-  // قائمة الأسماء المطلوبة (11 اسماً)
-  const NAMES_LIST = [
-    "محمد علاء الدين علي احمد",
-    "محمد محمود سويلم",
-    "معاذ احمد محمد محمود",
-    "عبدالرحمن ايمن انور حسن",
-    "محمد حازم عبدالهادي مؤنس",
-    "محمد هشام زين العابدين",
-    "عبدالرحمن اشرف فتحى حسين",
-    "محمد اشرف مصطفي دكتور حسن انيس",
-    "احمد هشام",
-    "محمد كمال",
-    "احمد ايمن"
+  Chart.register(ChartDataLabels);
+
+  const DEFAULT_DATA = [
+    { x: 2.0, y: 7.0 },
+    { x: 5.0, y: 10.0 },
+    { x: 7.0, y: 13.0 },
+    { x: 9.8, y: 14.0 },
+    { x: 12.8, y: 15.2 },
+    { x: 14.4, y: 16.8 }
   ];
 
-  // القيم الافتراضية: X = الترتيب (1 إلى 11) ، Y = قيم عشوائية منطقية تبدأ من 10 وتزيد تدريجياً
-  const DEFAULT_VALUES = [
-    { x: 1.0, y: 5.2 },
-    { x: 2.0, y: 6.8 },
-    { x: 3.0, y: 8.1 },
-    { x: 4.0, y: 9.5 },
-    { x: 5.0, y: 10.4 },
-    { x: 6.0, y: 12.0 },
-    { x: 7.0, y: 13.2 },
-    { x: 8.0, y: 14.5 },
-    { x: 9.0, y: 15.0 },
-    { x: 10.0, y: 16.3 },
-    { x: 11.0, y: 17.8 }
-  ];
-
-  // بناء مصفوفة البيانات (كل عنصر: { name, x, y })
-  let dataPoints = [];
-  function initData() {
-    dataPoints = [];
-    for (let i = 0; i < NAMES_LIST.length; i++) {
-      dataPoints.push({
-        name: NAMES_LIST[i],
-        x: DEFAULT_VALUES[i].x,
-        y: DEFAULT_VALUES[i].y
-      });
-    }
-  }
-  initData();
-
+  let currentData = DEFAULT_DATA.map(p => ({ ...p }));
   let chartInstance = null;
 
-  // دوال مساعدة
-  function formatNum(n, decimals = 2) {
-    if (n === undefined || isNaN(n)) return '-';
-    return Number(n).toFixed(decimals).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  const themeToggle = document.getElementById('themeToggle');
+
+  function getTheme() {
+    return localStorage.getItem('site-theme') || 'light';
   }
 
-  // حساب الانحدار الخطي (المربعات الصغرى)
-  function computeRegression(points) {
+  function applyTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('site-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? 'إيقاف الوضع الليلي' : 'تفعيل الوضع الليلي';
+    updateChartAndSolution();
+  }
+
+  applyTheme(getTheme());
+
+  themeToggle.addEventListener('click', () => {
+    const nextTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+  });
+
+  function formatValue(v) {
+    if (v === undefined || v === null || isNaN(v)) return '-';
+    const num = Number(v);
+    if (!isFinite(num)) return '-';
+    return num.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  }
+
+  function computeLinearRegression(points) {
     const n = points.length;
     if (n < 2) return { slope: 0, intercept: 0 };
+
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-    for (let p of points) {
+    for (const p of points) {
       sumX += p.x;
       sumY += p.y;
       sumXY += p.x * p.y;
       sumX2 += p.x * p.x;
     }
-    const denom = n * sumX2 - sumX * sumX;
-    if (Math.abs(denom) < 1e-9) return { slope: 0, intercept: sumY / n };
-    const slope = (n * sumXY - sumX * sumY) / denom;
+
+    const denominator = (n * sumX2 - sumX * sumX);
+    if (Math.abs(denominator) < 1e-9) return { slope: 0, intercept: sumY / n };
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
     const intercept = (sumY - slope * sumX) / n;
     return { slope, intercept };
   }
 
-  // بناء الجدول وعرض الأسماء مع حقول إدخال X,Y
-  function buildNamesTable() {
-    const tbody = document.getElementById('namesTbody');
+  function getScaleConfig(values) {
+    if (!values || values.length === 0) {
+      return { min: 0, max: 10, step: 1 };
+    }
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const span = max - min || 1;
+    const pad = span * 0.15;
+
+    let step = Math.pow(10, Math.floor(Math.log10((span + pad * 2) / 6)));
+    if ((span + pad * 2) / step < 3) step /= 2;
+
+    const finalMin = Math.floor((min - pad) / step) * step;
+    const finalMax = Math.ceil((max + pad) / step) * step;
+
+    return { min: finalMin, max: finalMax, step };
+  }
+
+  function buildDataTable() {
+    const tbody = document.querySelector('#dataTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    for (let i = 0; i < dataPoints.length; i++) {
-      const point = dataPoints[i];
-      const prev = i > 0 ? dataPoints[i-1] : null;
-      let deltaX = '', deltaY = '';
-      if (prev) {
-        deltaX = formatNum(point.x - prev.x, 3);
-        deltaY = formatNum(point.y - prev.y, 3);
+
+    for (let i = 0; i < currentData.length; i++) {
+      const point = currentData[i];
+      const prev = i > 0 ? currentData[i - 1] : null;
+      let deltaX = '', deltaY = '', partialSlope = '';
+
+      if (prev !== null) {
+        const dx = point.x - prev.x;
+        const dy = point.y - prev.y;
+        deltaX = formatValue(dx);
+        deltaY = formatValue(dy);
+        partialSlope = Math.abs(dx) > 1e-8 ? formatValue(dy / dx) : 'غير معرف';
       }
+
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td style="font-weight:bold;">${i+1}</td>
-        <td style="text-align:right; max-width:180px; white-space: nowrap; overflow-x: auto;">${point.name}</td>
-        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="x" value="${point.x}" style="width:80px;"></td>
-        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="y" value="${point.y}" style="width:80px;"></td>
-        <td>${deltaX || '-'}</td>
-        <td>${deltaY || '-'}</td>
+        <td style="font-weight:800;">${i + 1}</td>
+        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="x" value="${point.x}"></td>
+        <td><input type="number" step="0.1" class="input-cell" data-index="${i}" data-field="y" value="${point.y}"></td>
+        <td>${deltaX}</td>
+        <td>${deltaY}</td>
+        <td>${partialSlope}</td>
       `;
       tbody.appendChild(row);
     }
-    // ربط الأحداث للتعديل المباشر
-    document.querySelectorAll('#namesTable .input-cell').forEach(inp => {
-      inp.removeEventListener('input', handleInputChange);
-      inp.addEventListener('input', handleInputChange);
+
+    document.querySelectorAll('#dataTable .input-cell').forEach(input => {
+      input.removeEventListener('input', handleInputChange);
+      input.addEventListener('input', handleInputChange);
     });
   }
 
   function handleInputChange(e) {
-    const idx = parseInt(e.target.dataset.index);
+    const idx = parseInt(e.target.dataset.index, 10);
     const field = e.target.dataset.field;
-    let val = parseFloat(e.target.value);
-    if (isNaN(val)) val = 0;
-    if (idx >= 0 && idx < dataPoints.length) {
-      dataPoints[idx][field] = val;
+    let num = parseFloat(e.target.value);
+    if (isNaN(num)) num = 0;
+
+    if (idx >= 0 && idx < currentData.length) {
+      currentData[idx][field] = num;
     }
   }
 
-  // مزامنة البيانات من الحقول (للتأكد قبل التحديث)
-  function syncDataFromTable() {
-    const inputs = document.querySelectorAll('#namesTable .input-cell');
-    inputs.forEach(inp => {
-      const idx = parseInt(inp.dataset.index);
-      const field = inp.dataset.field;
-      let val = parseFloat(inp.value);
-      if (isNaN(val)) val = 0;
-      if (idx >= 0 && idx < dataPoints.length) {
-        dataPoints[idx][field] = val;
-      }
-    });
-  }
+  function updateChartAndSolution() {
+    if (!currentData.length) return;
 
-  // تحديث الرسم البياني والإحصائيات
-  function updateChartAndStats() {
-    syncDataFromTable();  // التأكد من أحدث القيم
-    if (dataPoints.length === 0) return;
-    const regression = computeRegression(dataPoints);
+    const regression = computeLinearRegression(currentData);
     const slope = regression.slope;
     const intercept = regression.intercept;
 
-    // نقاط خط الانحدار (لكل X موجود)
-    const fitted = dataPoints.map(p => ({ x: p.x, y: slope * p.x + intercept }));
-    const lastPoint = dataPoints[dataPoints.length-1];
+    const xValues = currentData.map(p => p.x);
+    const yValues = currentData.map(p => p.y);
+    const xScale = getScaleConfig(xValues);
+    const yScale = getScaleConfig(yValues);
+
+    const fittedPoints = currentData.map(p => ({ x: p.x, y: slope * p.x + intercept }));
+
+    const lastPoint = currentData[currentData.length - 1];
     const predictedLast = slope * lastPoint.x + intercept;
 
-    // تحديث بطاقات الإحصائيات
-    document.getElementById('statN').innerText = dataPoints.length;
-    document.getElementById('statSlope').innerText = formatNum(slope, 4);
-    document.getElementById('statIntercept').innerText = formatNum(intercept, 4);
-    document.getElementById('statPred').innerText = formatNum(predictedLast, 4);
-    document.getElementById('equationText').innerHTML = `📐 Y = ${formatNum(slope,4)} · X + ${formatNum(intercept,4)}`;
+    document.getElementById('statN').innerText = currentData.length;
+    document.getElementById('statSlope').innerText = formatValue(slope);
+    document.getElementById('statIntercept').innerText = formatValue(intercept);
+    document.getElementById('statPred').innerText = formatValue(predictedLast);
+    document.getElementById('equationText').innerHTML = `y = ${formatValue(slope)} · x + ${formatValue(intercept)}`;
 
-    // تفاصيل الحل
     let deltasText = '';
-    for (let i = 1; i < dataPoints.length; i++) {
-      const dx = dataPoints[i].x - dataPoints[i-1].x;
-      const dy = dataPoints[i].y - dataPoints[i-1].y;
-      deltasText += `ΔX${i}=${formatNum(dx,3)} , ΔY${i}=${formatNum(dy,3)} &nbsp;&nbsp;`;
-      if (i % 2 === 0 && i !== dataPoints.length-1) deltasText += '<br>';
+    for (let i = 1; i < currentData.length; i++) {
+      const dx = currentData[i].x - currentData[i - 1].x;
+      const dy = currentData[i].y - currentData[i - 1].y;
+      deltasText += `ΔX${i}=${formatValue(dx)} ، ΔY${i}=${formatValue(dy)} &nbsp;&nbsp;`;
+      if (i % 2 === 0 && i !== currentData.length - 1) deltasText += '<br>';
     }
-    const solutionHtml = `
-      <strong>📐 تحليل الانحدار الخطي (طريقة المربعات الصغرى):</strong><br>
-      • عدد النقاط: ${dataPoints.length}<br>
-      • الميل العام (Slope): ${formatNum(slope,5)}<br>
-      • المقطع (Intercept): ${formatNum(intercept,5)}<br>
-      • معادلة الخط النهائية: <span dir="ltr">Y = ${formatNum(slope,5)} X + ${formatNum(intercept,5)}</span><br>
-      • تقدير Y عند آخر قيمة X (${formatNum(lastPoint.x)}) = ${formatNum(predictedLast,5)}<br>
-      • الفروق بين النقاط المتتالية:<br> ${deltasText || 'لا توجد فروق كافية'}
-    `;
-    document.getElementById('solutionDetails').innerHTML = solutionHtml;
 
-    // إعداد الرسم البياني باستخدام Chart.js
+    document.getElementById('solutionDetails').innerHTML = `
+      <strong>تحليل الانحدار الخطي:</strong><br>
+      • عدد النقاط: ${currentData.length}<br>
+      • الميل = ${formatValue(slope)}<br>
+      • المعادلة النهائية: <span dir="ltr">Y = ${formatValue(slope)} X + ${formatValue(intercept)}</span><br>
+      • التقدير عند آخر قيمة X (${formatValue(lastPoint.x)}) = ${formatValue(predictedLast)}<br>
+      • الفروق بين النقاط المتتالية:<br>
+      <span style="font-family: monospace; background: var(--code-bg); padding: 5px 8px; display: inline-block; border-radius: 10px; margin-top: 6px;">${deltasText || 'لا توجد فروق كافية'}</span><br>
+      • تم الحساب باستخدام طريقة المربعات الصغرى (OLS).
+    `;
+
     const ctx = document.getElementById('scatterChart').getContext('2d');
     if (chartInstance) chartInstance.destroy();
-
-    // إعداد التسميات (الأسماء) للـ tooltip
-    const chartDataPoints = dataPoints.map((p, idx) => ({
-      x: p.x,
-      y: p.y,
-      label: `${idx+1}- ${p.name.substring(0, 18)}`
-    }));
 
     chartInstance = new Chart(ctx, {
       type: 'scatter',
       data: {
         datasets: [
           {
-            label: 'البيانات (كل اسم)',
-            data: chartDataPoints,
-            backgroundColor: '#3b82f6',
-            borderColor: '#60a5fa',
+            label: 'البيانات المدخلة',
+            data: currentData,
+            backgroundColor: '#2563eb',
+            borderColor: '#93c5fd',
             borderWidth: 2,
-            pointRadius: 7,
-            pointHoverRadius: 10,
-            showLine: true,
-            tension: 0.1,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            type: 'scatter',
+            showLine: false,
             order: 2
           },
           {
-            label: 'خط الانحدار (أفضل تقريب)',
-            data: fitted,
+            label: 'خط الانحدار',
+            data: fittedPoints,
             type: 'line',
-            borderColor: '#22c55e',
+            borderColor: '#059669',
             borderWidth: 2.5,
-            borderDash: [8, 6],
+            borderDash: [7, 6],
             pointRadius: 0,
             fill: false,
+            tension: 0,
             order: 1
           }
         ]
@@ -468,67 +812,151 @@
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        layout: {
+          padding: 8
+        },
         plugins: {
+          datalabels: {
+            display: (context) => context.datasetIndex === 0,
+            formatter: (value) => `(${formatValue(value.x)}, ${formatValue(value.y)})`,
+            anchor: 'top',
+            align: 'top',
+            offset: 6,
+            color: document.body.getAttribute('data-theme') === 'dark' ? '#e5eefb' : '#0f172a',
+            font: {
+              size: 10,
+              weight: '700'
+            }
+          },
           tooltip: {
             callbacks: {
               label: (context) => {
+                const label = context.dataset.label || '';
                 const raw = context.raw;
-                let nameLabel = '';
-                if (raw.label) nameLabel = raw.label;
-                else if (dataPoints[context.dataIndex]) nameLabel = dataPoints[context.dataIndex].name;
-                return `${nameLabel} : (${formatNum(raw.x,2)}, ${formatNum(raw.y,2)})`;
+                if (raw && raw.x !== undefined && raw.y !== undefined) {
+                  return `${label}: (${formatValue(raw.x)}, ${formatValue(raw.y)})`;
+                }
+                return label;
               }
             },
-            backgroundColor: '#0f172f',
-            titleColor: '#e2e8f0',
-            bodyColor: '#cbd5e6'
+            backgroundColor: document.body.getAttribute('data-theme') === 'dark' ? '#0f172a' : '#ffffff',
+            titleColor: document.body.getAttribute('data-theme') === 'dark' ? '#ffffff' : '#0f172a',
+            bodyColor: document.body.getAttribute('data-theme') === 'dark' ? '#e2e8f0' : '#334155',
+            borderColor: 'rgba(148,163,184,0.18)',
+            borderWidth: 1
           },
           legend: {
-            labels: { color: '#cbd5f0', font: { size: 11 } },
+            labels: {
+              color: document.body.getAttribute('data-theme') === 'dark' ? '#dbeafe' : '#334155',
+              font: { size: 11, weight: '700' }
+            },
             position: 'top'
           }
         },
         scales: {
           x: {
-            title: { display: true, text: 'قيمة X (المتغير المستقل)', color: '#9bb3d0' },
-            ticks: { color: '#b9cef0' },
-            grid: { color: 'rgba(71, 85, 105, 0.3)' }
+            min: xScale.min,
+            max: xScale.max,
+            title: { display: true, text: 'X', color: document.body.getAttribute('data-theme') === 'dark' ? '#cbd5e1' : '#334155' },
+            ticks: {
+              color: document.body.getAttribute('data-theme') === 'dark' ? '#cbd5e1' : '#475569',
+              stepSize: xScale.step,
+              callback: (value) => formatValue(value)
+            },
+            grid: {
+              color: document.body.getAttribute('data-theme') === 'dark' ? 'rgba(148, 163, 184, 0.14)' : 'rgba(15, 23, 42, 0.08)'
+            }
           },
           y: {
-            title: { display: true, text: 'قيمة Y (المتغير التابع)', color: '#9bb3d0' },
-            ticks: { color: '#b9cef0' },
-            grid: { color: 'rgba(71, 85, 105, 0.3)' }
+            min: yScale.min,
+            max: yScale.max,
+            title: { display: true, text: 'Y', color: document.body.getAttribute('data-theme') === 'dark' ? '#cbd5e1' : '#334155' },
+            ticks: {
+              color: document.body.getAttribute('data-theme') === 'dark' ? '#cbd5e1' : '#475569',
+              stepSize: yScale.step,
+              callback: (value) => formatValue(value)
+            },
+            grid: {
+              color: document.body.getAttribute('data-theme') === 'dark' ? 'rgba(148, 163, 184, 0.14)' : 'rgba(15, 23, 42, 0.08)'
+            }
           }
         }
       }
     });
   }
 
-  // إعادة تعيين البيانات إلى القيم الافتراضية (مع الأسماء نفسها)
-  function resetToDefault() {
-    for (let i = 0; i < dataPoints.length; i++) {
-      dataPoints[i].x = DEFAULT_VALUES[i].x;
-      dataPoints[i].y = DEFAULT_VALUES[i].y;
-    }
-    buildNamesTable();      // إعادة بناء الجدول لعرض القيم الجديدة
-    updateChartAndStats();  // تحديث الرسم البياني والنتائج
+  function resetToOriginal() {
+    currentData = DEFAULT_DATA.map(p => ({ ...p }));
+    buildDataTable();
+    updateChartAndSolution();
   }
 
-  // حدث التحديث الكامل (مزامنة + بناء الجدول + تحديث الرسم)
-  function fullUpdate() {
-    syncDataFromTable();
-    buildNamesTable();      // إعادة بناء الجدول لتحديث قيم ΔX, ΔY
-    updateChartAndStats();
+  function syncFromTableAndUpdate() {
+    const inputs = document.querySelectorAll('#dataTable .input-cell');
+    inputs.forEach(input => {
+      const idx = parseInt(input.dataset.index, 10);
+      const field = input.dataset.field;
+      let val = parseFloat(input.value);
+      if (isNaN(val)) val = 0;
+      if (idx >= 0 && idx < currentData.length) {
+        currentData[idx][field] = val;
+      }
+    });
+
+    buildDataTable();
+    updateChartAndSolution();
   }
 
-  // ربط الأزرار
-  document.getElementById('updateBtn')?.addEventListener('click', fullUpdate);
-  document.getElementById('resetBtn')?.addEventListener('click', resetToDefault);
+  document.getElementById('updateBtn')?.addEventListener('click', syncFromTableAndUpdate);
+  document.getElementById('resetBtn')?.addEventListener('click', resetToOriginal);
 
-  // التهيئة الأولية
-  buildNamesTable();
-  updateChartAndStats();
+  buildDataTable();
+  updateChartAndSolution();
+
+  function getQuizAnswers() {
+    return {
+      q1: 'a',
+      q2: 'a',
+      q3: 'a'
+    };
+  }
+
+  const quizResult = document.getElementById('quizResult');
+
+  document.getElementById('checkQuizBtn')?.addEventListener('click', () => {
+    const answers = getQuizAnswers();
+    let score = 0;
+
+    const userAnswers = {
+      q1: document.getElementById('q1').value,
+      q2: document.getElementById('q2').value,
+      q3: document.getElementById('q3').value
+    };
+
+    if (userAnswers.q1 === answers.q1) score++;
+    if (userAnswers.q2 === answers.q2) score++;
+    if (userAnswers.q3 === answers.q3) score++;
+
+    const status = score === 3 ? 'ok' : 'bad';
+    quizResult.style.display = 'block';
+    quizResult.className = `solution-box ${status}`;
+
+    quizResult.innerHTML = `
+      <strong>نتيجة الاختبار:</strong> ${score} من 3<br>
+      ${score === 3 ? 'إجابات صحيحة بالكامل.' : 'راجع الإجابات ثم اضغط إظهار الحل.'}
+    `;
+  });
+
+  document.getElementById('showQuizSolutionBtn')?.addEventListener('click', () => {
+    quizResult.style.display = 'block';
+    quizResult.className = 'solution-box';
+    quizResult.innerHTML = `
+      <strong>حل الاختبار:</strong><br>
+      1) الميل يمثل معدل التغير بين X و Y.<br>
+      2) المقطع الصادي هو قيمة Y عندما X = 0.<br>
+      3) الطريقة المستخدمة هي طريقة المربعات الصغرى.
+    `;
+  });
 </script>
 </body>
 </html>
-```
