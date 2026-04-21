@@ -1,58 +1,664 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>PoC: CORS Misconfiguration</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        button { padding: 10px 20px; font-size: 16px; }
-        pre { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>نظام تحليل حركة الشاحنة | جدول تفاعلي مع رسم بياني</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f4f7fc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --danger: #ef4444;
+      --success: #10b981;
+      --header-bg: #eef2ff;
+      --input-bg: #ffffff;
+      --chart-grid: #e2e8f0;
+    }
+
+    body.dark {
+      --bg: #0a0f1a;
+      --surface: #111827;
+      --surface-soft: #1e293b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --accent: #60a5fa;
+      --accent-light: #1e3a8a;
+      --header-bg: #1e293b;
+      --input-bg: #0f172a;
+      --chart-grid: #334155;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', 'Tahoma', system-ui, -apple-system, sans-serif;
+      padding: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* بطاقات */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s;
+    }
+
+    .header-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-right: 4px solid var(--accent);
+      padding-right: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .team-badge {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .badge {
+      background: var(--accent-light);
+      padding: 0.25rem 1rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.85rem;
+    }
+
+    button.secondary {
+      background: var(--text-muted);
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* الجدول المتجاوب */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .data-table {
+      min-width: 1000px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0.4rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: var(--header-bg);
+      font-weight: 800;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .data-table input {
+      width: 85px;
+      padding: 6px 4px;
+      text-align: center;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.8rem;
+      transition: 0.1s;
+    }
+
+    .data-table input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .computed-cell {
+      font-weight: 700;
+      background: var(--surface-soft);
+      border-radius: 8px;
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      min-width: 55px;
+    }
+
+    /* إحصائيات سريعة */
+    .stats-mini {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      justify-content: space-between;
+    }
+
+    .stat-block {
+      background: var(--surface-soft);
+      border-radius: 1rem;
+      padding: 0.6rem 1rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    canvas {
+      max-height: 320px;
+      width: 100%;
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 0.5rem;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 760px) {
+      .data-table input {
+        width: 65px;
+        font-size: 0.7rem;
+      }
+      .data-table th, .data-table td {
+        padding: 0.5rem 0.2rem;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h2>Proof of Concept: CORS Misconfiguration</h2>
-    <p>This code attempts to fetch data from:</p>
-    <code>https://api.medilink.healthatom.com/api/v1/citas</code>
-    <p>with credentials (cookies, authorization headers) automatically included if you are logged into Healthatom in the same browser.</p>
-    <p><strong>Note:</strong> In modern browsers, if the server responds with <code>Access-Control-Allow-Origin: *</code> together with <code>Access-Control-Allow-Credentials: true</code>, the browser will <strong>block reading the response</strong> and an error will appear in the console. If the data is successfully displayed, it means the server is not enforcing the restrictions correctly and the vulnerability is exploitable.</p>
+<div class="container">
+  <!-- رأس المشروع -->
+  <div class="card">
+    <div class="header-flex">
+      <div>
+        <h1>📊 نظام التحليل الهندسي للشاحنة</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">جدول تفاعلي كامل – حساب السرعة، العجلة، والزاوية بشكل تلقائي</p>
+      </div>
+      <button id="themeToggle" style="background:#334155;">🌙 الوضع الليلي</button>
+    </div>
+    <div class="team-badge">
+      <span class="badge">فريق: محمد علاء الدين | محمد محمود سويلم | معاذ احمد | عبدالرحمن ايمن | محمد حازم | محمد هشام | عبدالرحمن اشرف | محمد اشرف</span>
+      <span class="badge">إشراف: د/ حسن أنيس | د/ أحمد هشام | د/ محمد كمال</span>
+    </div>
+    <div style="margin-top: 12px;">
+      <button id="resetDataBtn">🔄 استعادة البيانات الأصلية</button>
+      <span style="margin-right: 12px; font-size:0.75rem;">✏️ عدّل أي خلية زرقاء (Δt, x, Δx, y, Δy, R, ΔR, رقم البيانات) – سيتم تحديث V, ΔV, a, θ والرسم البياني فوراً.</span>
+    </div>
+  </div>
+
+  <!-- الجدول الرئيسي (5 نقاط) -->
+  <div class="card">
+    <h2>📋 جدول حركة الشاحنة (بيانات تفصيلية)</h2>
+    <div class="table-wrapper">
+      <table class="data-table" id="kinematicTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="stats-mini" id="summaryStats"></div>
+  </div>
+
+  <!-- الرسم البياني + ملخص سريع -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div class="card">
+      <h2>📈 سرعة الشاحنة مقابل رقم النقطة</h2>
+      <canvas id="speedChart" width="400" height="250"></canvas>
+      <p style="font-size: 0.7rem; margin-top: 0.5rem;">* يتم حساب السرعة V من (Δx/Δt , Δy/Δt) لكل نقطة (إن توفرت).</p>
+    </div>
+    <div class="card">
+      <h2>📐 الزاوية (θ) لكل نقطة</h2>
+      <canvas id="angleChart" width="400" height="250"></canvas>
+      <p style="font-size: 0.7rem;">θ = atan2(Δy, Δx) بالدرجات. تشير إلى اتجاه الحركة.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    نظام تحليل ديناميكي – معادلات الحركة: السرعة V = √((Δx/Δt)²+(Δy/Δt)²) ، العجلة a = ΔV/Δt ، الزاوية θ = atan2(Δy,Δx)
+  </div>
+</div>
+
+<script>
+  // ----------------------- البيانات الأولية حسب الجدول المقدم (5 نقاط) -----------------------
+  // الأعمدة: الرقم التسلسلي, رقم النقطة, التوقيت T, Δt, x, Δx, y, Δy, R, ΔR, رقم البيانات, V, ΔV, a, θ
+  // سنديرها كمصفوفة من الصفوف (كل صف يمثل نقطة)
+  // الصفوف من 0 إلى 4
+  const INITIAL_ROWS = [
+    { pointNum: 1, T: "8:00 pm", dt: 30, x: 150, dx: 50, y: 200, dy: 100, R: 250, dR: 110.6, dataNum: 1, V: 3.73, dV: 0, a: 0, theta: 63.4 },
+    { pointNum: 2, T: "8:30", dt: 30, x: 200, dx: 50, y: 300, dy: 100, R: 360.6, dR: 110.6, dataNum: 1, V: 3.73, dV: 0, a: 0, theta: 63.4 },
+    { pointNum: 3, T: "9:00", dt: 30, x: 250, dx: 50, y: 400, dy: 100, R: 471.7, dR: 111.1, dataNum: 2, V: 3.73, dV: 0, a: 0, theta: 63.4 },
+    { pointNum: 4, T: "9:30", dt: 30, x: 350, dx: 100, y: 450, dy: 50, R: 570.7, dR: 99, dataNum: 3, V: 3.78, dV: 1.54, a: 0.05, theta: 26.6 },
+    { pointNum: 5, T: "10:00", dt: 30, x: 500, dx: 150, y: 500, dy: 50, R: 707.1, dR: 136.4, dataNum: 4, V: 5.27, dV: 1.49, a: 0.0497, theta: 18.4 }
+  ];
+
+  // نسخة عمل
+  let rowsData = INITIAL_ROWS.map(row => ({ ...row }));
+
+  // مراجع للرسوم البيانية
+  let speedChart, angleChart;
+
+  // دالة حساب V و ΔV و a و θ بناءً على المدخلات الحالية
+  function recalcDerivedFields() {
+    for (let i = 0; i < rowsData.length; i++) {
+      const row = rowsData[i];
+      const dt = parseFloat(row.dt);
+      const dx = parseFloat(row.dx);
+      const dy = parseFloat(row.dy);
+      
+      // حساب السرعة V من Δx, Δy, Δt (إن أمكن)
+      if (!isNaN(dt) && dt !== 0 && !isNaN(dx) && !isNaN(dy)) {
+        const vx = dx / dt;
+        const vy = dy / dt;
+        const V = Math.hypot(vx, vy);
+        row.V = parseFloat(V.toFixed(4));
+        // الزاوية θ بالدرجات
+        let thetaRad = Math.atan2(vy, vx);
+        let thetaDeg = thetaRad * 180 / Math.PI;
+        row.theta = parseFloat(thetaDeg.toFixed(2));
+      } else {
+        row.V = NaN;
+        row.theta = NaN;
+      }
+      
+      // ΔV = V_current - V_previous
+      if (i === 0) {
+        row.dV = 0;
+      } else {
+        const prevV = rowsData[i-1].V;
+        if (!isNaN(row.V) && !isNaN(prevV)) {
+          row.dV = parseFloat((row.V - prevV).toFixed(4));
+        } else {
+          row.dV = NaN;
+        }
+      }
+      
+      // العجلة a = ΔV / Δt (باستخدام dt للنقطة الحالية)
+      if (!isNaN(row.dV) && !isNaN(dt) && dt !== 0) {
+        row.a = parseFloat((row.dV / dt).toFixed(6));
+      } else {
+        row.a = NaN;
+      }
+    }
+  }
+
+  // بناء الجدول وعرض القيم (مع حلقات الإدخال)
+  function buildTable() {
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tableBody');
+    if (!thead || !tbody) return;
     
-    <button id="fetchBtn">Execute Request</button>
-    <pre id="result">Result will appear here...</pre>
-
-    <script>
-        document.getElementById('fetchBtn').addEventListener('click', function() {
-            const url = 'https://api.medilink.healthatom.com/api/v1/citas';
-            const resultElement = document.getElementById('result');
-
-            resultElement.textContent = 'Executing...';
-
-            fetch(url, {
-                method: 'GET',
-                credentials: 'include'  // sends cookies and authentication headers
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();  // or response.json() if you expect JSON
-            })
-            .then(data => {
-                resultElement.textContent = 'Retrieved data:\n' + data;
-                console.log('Data:', data);
-            })
-            .catch(error => {
-                resultElement.textContent = 'Error:\n' + error.message;
-                console.error('Error:', error);
-            });
-        });
-    </script>
-
-    <hr>
-    <h3>Interpreting the results:</h3>
-    <ul>
-        <li><strong>If data appears</strong>: The vulnerability is fully exploitable – any malicious website can steal your information.</li>
-        <li><strong>If an error appears in the console (e.g., "CORS ...")</strong>: The browser prevented reading the data due to the unsafe configuration, but the misconfiguration still exists and might be a risk in other contexts (e.g., native apps).</li>
-        <li><strong>If another error appears (e.g., 401 Unauthorized)</strong>: The session might be inactive or authentication is required.</li>
-    </ul>
+    // تعريف أعمدة الجدول (العناوين)
+    const columns = [
+      "رقم المعاملة", "رقم النقطة", "التوقيت T", "Δt (ث)", "x (م)", "Δx (م)", "y (م)", "Δy (م)", "R (م)", "ΔR (م)", 
+      "رقم البيانات", "السرعة V (م/ث)", "ΔV (م/ث)", "العجلة a (م/ث²)", "الزاوية θ (°)"
+    ];
+    
+    // رأس الجدول
+    thead.innerHTML = '';
+    let headerRow = document.createElement('tr');
+    columns.forEach(col => {
+      let th = document.createElement('th');
+      th.innerText = col;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    // صفوف الجدول
+    tbody.innerHTML = '';
+    for (let i = 0; i < rowsData.length; i++) {
+      const row = rowsData[i];
+      const tr = document.createElement('tr');
+      
+      // عمود رقم المعاملة (تلقائي)
+      let td1 = document.createElement('td');
+      td1.innerText = i+1;
+      tr.appendChild(td1);
+      
+      // رقم النقطة (قابل للتعديل؟ لا, ثابت لكن لو أراد المستخدم نجعله editable? الأفضل ثابت)
+      let tdPoint = document.createElement('td');
+      tdPoint.innerText = row.pointNum;
+      tr.appendChild(tdPoint);
+      
+      // التوقيت T (نص قابل للتعديل)
+      let tdT = document.createElement('td');
+      let inputT = document.createElement('input');
+      inputT.type = 'text';
+      inputT.value = row.T;
+      inputT.style.width = '85px';
+      inputT.addEventListener('change', (function(idx) {
+        return function(e) { rowsData[idx].T = e.target.value; };
+      })(i));
+      tdT.appendChild(inputT);
+      tr.appendChild(tdT);
+      
+      // Δt (رقمي)
+      let tddt = createNumberInput(row.dt, i, 'dt');
+      tr.appendChild(tddt);
+      
+      // x
+      let tdx = createNumberInput(row.x, i, 'x');
+      tr.appendChild(tdx);
+      
+      // Δx
+      let tddx = createNumberInput(row.dx, i, 'dx');
+      tr.appendChild(tddx);
+      
+      // y
+      let tdy = createNumberInput(row.y, i, 'y');
+      tr.appendChild(tdy);
+      
+      // Δy
+      let tddy = createNumberInput(row.dy, i, 'dy');
+      tr.appendChild(tddy);
+      
+      // R
+      let tdR = createNumberInput(row.R, i, 'R');
+      tr.appendChild(tdR);
+      
+      // ΔR
+      let tddR = createNumberInput(row.dR, i, 'dR');
+      tr.appendChild(tddR);
+      
+      // رقم البيانات
+      let tdDataNum = createNumberInput(row.dataNum, i, 'dataNum');
+      tr.appendChild(tdDataNum);
+      
+      // السرعة V (معروضة محسوبة)
+      let tdV = document.createElement('td');
+      let spanV = document.createElement('span');
+      spanV.className = 'computed-cell';
+      spanV.id = `V_${i}`;
+      tdV.appendChild(spanV);
+      tr.appendChild(tdV);
+      
+      // ΔV
+      let tddV = document.createElement('td');
+      let spanDV = document.createElement('span');
+      spanDV.className = 'computed-cell';
+      spanDV.id = `dV_${i}`;
+      tddV.appendChild(spanDV);
+      tr.appendChild(tddV);
+      
+      // العجلة a
+      let tda = document.createElement('td');
+      let spanA = document.createElement('span');
+      spanA.className = 'computed-cell';
+      spanA.id = `a_${i}`;
+      tda.appendChild(spanA);
+      tr.appendChild(tda);
+      
+      // الزاوية θ
+      let tdTheta = document.createElement('td');
+      let spanTheta = document.createElement('span');
+      spanTheta.className = 'computed-cell';
+      spanTheta.id = `theta_${i}`;
+      tdTheta.appendChild(spanTheta);
+      tr.appendChild(tdTheta);
+      
+      tbody.appendChild(tr);
+    }
+    
+    // تحديث القيم المحسوبة بعد بناء الجدول
+    updateDisplayedValues();
+  }
+  
+  // مساعد لإنشاء خلية إدخال رقمي
+  function createNumberInput(initialValue, rowIdx, fieldName) {
+    const td = document.createElement('td');
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.step = 'any';
+    input.value = (initialValue !== undefined && !isNaN(initialValue)) ? initialValue : '';
+    input.addEventListener('input', (function(idx, fld) {
+      return function(e) {
+        let val = e.target.value;
+        if (val === '') {
+          rowsData[idx][fld] = NaN;
+        } else {
+          let num = parseFloat(val);
+          rowsData[idx][fld] = isNaN(num) ? NaN : num;
+        }
+        recalcDerivedFields();       // إعادة حساب V, dV, a, theta
+        updateDisplayedValues();     // تحديث الخلايا المحسوبة
+        updateCharts();              // تحديث الرسوم البيانية
+        updateSummaryStats();        // تحديث الإحصائيات السريعة
+      };
+    })(rowIdx, fieldName));
+    td.appendChild(input);
+    return td;
+  }
+  
+  // تحديث الخلايا المعروضة للقيم المحسوبة (V, dV, a, theta)
+  function updateDisplayedValues() {
+    for (let i = 0; i < rowsData.length; i++) {
+      const row = rowsData[i];
+      const spanV = document.getElementById(`V_${i}`);
+      const spanDV = document.getElementById(`dV_${i}`);
+      const spanA = document.getElementById(`a_${i}`);
+      const spanTheta = document.getElementById(`theta_${i}`);
+      
+      if (spanV) spanV.innerText = (!isNaN(row.V) && isFinite(row.V)) ? row.V.toFixed(2) : '—';
+      if (spanDV) spanDV.innerText = (!isNaN(row.dV) && isFinite(row.dV)) ? row.dV.toFixed(3) : '—';
+      if (spanA) spanA.innerText = (!isNaN(row.a) && isFinite(row.a)) ? row.a.toFixed(4) : '—';
+      if (spanTheta) spanTheta.innerText = (!isNaN(row.theta) && isFinite(row.theta)) ? row.theta.toFixed(1) + '°' : '—';
+    }
+  }
+  
+  // تحديث الرسم البياني للسرعة والزاوية
+  function updateCharts() {
+    const labels = rowsData.map((_, idx) => `نقطة ${idx+1}`);
+    const speeds = rowsData.map(r => (!isNaN(r.V) && isFinite(r.V)) ? r.V : null);
+    const angles = rowsData.map(r => (!isNaN(r.theta) && isFinite(r.theta)) ? r.theta : null);
+    
+    if (speedChart) {
+      speedChart.data.datasets[0].data = speeds;
+      speedChart.update();
+    }
+    if (angleChart) {
+      angleChart.data.datasets[0].data = angles;
+      angleChart.update();
+    }
+  }
+  
+  // إحصائيات سريعة (أقصى سرعة، متوسط العجلة)
+  function updateSummaryStats() {
+    const speeds = rowsData.map(r => r.V).filter(v => !isNaN(v) && isFinite(v));
+    const maxSpeed = speeds.length ? Math.max(...speeds).toFixed(2) : '—';
+    const avgAcc = rowsData.map(r => r.a).filter(a => !isNaN(a) && isFinite(a)).reduce((s,val)=>s+val,0);
+    const avgAccVal = (rowsData.filter(r=>!isNaN(r.a)).length) ? (avgAcc / rowsData.filter(r=>!isNaN(r.a)).length).toFixed(4) : '—';
+    const lastTheta = (!isNaN(rowsData[rowsData.length-1].theta)) ? rowsData[rowsData.length-1].theta.toFixed(1)+'°' : '—';
+    
+    const container = document.getElementById('summaryStats');
+    if (container) {
+      container.innerHTML = `
+        <div class="stat-block">🏁 أقصى سرعة: ${maxSpeed} م/ث</div>
+        <div class="stat-block">📉 متوسط العجلة: ${avgAccVal} م/ث²</div>
+        <div class="stat-block">🧭 الزاوية الأخيرة: ${lastTheta}</div>
+        <div class="stat-block">📊 عدد النقاط: ${rowsData.length}</div>
+      `;
+    }
+  }
+  
+  // استعادة البيانات الأصلية
+  function resetData() {
+    rowsData = INITIAL_ROWS.map(row => ({ ...row }));
+    recalcDerivedFields();
+    // إعادة بناء الجدول بالكامل لتحديث حقول الإدخال
+    buildTable();
+    updateCharts();
+    updateSummaryStats();
+  }
+  
+  // تهيئة الرسوم البيانية
+  function initCharts() {
+    const ctxSpeed = document.getElementById('speedChart').getContext('2d');
+    const ctxAngle = document.getElementById('angleChart').getContext('2d');
+    const labels = rowsData.map((_, idx) => `نقطة ${idx+1}`);
+    const speeds = rowsData.map(r => (!isNaN(r.V) && isFinite(r.V)) ? r.V : null);
+    const angles = rowsData.map(r => (!isNaN(r.theta) && isFinite(r.theta)) ? r.theta : null);
+    
+    speedChart = new Chart(ctxSpeed, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'السرعة V (م/ث)',
+          data: speeds,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#f97316',
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          tooltip: { callbacks: { label: (ctx) => `السرعة: ${ctx.raw} م/ث` } },
+          legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text') } }
+        },
+        scales: {
+          y: { title: { display: true, text: 'م/ث', color: 'var(--text-muted)' } },
+          x: { title: { display: true, text: 'رقم النقطة', color: 'var(--text-muted)' } }
+        }
+      }
+    });
+    
+    angleChart = new Chart(ctxAngle, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'زاوية الاتجاه θ (درجة)',
+          data: angles,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#8b5cf6',
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          tooltip: { callbacks: { label: (ctx) => `الزاوية: ${ctx.raw}°` } },
+          legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text') } }
+        },
+        scales: {
+          y: { title: { display: true, text: 'درجة', color: 'var(--text-muted)' }, min: -10, max: 90 },
+          x: { title: { display: true, text: 'رقم النقطة', color: 'var(--text-muted)' } }
+        }
+      }
+    });
+  }
+  
+  // الوضع الليلي
+  function setupTheme() {
+    const stored = localStorage.getItem('theme');
+    const isDark = stored === 'dark';
+    if (isDark) document.body.classList.add('dark');
+    const btn = document.getElementById('themeToggle');
+    btn.innerText = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+    btn.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const darkNow = document.body.classList.contains('dark');
+      localStorage.setItem('theme', darkNow ? 'dark' : 'light');
+      btn.innerText = darkNow ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+      // إعادة تحديث الرسوم البيانية لتغيير ألوان المحاور (إعادة إنشاء بسيطة)
+      if (speedChart) speedChart.destroy();
+      if (angleChart) angleChart.destroy();
+      initCharts();
+      updateCharts(); // تحديث البيانات
+    });
+  }
+  
+  // ربط أزرار التحكم
+  document.getElementById('resetDataBtn')?.addEventListener('click', resetData);
+  
+  // البدء
+  recalcDerivedFields();   // حساب أولي بناءً على البيانات المدخلة
+  buildTable();            // إنشاء الجدول مع حقول editable
+  initCharts();            // إنشاء الرسوم البيانية
+  updateSummaryStats();    // عرض إحصائيات
+  setupTheme();            // الثيم
+  
+  // إضافة مستمع إضافي لأي تغيير على الجدول عبر التحديث اليدوي (بعض الحقول قد لا تطلق الحدث)
+  // لكن لدينا مستمعات input لكل حقل، وسيتم تحديث كامل.
+</script>
 </body>
 </html>
