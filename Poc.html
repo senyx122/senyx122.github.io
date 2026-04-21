@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>نظام تحليل حركة  | جدول تفاعلي مع رسم بياني</title>
+  <title>نظام التحليل الهندسي للحركة | جدول تفاعلي مع رسم بياني واختبار</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     * {
@@ -26,6 +26,8 @@
       --header-bg: #eef2ff;
       --input-bg: #ffffff;
       --chart-grid: #e2e8f0;
+      --quiz-bg: #fefce8;
+      --quiz-border: #eab308;
     }
 
     body.dark {
@@ -40,6 +42,8 @@
       --header-bg: #1e293b;
       --input-bg: #0f172a;
       --chart-grid: #334155;
+      --quiz-bg: #1e293b;
+      --quiz-border: #facc15;
     }
 
     body {
@@ -66,6 +70,12 @@
       transition: all 0.2s;
     }
 
+    .quiz-card {
+      background: var(--surface);
+      border: 1px solid var(--quiz-border);
+      border-right: 8px solid var(--accent);
+    }
+
     .header-flex {
       display: flex;
       flex-wrap: wrap;
@@ -90,6 +100,13 @@
       border-right: 4px solid var(--accent);
       padding-right: 0.75rem;
       margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      color: var(--accent);
     }
 
     .team-badge {
@@ -122,6 +139,12 @@
 
     button.secondary {
       background: var(--text-muted);
+    }
+
+    button.quiz-btn {
+      background: #eab308;
+      color: #0f172a;
+      margin-top: 1rem;
     }
 
     button:hover {
@@ -212,6 +235,58 @@
       padding: 0.5rem;
     }
 
+    /* أسئلة الاختبار */
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .question-item {
+      background: var(--surface-soft);
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      border-right: 3px solid var(--accent);
+    }
+
+    .question-text {
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-right: 1rem;
+      align-items: center;
+    }
+
+    .options label {
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+    }
+
+    .answers-panel {
+      background: var(--accent-light);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: none;
+      direction: ltr;
+      text-align: right;
+      font-size: 0.85rem;
+    }
+
+    .answers-panel.show {
+      display: block;
+    }
+
     .footer {
       text-align: center;
       font-size: 0.7rem;
@@ -232,16 +307,21 @@
       h1 {
         font-size: 1.3rem;
       }
+      .options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+      }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- رأس المشروع -->
+  <!-- رأس المشروع (تمت إزالة كلمة الشاحنة) -->
   <div class="card">
     <div class="header-flex">
       <div>
-        <h1>📊 نظام التحليل الهندسي للشاحنة</h1>
+        <h1>📊 نظام التحليل الهندسي للحركة</h1>
         <p style="color: var(--text-muted); font-size: 0.85rem;">جدول تفاعلي كامل – حساب السرعة، العجلة، والزاوية بشكل تلقائي</p>
       </div>
       <button id="themeToggle" style="background:#334155;">🌙 الوضع الليلي</button>
@@ -256,9 +336,9 @@
     </div>
   </div>
 
-  <!-- الجدول الرئيسي (5 نقاط) -->
+  <!-- الجدول الرئيسي (5 نقاط) - تم تعديل العنوان -->
   <div class="card">
-    <h2>📋 جدول حركة الشاحنة (بيانات تفصيلية)</h2>
+    <h2>📋 جدول حركة المركبة (بيانات تفصيلية)</h2>
     <div class="table-wrapper">
       <table class="data-table" id="kinematicTable">
         <thead id="tableHead"></thead>
@@ -268,10 +348,10 @@
     <div class="stats-mini" id="summaryStats"></div>
   </div>
 
-  <!-- الرسم البياني + ملخص سريع -->
+  <!-- الرسم البياني + ملخص سريع (تم تعديل عنوان السرعة) -->
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
     <div class="card">
-      <h2>📈 سرعة الشاحنة مقابل رقم النقطة</h2>
+      <h2>📈 سرعة المركبة مقابل رقم النقطة</h2>
       <canvas id="speedChart" width="400" height="250"></canvas>
       <p style="font-size: 0.7rem; margin-top: 0.5rem;">* يتم حساب السرعة V من (Δx/Δt , Δy/Δt) لكل نقطة (إن توفرت).</p>
     </div>
@@ -282,16 +362,23 @@
     </div>
   </div>
 
+  <!-- قسم الاختبار: 10 أسئلة منظمة -->
+  <div class="card quiz-card">
+    <h2>📝 اختبار الفهم في الحركة (10 أسئلة موضوعية)</h2>
+    <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">اختر الإجابة الصحيحة لكل سؤال، ثم اضغط على زر "إظهار الإجابات الصحيحة" للمراجعة.</p>
+    <div class="quiz-list" id="quizContainer"></div>
+    <button id="showAnswersBtn" class="quiz-btn">🔍 إظهار الإجابات الصحيحة</button>
+    <div id="answersPanel" class="answers-panel"></div>
+  </div>
+
   <div class="footer">
     نظام تحليل ديناميكي – معادلات الحركة: السرعة V = √((Δx/Δt)²+(Δy/Δt)²) ، العجلة a = ΔV/Δt ، الزاوية θ = atan2(Δy,Δx)
   </div>
 </div>
 
 <script>
-  // ----------------------- البيانات الأولية حسب الجدول المقدم (5 نقاط) -----------------------
-  // الأعمدة: الرقم التسلسلي, رقم النقطة, التوقيت T, Δt, x, Δx, y, Δy, R, ΔR, رقم البيانات, V, ΔV, a, θ
-  // سنديرها كمصفوفة من الصفوف (كل صف يمثل نقطة)
-  // الصفوف من 0 إلى 4
+  // ----------------------- البيانات الأولية (نقاط الحركة) -----------------------
+  // الأعمدة: رقم النقطة, التوقيت T, Δt, x, Δx, y, Δy, R, ΔR, رقم البيانات, V, ΔV, a, θ
   const INITIAL_ROWS = [
     { pointNum: 1, T: "8:00 pm", dt: 30, x: 150, dx: 50, y: 200, dy: 100, R: 250, dR: 110.6, dataNum: 1, V: 3.73, dV: 0, a: 0, theta: 63.4 },
     { pointNum: 2, T: "8:30", dt: 30, x: 200, dx: 50, y: 300, dy: 100, R: 360.6, dR: 110.6, dataNum: 1, V: 3.73, dV: 0, a: 0, theta: 63.4 },
@@ -300,27 +387,99 @@
     { pointNum: 5, T: "10:00", dt: 30, x: 500, dx: 150, y: 500, dy: 50, R: 707.1, dR: 136.4, dataNum: 4, V: 5.27, dV: 1.49, a: 0.0497, theta: 18.4 }
   ];
 
-  // نسخة عمل
   let rowsData = INITIAL_ROWS.map(row => ({ ...row }));
-
-  // مراجع للرسوم البيانية
   let speedChart, angleChart;
 
-  // دالة حساب V و ΔV و a و θ بناءً على المدخلات الحالية
+  // --- قائمة الأسئلة (10 أسئلة اختبار مع الخيارات والإجابة الصحيحة) ---
+  const questionsList = [
+    { text: "ما هي معادلة حساب مقدار السرعة V من الإزاحتين Δx, Δy والزمن Δt؟",
+      options: ["أ) V = (Δx+Δy)/Δt", "ب) V = √((Δx/Δt)² + (Δy/Δt)²)", "ج) V = (Δx/Δt) + (Δy/Δt)", "د) V = (Δx²+Δy²)/Δt"],
+      correct: "ب" },
+    { text: "إذا كانت Δx = 100 متر، Δy = 0 متر، و Δt = 10 ثوان، فإن الزاوية θ (بالدرجات) تساوي:",
+      options: ["أ) 0°", "ب) 45°", "ج) 90°", "د) 180°"],
+      correct: "أ" },
+    { text: "العجلة a تُحسب من العلاقة:",
+      options: ["أ) a = ΔV / Δt", "ب) a = V / Δt", "ج) a = Δx / Δt²", "د) a = Δy / Δt"],
+      correct: "أ" },
+    { text: "في الجدول المعروض، إذا كانت السرعة في النقطة 3 هي 3.73 م/ث وفي النقطة 4 هي 3.78 م/ث وΔt=30 ث، فإن العجلة تساوي تقريباً:",
+      options: ["أ) 0.0017 م/ث²", "ب) 0.05 م/ث²", "ج) 0.1 م/ث²", "د) 0.5 م/ث²"],
+      correct: "ب" },
+    { text: "زاوية الاتجاه θ = atan2(Δy, Δx). إذا كانت Δx موجب وΔy سالب، فإن الزاوية تقع في:",
+      options: ["أ) الربع الأول", "ب) الربع الثاني", "ج) الربع الثالث", "د) الربع الرابع"],
+      correct: "د" },
+    { text: "ماذا يمثل ΔR في الجدول؟",
+      options: ["أ) التغير في المسافة المقطوعة", "ب) التغير في متجه الموقع R", "ج) السرعة المتجهة", "د) العجلة المركزية"],
+      correct: "ب" },
+    { text: "إذا كانت السرعة ثابتة (V ثابتة) فإن العجلة a تكون:",
+      options: ["أ) موجبة", "ب) سالبة", "ج) صفر", "د) غير محددة"],
+      correct: "ج" },
+    { text: "في الرسم البياني للسرعة، إذا كان الخط متزايداً فهذا يعني:",
+      options: ["أ) المركبة تتحرك بسرعة ثابتة", "ب) المركبة تتسارع", "ج) المركبة تتباطأ", "د) المركبة في حالة سكون"],
+      correct: "ب" },
+    { text: "وحدة قياس العجلة في النظام الدولي هي:",
+      options: ["أ) متر/ثانية", "ب) متر/ثانية²", "ج) متر²/ثانية", "د) ثانية/متر"],
+      correct: "ب" },
+    { text: "إذا أردنا حساب المسافة الكلية المقطوعة من منحنى السرعة مقابل الزمن، فإننا نحسب:",
+      options: ["أ) ميل المنحنى", "ب) المساحة تحت المنحنى", "ج) نقطة التقاطع مع المحاور", "د) المشتقة الأولى"],
+      correct: "ب" }
+  ];
+
+  // دالة إنشاء واجهة الأسئلة (راديو)
+  function buildQuizUI() {
+    const quizContainer = document.getElementById('quizContainer');
+    if (!quizContainer) return;
+    quizContainer.innerHTML = '';
+    questionsList.forEach((q, idx) => {
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'question-item';
+      questionDiv.dataset.qIndex = idx;
+      const qText = document.createElement('div');
+      qText.className = 'question-text';
+      qText.innerText = `${idx+1}. ${q.text}`;
+      questionDiv.appendChild(qText);
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'options';
+      q.options.forEach(opt => {
+        const optLetter = opt.charAt(0);
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = `q${idx}`;
+        radio.value = optLetter;
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(` ${opt}`));
+        optionsDiv.appendChild(label);
+      });
+      questionDiv.appendChild(optionsDiv);
+      quizContainer.appendChild(questionDiv);
+    });
+  }
+
+  // عرض الإجابات الصحيحة
+  function showCorrectAnswers() {
+    const panel = document.getElementById('answersPanel');
+    if (!panel) return;
+    let answersHtml = '<strong>✅ الإجابات الصحيحة:</strong><br><div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">';
+    questionsList.forEach((q, idx) => {
+      answersHtml += `<span style="background:var(--surface); padding:0.2rem 0.7rem; border-radius:20px;">${idx+1}. ${q.correct})</span> `;
+    });
+    answersHtml += '</div><p style="margin-top:0.8rem; font-size:0.8rem;">ملاحظة: الإجابات مبنية على المفاهيم الفيزيائية والجدول المعروض.</p>';
+    panel.innerHTML = answersHtml;
+    panel.classList.add('show');
+  }
+
+  // --- دوال الجدول والحسابات ---
   function recalcDerivedFields() {
     for (let i = 0; i < rowsData.length; i++) {
       const row = rowsData[i];
       const dt = parseFloat(row.dt);
       const dx = parseFloat(row.dx);
       const dy = parseFloat(row.dy);
-      
-      // حساب السرعة V من Δx, Δy, Δt (إن أمكن)
       if (!isNaN(dt) && dt !== 0 && !isNaN(dx) && !isNaN(dy)) {
         const vx = dx / dt;
         const vy = dy / dt;
         const V = Math.hypot(vx, vy);
         row.V = parseFloat(V.toFixed(4));
-        // الزاوية θ بالدرجات
         let thetaRad = Math.atan2(vy, vx);
         let thetaDeg = thetaRad * 180 / Math.PI;
         row.theta = parseFloat(thetaDeg.toFixed(2));
@@ -328,8 +487,6 @@
         row.V = NaN;
         row.theta = NaN;
       }
-      
-      // ΔV = V_current - V_previous
       if (i === 0) {
         row.dV = 0;
       } else {
@@ -340,8 +497,6 @@
           row.dV = NaN;
         }
       }
-      
-      // العجلة a = ΔV / Δt (باستخدام dt للنقطة الحالية)
       if (!isNaN(row.dV) && !isNaN(dt) && dt !== 0) {
         row.a = parseFloat((row.dV / dt).toFixed(6));
       } else {
@@ -350,128 +505,6 @@
     }
   }
 
-  // بناء الجدول وعرض القيم (مع حلقات الإدخال)
-  function buildTable() {
-    const thead = document.getElementById('tableHead');
-    const tbody = document.getElementById('tableBody');
-    if (!thead || !tbody) return;
-    
-    // تعريف أعمدة الجدول (العناوين)
-    const columns = [
-      "رقم المعاملة", "رقم النقطة", "التوقيت T", "Δt (ث)", "x (م)", "Δx (م)", "y (م)", "Δy (م)", "R (م)", "ΔR (م)", 
-      "رقم البيانات", "السرعة V (م/ث)", "ΔV (م/ث)", "العجلة a (م/ث²)", "الزاوية θ (°)"
-    ];
-    
-    // رأس الجدول
-    thead.innerHTML = '';
-    let headerRow = document.createElement('tr');
-    columns.forEach(col => {
-      let th = document.createElement('th');
-      th.innerText = col;
-      headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    
-    // صفوف الجدول
-    tbody.innerHTML = '';
-    for (let i = 0; i < rowsData.length; i++) {
-      const row = rowsData[i];
-      const tr = document.createElement('tr');
-      
-      // عمود رقم المعاملة (تلقائي)
-      let td1 = document.createElement('td');
-      td1.innerText = i+1;
-      tr.appendChild(td1);
-      
-      // رقم النقطة (قابل للتعديل؟ لا, ثابت لكن لو أراد المستخدم نجعله editable? الأفضل ثابت)
-      let tdPoint = document.createElement('td');
-      tdPoint.innerText = row.pointNum;
-      tr.appendChild(tdPoint);
-      
-      // التوقيت T (نص قابل للتعديل)
-      let tdT = document.createElement('td');
-      let inputT = document.createElement('input');
-      inputT.type = 'text';
-      inputT.value = row.T;
-      inputT.style.width = '85px';
-      inputT.addEventListener('change', (function(idx) {
-        return function(e) { rowsData[idx].T = e.target.value; };
-      })(i));
-      tdT.appendChild(inputT);
-      tr.appendChild(tdT);
-      
-      // Δt (رقمي)
-      let tddt = createNumberInput(row.dt, i, 'dt');
-      tr.appendChild(tddt);
-      
-      // x
-      let tdx = createNumberInput(row.x, i, 'x');
-      tr.appendChild(tdx);
-      
-      // Δx
-      let tddx = createNumberInput(row.dx, i, 'dx');
-      tr.appendChild(tddx);
-      
-      // y
-      let tdy = createNumberInput(row.y, i, 'y');
-      tr.appendChild(tdy);
-      
-      // Δy
-      let tddy = createNumberInput(row.dy, i, 'dy');
-      tr.appendChild(tddy);
-      
-      // R
-      let tdR = createNumberInput(row.R, i, 'R');
-      tr.appendChild(tdR);
-      
-      // ΔR
-      let tddR = createNumberInput(row.dR, i, 'dR');
-      tr.appendChild(tddR);
-      
-      // رقم البيانات
-      let tdDataNum = createNumberInput(row.dataNum, i, 'dataNum');
-      tr.appendChild(tdDataNum);
-      
-      // السرعة V (معروضة محسوبة)
-      let tdV = document.createElement('td');
-      let spanV = document.createElement('span');
-      spanV.className = 'computed-cell';
-      spanV.id = `V_${i}`;
-      tdV.appendChild(spanV);
-      tr.appendChild(tdV);
-      
-      // ΔV
-      let tddV = document.createElement('td');
-      let spanDV = document.createElement('span');
-      spanDV.className = 'computed-cell';
-      spanDV.id = `dV_${i}`;
-      tddV.appendChild(spanDV);
-      tr.appendChild(tddV);
-      
-      // العجلة a
-      let tda = document.createElement('td');
-      let spanA = document.createElement('span');
-      spanA.className = 'computed-cell';
-      spanA.id = `a_${i}`;
-      tda.appendChild(spanA);
-      tr.appendChild(tda);
-      
-      // الزاوية θ
-      let tdTheta = document.createElement('td');
-      let spanTheta = document.createElement('span');
-      spanTheta.className = 'computed-cell';
-      spanTheta.id = `theta_${i}`;
-      tdTheta.appendChild(spanTheta);
-      tr.appendChild(tdTheta);
-      
-      tbody.appendChild(tr);
-    }
-    
-    // تحديث القيم المحسوبة بعد بناء الجدول
-    updateDisplayedValues();
-  }
-  
-  // مساعد لإنشاء خلية إدخال رقمي
   function createNumberInput(initialValue, rowIdx, fieldName) {
     const td = document.createElement('td');
     const input = document.createElement('input');
@@ -487,17 +520,16 @@
           let num = parseFloat(val);
           rowsData[idx][fld] = isNaN(num) ? NaN : num;
         }
-        recalcDerivedFields();       // إعادة حساب V, dV, a, theta
-        updateDisplayedValues();     // تحديث الخلايا المحسوبة
-        updateCharts();              // تحديث الرسوم البيانية
-        updateSummaryStats();        // تحديث الإحصائيات السريعة
+        recalcDerivedFields();
+        updateDisplayedValues();
+        updateCharts();
+        updateSummaryStats();
       };
     })(rowIdx, fieldName));
     td.appendChild(input);
     return td;
   }
-  
-  // تحديث الخلايا المعروضة للقيم المحسوبة (V, dV, a, theta)
+
   function updateDisplayedValues() {
     for (let i = 0; i < rowsData.length; i++) {
       const row = rowsData[i];
@@ -505,20 +537,90 @@
       const spanDV = document.getElementById(`dV_${i}`);
       const spanA = document.getElementById(`a_${i}`);
       const spanTheta = document.getElementById(`theta_${i}`);
-      
       if (spanV) spanV.innerText = (!isNaN(row.V) && isFinite(row.V)) ? row.V.toFixed(2) : '—';
       if (spanDV) spanDV.innerText = (!isNaN(row.dV) && isFinite(row.dV)) ? row.dV.toFixed(3) : '—';
       if (spanA) spanA.innerText = (!isNaN(row.a) && isFinite(row.a)) ? row.a.toFixed(4) : '—';
       if (spanTheta) spanTheta.innerText = (!isNaN(row.theta) && isFinite(row.theta)) ? row.theta.toFixed(1) + '°' : '—';
     }
   }
-  
-  // تحديث الرسم البياني للسرعة والزاوية
+
+  function buildTable() {
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tableBody');
+    if (!thead || !tbody) return;
+    const columns = [
+      "رقم المعاملة", "رقم النقطة", "التوقيت T", "Δt (ث)", "x (م)", "Δx (م)", "y (م)", "Δy (م)", "R (م)", "ΔR (م)", 
+      "رقم البيانات", "السرعة V (م/ث)", "ΔV (م/ث)", "العجلة a (م/ث²)", "الزاوية θ (°)"
+    ];
+    thead.innerHTML = '';
+    let headerRow = document.createElement('tr');
+    columns.forEach(col => {
+      let th = document.createElement('th');
+      th.innerText = col;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    tbody.innerHTML = '';
+    for (let i = 0; i < rowsData.length; i++) {
+      const row = rowsData[i];
+      const tr = document.createElement('tr');
+      let td1 = document.createElement('td');
+      td1.innerText = i+1;
+      tr.appendChild(td1);
+      let tdPoint = document.createElement('td');
+      tdPoint.innerText = row.pointNum;
+      tr.appendChild(tdPoint);
+      let tdT = document.createElement('td');
+      let inputT = document.createElement('input');
+      inputT.type = 'text';
+      inputT.value = row.T;
+      inputT.style.width = '85px';
+      inputT.addEventListener('change', (function(idx) {
+        return function(e) { rowsData[idx].T = e.target.value; };
+      })(i));
+      tdT.appendChild(inputT);
+      tr.appendChild(tdT);
+      tr.appendChild(createNumberInput(row.dt, i, 'dt'));
+      tr.appendChild(createNumberInput(row.x, i, 'x'));
+      tr.appendChild(createNumberInput(row.dx, i, 'dx'));
+      tr.appendChild(createNumberInput(row.y, i, 'y'));
+      tr.appendChild(createNumberInput(row.dy, i, 'dy'));
+      tr.appendChild(createNumberInput(row.R, i, 'R'));
+      tr.appendChild(createNumberInput(row.dR, i, 'dR'));
+      tr.appendChild(createNumberInput(row.dataNum, i, 'dataNum'));
+      let tdV = document.createElement('td');
+      let spanV = document.createElement('span');
+      spanV.className = 'computed-cell';
+      spanV.id = `V_${i}`;
+      tdV.appendChild(spanV);
+      tr.appendChild(tdV);
+      let tddV = document.createElement('td');
+      let spanDV = document.createElement('span');
+      spanDV.className = 'computed-cell';
+      spanDV.id = `dV_${i}`;
+      tddV.appendChild(spanDV);
+      tr.appendChild(tddV);
+      let tda = document.createElement('td');
+      let spanA = document.createElement('span');
+      spanA.className = 'computed-cell';
+      spanA.id = `a_${i}`;
+      tda.appendChild(spanA);
+      tr.appendChild(tda);
+      let tdTheta = document.createElement('td');
+      let spanTheta = document.createElement('span');
+      spanTheta.className = 'computed-cell';
+      spanTheta.id = `theta_${i}`;
+      tdTheta.appendChild(spanTheta);
+      tr.appendChild(tdTheta);
+      tbody.appendChild(tr);
+    }
+    updateDisplayedValues();
+  }
+
   function updateCharts() {
     const labels = rowsData.map((_, idx) => `نقطة ${idx+1}`);
     const speeds = rowsData.map(r => (!isNaN(r.V) && isFinite(r.V)) ? r.V : null);
     const angles = rowsData.map(r => (!isNaN(r.theta) && isFinite(r.theta)) ? r.theta : null);
-    
     if (speedChart) {
       speedChart.data.datasets[0].data = speeds;
       speedChart.update();
@@ -528,15 +630,14 @@
       angleChart.update();
     }
   }
-  
-  // إحصائيات سريعة (أقصى سرعة، متوسط العجلة)
+
   function updateSummaryStats() {
     const speeds = rowsData.map(r => r.V).filter(v => !isNaN(v) && isFinite(v));
     const maxSpeed = speeds.length ? Math.max(...speeds).toFixed(2) : '—';
     const avgAcc = rowsData.map(r => r.a).filter(a => !isNaN(a) && isFinite(a)).reduce((s,val)=>s+val,0);
-    const avgAccVal = (rowsData.filter(r=>!isNaN(r.a)).length) ? (avgAcc / rowsData.filter(r=>!isNaN(r.a)).length).toFixed(4) : '—';
+    const validAccCount = rowsData.filter(r=>!isNaN(r.a)).length;
+    const avgAccVal = validAccCount ? (avgAcc / validAccCount).toFixed(4) : '—';
     const lastTheta = (!isNaN(rowsData[rowsData.length-1].theta)) ? rowsData[rowsData.length-1].theta.toFixed(1)+'°' : '—';
-    
     const container = document.getElementById('summaryStats');
     if (container) {
       container.innerHTML = `
@@ -547,25 +648,23 @@
       `;
     }
   }
-  
-  // استعادة البيانات الأصلية
+
   function resetData() {
     rowsData = INITIAL_ROWS.map(row => ({ ...row }));
     recalcDerivedFields();
-    // إعادة بناء الجدول بالكامل لتحديث حقول الإدخال
     buildTable();
     updateCharts();
     updateSummaryStats();
   }
-  
-  // تهيئة الرسوم البيانية
+
   function initCharts() {
     const ctxSpeed = document.getElementById('speedChart').getContext('2d');
     const ctxAngle = document.getElementById('angleChart').getContext('2d');
     const labels = rowsData.map((_, idx) => `نقطة ${idx+1}`);
     const speeds = rowsData.map(r => (!isNaN(r.V) && isFinite(r.V)) ? r.V : null);
     const angles = rowsData.map(r => (!isNaN(r.theta) && isFinite(r.theta)) ? r.theta : null);
-    
+    if (speedChart) speedChart.destroy();
+    if (angleChart) angleChart.destroy();
     speedChart = new Chart(ctxSpeed, {
       type: 'line',
       data: {
@@ -595,7 +694,6 @@
         }
       }
     });
-    
     angleChart = new Chart(ctxAngle, {
       type: 'line',
       data: {
@@ -626,8 +724,7 @@
       }
     });
   }
-  
-  // الوضع الليلي
+
   function setupTheme() {
     const stored = localStorage.getItem('theme');
     const isDark = stored === 'dark';
@@ -639,26 +736,23 @@
       const darkNow = document.body.classList.contains('dark');
       localStorage.setItem('theme', darkNow ? 'dark' : 'light');
       btn.innerText = darkNow ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
-      // إعادة تحديث الرسوم البيانية لتغيير ألوان المحاور (إعادة إنشاء بسيطة)
       if (speedChart) speedChart.destroy();
       if (angleChart) angleChart.destroy();
       initCharts();
-      updateCharts(); // تحديث البيانات
+      updateCharts();
     });
   }
-  
-  // ربط أزرار التحكم
+
+  // --- بدء التشغيل ---
+  recalcDerivedFields();
+  buildTable();
+  initCharts();
+  updateSummaryStats();
+  setupTheme();
+  buildQuizUI();         // إنشاء أسئلة الاختبار
+  const showBtn = document.getElementById('showAnswersBtn');
+  if (showBtn) showBtn.addEventListener('click', showCorrectAnswers);
   document.getElementById('resetDataBtn')?.addEventListener('click', resetData);
-  
-  // البدء
-  recalcDerivedFields();   // حساب أولي بناءً على البيانات المدخلة
-  buildTable();            // إنشاء الجدول مع حقول editable
-  initCharts();            // إنشاء الرسوم البيانية
-  updateSummaryStats();    // عرض إحصائيات
-  setupTheme();            // الثيم
-  
-  // إضافة مستمع إضافي لأي تغيير على الجدول عبر التحديث اليدوي (بعض الحقول قد لا تطلق الحدث)
-  // لكن لدينا مستمعات input لكل حقل، وسيتم تحديث كامل.
 </script>
 </body>
 </html>
