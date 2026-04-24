@@ -7,22 +7,14 @@
   <h2>Testing API Response...</h2>
 
   <script>
-    async function test() {
-      try {
-        const res = await fetch("https://agents.hostinger.com/api/agents-backend/api/users/me/credits", {
-          method: "GET",
-          credentials: "include"
-        });
-
-        const data = await res.text();
-
-        document.body.innerHTML =
-          "<h3>API Response:</h3><pre>" + data + "</pre>";
-
-      } catch (e) {
-        document.body.innerHTML = "Error: " + e;
-      }
-    }
+   fetch("https://agents.hostinger.com/api/message-hub/api/v1/chat/respond", {
+  method: "POST",
+  credentials: "include",
+  headers: {"Content-Type":"application/json"},
+  body: JSON.stringify({message:"test"})
+})
+.then(r => r.text())
+.then(console.log)
 
     test();
   </script>
